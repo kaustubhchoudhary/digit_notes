@@ -1,0 +1,12 @@
+
+Subjective Assignment.
+
+1. 
+State the differences between yield and return.
+Why are we not using return instead of yield.
+Some code samples to demonstrate the differences between the two.
+
+2. 
+Tell the proper behavior of nextLine(), next() of Scanner class
+
+3. Why does the repeated opening and closing of Scanner throws NoSuchElementException?

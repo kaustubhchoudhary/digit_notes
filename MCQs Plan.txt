@@ -1,0 +1,107 @@
+Final Assessment Plan
+=====================
+
+MCQs
+
+| ---------------- | ----------------------------------------------------------------- |
+| Assessment       | Topics                                                            |
+| ---------------- | ----------------------------------------------------------------- |
+| MCQ Test 1       | Core Java Basics                                                  |
+| MCQ Test 2       | Core Java Advanced, Enums, Sealed Classes, Records                |
+| MCQ Test 3       | Git, RDBMS, SQL, PostgreSQL, JDBC                                 |
+| MCQ Test 4       | Advanced Java, Spring Core, Spring AOP                            |
+| MCQ Test 5       | Spring Boot, Web Services, APIs, Spring Data JPA, Spring Security |
+| MCQ Test 6       | Complete Course + DevOps (Final Assessment)                       |
+| ---------------- | ----------------------------------------------------------------- |
+
+
+### Assessment Guidelines
+
+* Total Questions: **50**
+* Duration: **45 Minutes** (May change according to question level)
+* Marks per Question: **1**
+* Maximum Marks: **50**
+* **No Negative Marking**
+
+---
+
+## Test 1 – Core Java Basics
+
+Topics:
+
+* Java Basics
+* Encapsulation
+* Association
+* Inheritance
+* Polymorphism
+* Abstraction
+* Data Protection
+* Java Library
+* Interface Basics
+
+---
+
+## Test 2 – Core Java Advanced
+
+Topics:
+
+* Exception Handling
+* Generics
+* Functional Programming
+* Collections
+* Streams API
+* Multithreading
+* Design Patterns
+
+---
+
+## Test 3 – Database & Version Control
+
+Topics:
+
+* Git
+* SQL
+* RDBMS
+* JDBC
+* Revision
+
+---
+
+## Test 4 – Enterprise Java
+
+Topics:
+
+* Advanced Java
+* Spring Core
+* Spring AOP
+* Revision
+
+---
+
+## Test 5 – Spring Boot Web Services
+
+Topics:
+
+* HTTP Protocol
+* REST
+* Web Services
+* API Design Principles
+* Spring Boot
+* Spring Data JPA
+* Spring Security
+* Revision
+
+---
+
+## Test 6 – Full Revision + Devops
+
+| Section                          | Questions |
+| -------------------------------- | --------- |
+| Core Java (Basics + Advanced)    |        15 |
+| SQL + PostgreSQL + Git           |         8 |
+| Spring Core + Spring Boot        |         8 |
+| REST APIs + HTTP + API Design    |         7 |
+| Spring Data JPA + AOP + Security |         7 |
+| DevOps & Deployment              |         5 |
+| -------------------------------------------- |
+| **Total**                        |    **50** |
