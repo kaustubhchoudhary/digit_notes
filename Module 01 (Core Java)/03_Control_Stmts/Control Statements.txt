@@ -1,0 +1,456 @@
+Control Statements
+==================
+There are 3 types of control statements:
+1. Decision Control statements
+2. Repetition statements
+3. Jump statements
+
+Decision Control statements
+----------------------------
+There are 2 Decision Control statements:
+1. if - else
+2. switch-case-default
+
+☕ Types of if–else Statements
+
+Java provides several ways to perform decision making based on conditions.
+
+---
+
+🔹 1. Single `if` Statement
+
+➤ Syntax
+
+```java
+if (condition) {
+    // code executes only if condition is true
+}
+```
+
+➤ Example
+
+```java
+int age = 20;
+if (age >= 18) {
+    System.out.println("Eligible to vote");
+}
+```
+
+Pros
+
+* Simple and readable
+* Good for one-way decisions
+
+Cons
+
+* No “else” — nothing happens when condition is false
+
+---
+
+🔹 2. if–else Statement
+
+➤ Syntax
+
+```java
+if (condition) {
+    // executes if true
+} else {
+    // executes if false
+}
+```
+
+➤ Example
+
+```java
+int marks = 45;
+if (marks >= 40) {
+    System.out.println("Pass");
+} else {
+    System.out.println("Fail");
+}
+```
+
+Pros
+
+* Handles both true and false outcomes
+* Clear control flow
+
+Cons
+
+* Only handles two conditions (true/false)
+* Not ideal when you have many choices
+
+---
+
+🔹 3. if–else–if Ladder
+
+➤ Syntax
+
+```java
+if (condition1) {
+    // block 1
+} else if (condition2) {
+    // block 2
+} else if (condition3) {
+    // block 3
+} else {
+    // default block
+}
+```
+
+➤ Example
+
+```java
+int score = 85;
+if (score >= 90) {
+    System.out.println("A Grade");
+} else if (score >= 75) {
+    System.out.println("B Grade");
+} else if (score >= 60) {
+    System.out.println("C Grade");
+} else {
+    System.out.println("Fail");
+}
+```
+
+Pros
+
+* Can check multiple conditions sequentially
+* Executes only one matching block
+
+Cons
+
+* Order-sensitive
+* Can get lengthy and hard to read
+* Better replaced by switch for discrete values
+
+---
+
+🔹 4. Multiple Independent ifs
+
+➤ Syntax
+
+```java
+if (condition1) {
+    // may execute
+}
+if (condition2) {
+    // may also execute
+}
+```
+
+➤ Example
+
+```java
+int num = 12;
+if (num % 2 == 0) {
+    System.out.println("Even");
+}
+if (num % 3 == 0) {
+    System.out.println("Divisible by 3");
+}
+```
+
+Pros
+
+* All true conditions can execute
+* Useful when conditions are not related
+
+Cons
+
+* Each condition checked separately (less efficient if many)
+* Can lead to redundant checks
+
+---
+
+🔹 5. Nested if–else Statement
+
+When an `if` statement is written inside another if or else block, it’s called a nested if–else.
+Used when one condition depends on another.
+
+---
+
+➤ Syntax
+
+```java
+if (condition1) {
+    if (condition2) {
+        // executes if both condition1 and condition2 are true
+    } else {
+        // executes if condition1 true, condition2 false
+    }
+} else {
+    // executes if condition1 is false
+}
+```
+
+---
+
+➤ Example
+
+```java
+int age = 25;
+boolean hasLicense = true;
+
+if (age >= 18) {
+    if (hasLicense) {
+        System.out.println("You can drive");
+    } else {
+        System.out.println("Get a license first");
+    }
+} else {
+    System.out.println("You are underage");
+}
+```
+
+---
+
+Pros
+
+* Good for hierarchical checks (one condition inside another)
+* Adds clarity when one condition logically depends on another
+
+Cons
+
+* Becomes hard to read with deep nesting
+* Can be replaced by logical operators (`&&`, `||`) for simplicity
+
+Example replacement:
+
+```java
+if (age >= 18 && hasLicense) {
+    System.out.println("You can drive");
+}
+```
+
+---
+
+☕ Switch Statement
+
+The `switch` statement is a cleaner alternative to long if–else–if ladders
+when you need to compare the same variable with multiple values.
+
+---
+
+🔹 1. Traditional Switch (Before Java 12)
+
+➤ Syntax
+
+```java
+switch (expression) {
+    case value1:
+        // code block
+        break;
+    case value2:
+        // code block
+        break;
+    default:
+        // default block
+}
+```
+
+➤ Example
+
+```java
+int day = 3;
+switch (day) {
+    case 1:
+        System.out.println("Monday");
+        break;
+    case 2:
+        System.out.println("Tuesday");
+        break;
+    case 3:
+        System.out.println("Wednesday");
+        break;
+    default:
+        System.out.println("Invalid day");
+}
+```
+
+---
+
+Pros
+
+* Cleaner than multiple `if–else`
+* Easy to read for fixed constant comparisons
+
+Cons
+
+* Must remember to use `break`
+* Works only with byte, short, int, char, enum, String
+* No return value (only statements)
+
+=> Fall-through Behavior
+
+If you forget `break`, the control “falls through” to the next case — sometimes useful, sometimes a bug.
+
+➤ Example
+
+```java
+int num = 2;
+switch (num) {
+    case 1:
+    case 2:
+    case 3:
+        System.out.println("Small number");
+        break;
+    default:
+        System.out.println("Large number");
+}
+```
+
+Useful when multiple cases need the same logic.
+
+But can cause errors if `break` is accidentally missed.
+
+---
+
+🔹 2. Enhanced Switch Expression (Java 12+, Finalized in Java 14)
+
+Introduced arrow syntax (→) and allowed switch to return a value
+— much cleaner and safer ✅
+
+---
+
+➤ Example
+
+```java
+int day = 3;
+String result = switch (day) {
+    case 1 -> "Monday";
+    case 2 -> "Tuesday";
+    case 3 -> "Wednesday";
+    default -> "Invalid";
+};
+System.out.println(result);
+```
+
+---
+
+Pros
+
+* No `break` needed 🚫
+* Each case returns a value directly
+* Can assign result to a variable
+* Prevents fall-through bugs
+
+Cons
+
+* Available only in Java 14+
+* Each case can only execute one statement, unless you use `yield`
+
+---
+
+🔹 3. Multiple Labels (Java 14+)
+
+Combine several case values using commas.
+
+➤ Example
+
+```java
+String type = switch (day) {
+    case 1, 2, 3, 4, 5 -> "Weekday";
+    case 6, 7 -> "Weekend";
+    default -> "Invalid";
+};
+```
+
+Reduces repetitive code.
+
+---
+
+🔹 4. `yield` Keyword (for multi-line logic)
+
+When a case needs more than one statement, use `yield` to return a value.
+
+➤ Example
+
+```java
+int marks = 75;
+String grade = switch (marks / 10) {
+    case 10, 9 -> "A";
+    case 8 -> "B";
+    case 7 -> {
+        System.out.println("Decent score");
+        yield "C";
+    }
+    default -> "Fail";
+};
+```
+
+---
+
+🧠 Summary Table
+
+| Feature          | Traditional Switch     | Enhanced Switch |
+| ---------------- | ---------------------- | --------------- |
+| Break needed     | Yes                    | No              |
+| Fall-through     | Yes                    | No              |
+| Returns value    | No                     | Yes             |
+| Multiple labels  | Yes (14+)              | Yes             |
+| Multi-line logic | `break` or nested code | yield           |
+| Simplicity       | Medium                 | High            |
+
+---
+
+Repetition statements/Loops
+===========================
+There are 5 Repetition statements:
+1. while
+2. do-while
+3. for
+4. Enhanced for
+5. forEach
+
+While
+-----
+intialization;
+while(condition){
+	inc/dec;
+}
+
+Do-while
+--------
+intialization;
+do {
+	inc/dec;
+}while(condition);
+
+for
+---
+for(intialization;condition;inc/dec){
+
+}
+
+Enhanced for
+------------
+It is used in Arrays and Collection Framework.
+
+Ex:
+int[] numbers = {1,2,3,4};
+for(int n : numbers){
+	process n...
+}
+
+for-each 
+--------
+It is also used in Arrays & Collection Framework and it uses Lambdas.
+List<Integer> numbers = List.of(1,2,3,4);
+numbers.forEach(System.out::print)
+
+Jump Statements
+===============
+There are 3 jump statements:
+1. break
+- breaks the innermost enclosing loop by default
+- we can make it break any other enclosing loop with labels
+
+2. continue
+- skips rest of the part of enclosing loop
+- we can make it skip any other enclosing loop with labels
+
+3. return : finishes the method, returns a value
+
+If a method is returning something, only then it can be used in an expression
+-----X-----X-----X-----X-----

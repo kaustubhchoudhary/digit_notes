@@ -1,0 +1,220 @@
+
+# IntelliJ IDEA Notes
+
+---
+
+# 1. Increase Font Size
+
+## A. Editor Font Size (Java Code)
+
+Navigate to:
+
+```text
+File
+    → Settings
+        → Editor
+            → Font
+```
+
+Recommended:
+
+* Font Size: **18–20**
+* Line Height: **1.2** (Optional)
+
+---
+
+## B. Console Font Size
+
+Navigate to:
+
+```text
+File
+    → Settings
+        → Editor
+            → Color Scheme
+                → Console Font
+```
+
+Recommended:
+
+* Font Size: **18–20**
+
+> If "Use editor font instead of the default" is enabled, the console automatically uses the editor font.
+
+---
+
+## C. Project Explorer (UI Font)
+
+Navigate to:
+
+```text
+File
+    → Settings
+        → Appearance & Behavior
+            → Appearance
+```
+
+Enable:
+
+```text
+✓ Override default fonts
+```
+
+Recommended:
+
+* UI Font Size: **15–16**
+
+This changes the font size of:
+
+* Project Explorer
+* Menus
+* Tool Windows
+* Terminal Tabs
+
+---
+
+## D. Terminal Font Size
+
+Navigate to:
+
+```text
+File
+    → Settings
+        → Tools
+            → Terminal
+```
+
+Recommended:
+
+* Font Size: **18–20**
+
+---
+
+## E. Mouse Zoom (Highly Recommended)
+
+Navigate to:
+
+```text
+File
+    → Settings
+        → Editor
+            → General
+```
+
+Enable:
+
+```text
+✓ Change font size with Ctrl + Mouse Wheel
+```
+
+Useful while teaching on a projector.
+
+---
+
+# 2. Frequently Used IntelliJ Shortcuts
+
+## Navigation
+
+| Action                                     | Shortcut                   |
+| ------------------------------------------ | -------------------------- |
+| Search Everywhere                          | **Shift** (Press Twice)    |
+| Find Class                                 | **Ctrl + N**               |
+| Find File                                  | **Ctrl + Shift + N**       |
+| Find Symbol (Method/Variable/Class Member) | **Ctrl + Alt + Shift + N** |
+| Recent Files                               | **Ctrl + E**               |
+| Recent Locations                           | **Ctrl + Shift + E**       |
+| Go to Declaration                          | **Ctrl + B**               |
+| Navigate Back                              | **Ctrl + Alt + Left**      |
+| Navigate Forward                           | **Ctrl + Alt + Right**     |
+
+---
+
+## Editing
+
+| Action                       | Shortcut               |
+| ---------------------------- | ---------------------- |
+| Duplicate Line               | **Ctrl + D**           |
+| Delete Line                  | **Ctrl + Y**           |
+| Move Line Up                 | **Alt + Shift + Up**   |
+| Move Line Down               | **Alt + Shift + Down** |
+| Comment / Uncomment          | **Ctrl + /**           |
+| Block Comment                | **Ctrl + Shift + /**   |
+| Format Code                  | **Ctrl + Alt + L**     |
+| Optimize Imports             | **Ctrl + Alt + O**     |
+| Rename Variable/Class/Method | **Shift + F6**         |
+| Find & Replace               | **Ctrl + R**           |
+| Select Next Occurrence       | **Alt + J**            |
+
+---
+
+## Code Assistance
+
+| Action                                            | Shortcut                 |
+| ------------------------------------------------- | ------------------------ |
+| Code Completion                                   | **Ctrl + Space**         |
+| Smart Completion                                  | **Ctrl + Shift + Space** |
+| Quick Fix / Suggestions                           | **Alt + Enter**          |
+| Generate Code (Constructor, Getter, Setter, etc.) | **Alt + Insert**         |
+| Override Methods                                  | **Ctrl + O**             |
+| Implement Methods                                 | **Ctrl + I**             |
+
+---
+
+## Search
+
+| Action                  | Shortcut             |
+| ----------------------- | -------------------- |
+| Find in Current File    | **Ctrl + F**         |
+| Find in Entire Project  | **Ctrl + Shift + F** |
+| Replace in Current File | **Ctrl + R**         |
+| Replace in Project      | **Ctrl + Shift + R** |
+
+---
+
+## Running
+
+| Action | Shortcut        |
+| ------ | --------------- |
+| Run    | **Shift + F10** |
+| Debug  | **Shift + F9**  |
+| Stop   | **Ctrl + F2**   |
+| Rerun  | **Ctrl + F5**   |
+
+---
+
+# 3. Debugging Shortcuts
+
+| Action              | Shortcut       |
+| ------------------- | -------------- |
+| Toggle Breakpoint   | **Ctrl + F8**  |
+| Step Over           | **F8**         |
+| Step Into           | **F7**         |
+| Step Out            | **Shift + F8** |
+| Resume Program      | **F9**         |
+| Evaluate Expression | **Alt + F8**   |
+
+---
+
+# 4. Essential Shortcuts for a Java Trainer
+
+These are the shortcuts you'll use repeatedly during live sessions:
+
+* **Shift + Shift** → Search Everything
+* **Ctrl + N** → Find Class
+* **Ctrl + Shift + N** → Find File
+* **Ctrl + Alt + Shift + N** → Find Method / Variable / Symbol
+* **Ctrl + D** → Duplicate Line
+* **Ctrl + Y** → Delete Line
+* **Ctrl + /** → Comment / Uncomment
+* **Ctrl + Alt + L** → Format Code
+* **Shift + F6** → Rename
+* **Alt + Enter** → Quick Fix
+* **Alt + Insert** → Generate Constructor / Getter / Setter
+* **Shift + F10** → Run
+* **Shift + F9** → Debug
+* **Ctrl + F8** → Toggle Breakpoint
+* **F8** → Step Over
+* **F7** → Step Into
+* **F9** → Resume Program
+
+---
