@@ -1,0 +1,62 @@
+📘 Assignment: Employee JSON Parser
+
+Given the following JSON data stored as a Text Block:
+
+```java
+String employeeJson = """
+{
+    "id": 101,
+    "name": "Akshay Mehta",
+    "basicSalary": 60000,
+    "hra": 12000,
+    "bonus": 5000,
+    "married": true,
+    "dateOfBirth": "2002-03-15"
+}
+""";
+```
+
+### Create an `Employee` class with the following fields:
+
+* `int id`
+* `String name`
+* `double basicSalary`
+* `double hra`
+* `double bonus`
+* `double totalSalary`
+* `boolean married`
+* `LocalDate dateOfBirth`
+* `int age`
+
+### Tasks
+
+1. Parse the JSON without using any JSON library (use only String methods).
+2. Store the extracted values in an `Employee` object.
+3. Use appropriate Wrapper Classes to convert the values.
+4. Convert the dates using `LocalDate.parse()`.
+5. Calculate the employee's Age using `Period.between()`.
+6. Calculate the Total Salary as:
+
+```text
+Total Salary = Basic Salary + HRA + Bonus
+```
+
+7. Use StringBuilder to generate and display a formatted Employee Report.
+
+Output:
+
+Employee ID      : 101
+Employee Name    : Akshay Mehta
+Married          : false
+
+Basic Salary     : 60,000.00
+HRA              : 12,000.00
+Bonus            : 5,000.00
+----------------------------------------
+Total Salary     : 77,000.00
+
+Date of Birth    : 2002-03-15
+Current Date     : 2026-07-23
+Employee Age     : 24 Years, 4 Months, 8 Days
+
+========================================

@@ -1,0 +1,135 @@
+Java Library (contd)
+====================
+String Handling
+===============
+Inorder to handle String data type, we have 3 main classes:
+1. String class
+2. StringBuilder class
+3. StringBuffer class
+
+Many Helper classes:
+1. StringJoiner
+2. StringTokenizer
+3. etc
+
+String 
+======
+1. Strings are Immutable for memory conservation.
+2. + operator is the only operator that is overloaded for String
+3. We can directly assign a value to String type: String name = "Sachin";
+
+Note: 
+- Any sequence of characters enclosed within double quotes is by default of type String.
+For ex: System.out.println("Hello Java");
+Here the type of "Hello Java" is string.
+
+- We can call any String class methods on a String literal
+Ex 1: "Hello Java".substring(6) will return "Java"
+Ex 2: "Hello Java".length() will return 10
+
+String v/s StringBuilder v/s StringBuffer
+=========================================
+If we modify a String in any way, it will create a new String object. 
+It is a bad practice to use String class for strings that require many manipulations.
+
+For multiple manipulation on strings, we use StringBuilder
+
+StringBuffer is thread safe, it should be used to create synchronized application
+
+String is used for simple data storage and data transfer
+
+How to use a method?
+--------------------
+Whenever we use any method, take into consideration following 4 things:
+1. What type and number of parameters we have to pass
+2. We should know the significance of parameters
+3. What the method returns
+4. The exception(s) that the method throws in case of wrong input
+
+Frequently used mathods for class String:
+
+1. length() - Returns the string's length.
+2. charAt(int index) - Retrieves character at specified index.
+3. substring(int beginIndex, int endIndex) - Extracts part of a string.
+4. indexOf(String str) - Finds index of substring occurrence.
+5. toLowerCase() - Converts string to lowercase characters.
+
+StringJoiner class
+==================
+- The StringJoiner class in Java is used to construct strings with a delimiter, a prefix, and a suffix.
+- It's initialized using the constructor:
+StringJoiner(CharSequence delimiter, CharSequence prefix, CharSequence suffix).
+- Strings are added using the add(CharSequence element) method.
+- Multiple StringJoiner instances can be merged using the merge(StringJoiner other) method.
+
+StringTokenizer class
+=====================
+- The StringTokenizer class in Java is used to break a string into tokens or parts based on a specified delimiter. 
+- It's initialized using the constructor StringTokenizer(String str, String delim).
+- It contains methods like nextToken(), countTokens(), split() to work with strings
+
+Wrapper Classes
+===============
+- Java, as we know, is primarily an object oriented language.
+- What it means is : it contains many classes and methods exclusively designed to support objects.
+- The existence of primitive types is not in accordance with the OOP philosophy.
+- For example: Collection framework does not work with primitive values
+	List<int> numbers will give CTE
+- In order to represent primitive types as objects, we use Wrapper classes.
+- We have 8 Wrapper classes, 1 each for each primitive type.
+
+Primitive type - Wrapper Type
+byte   - Byte
+short  - Short 
+int    - Integer
+long   - Long
+float  - Float
+double - Double
+bool   - Boolean
+char   - Character
+
+- We can type cast double to int in case of primitives, but we can't do it in case of objects as they are sibling classes.
+- The small to big hierarchy does not exist in Wrapper classes
+- All numerical classes extend the Number class and are siblings of each other
+- All wrapper classes are independent classes.
+
+Frequently used mathods for class Integer:
+
+1. parseInt(String s) - Converts string to integer value.
+2. valueOf(String s) - Returns wrapped object from string.
+3. intValue() - Converts object to primitive int.
+4. compareTo(Object o) - Compares two objects for order.
+
+Similar methods are there for other Wrapper classes.
+-----X-----X-----X-----X-----
+Date Time Classes
+=================
+- Before Java 8, we had java.util.Date and java.util.Calendar classes
+- In Java 8, new date/time classes were added in java.time package
+- Some of the most used classes are : 
+	- LocalDate
+	- LocalTime
+	- LocaldateTime
+	- Period
+	- Duration
+	
+- Some of the common methods of these classes are: now(), parse(), of(), compare(). equals()
+
+- The standard format used to represent dates is : "YYYY-MM-dd"
+- This format is known as ISO format
+
+Some frequently used methods of the LocalDate class:
+
+1. now() - Gets the current date.
+2. of(int year, int month, int day) - Creates a date with specified values.
+3. plusDays(long days) - Adds days to current date.
+4. minusMonths(long months) - Subtracts months from current date.
+5. isBefore(LocalDate otherDate) - Checks if date is before another.
+
+-----X-----X-----X-----X-----
+JDBC API
+========
+- The JDBC API consists of classes and interfaces used to connect and transact with the underlying database.
+- Ex: Connection, DriverManager, Statement, PreparedStatement, ResultSet
+- We will dig them up in JDBC.
+-----X-----X-----X-----X-----X-----

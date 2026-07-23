@@ -1,0 +1,343 @@
+
+# Static Variable Initialization in Java
+
+## What is a Static Variable?
+
+A **static variable** belongs to the **class**, not to individual objects. Only **one copy** of a static variable exists, and it is shared by all objects of the class.
+
+```java
+class Student {
+
+    static String college = "ABC College";
+}
+```
+
+---
+
+# When is a Static Variable Initialized?
+
+A static variable is initialized **when the class is initialized by the JVM**, which happens **at runtime**, before the class is used for the first time.
+
+> **Note:** Class initialization is different from class compilation. Compilation generates the `.class` file, whereas initialization occurs when the program is executed.
+
+---
+
+# Initialization Process
+
+Whenever a class is initialized, the JVM performs the following steps:
+
+```text
+.java File
+      │
+      ▼
+Compilation (javac)
+      │
+      ▼
+.class File
+      │
+      ▼
+Program Execution (java ClassName)
+      │
+      ▼
+Class is Loaded into Memory
+      │
+      ▼
+Memory is allocated for static variables
+      │
+      ▼
+Default values are assigned
+      │
+      ▼
+Explicit static variable initializers execute
+      │
+      ▼
+Static initialization blocks execute
+      │
+      ▼
+main() method executes
+```
+
+---
+
+# Step 1: Default Initialization
+
+Every static variable first receives a **default value** based on its data type.
+
+| Data Type       | Default Value |
+| --------------- | ------------- |
+| byte            | 0             |
+| short           | 0             |
+| int             | 0             |
+| long            | 0L            |
+| float           | 0.0f          |
+| double          | 0.0           |
+| char            | '\u0000'      |
+| boolean         | false         |
+| Reference Types | null          |
+
+Example:
+
+```java
+class Test {
+
+    static int x;
+
+    public static void main(String[] args) {
+        System.out.println(x);
+    }
+}
+```
+
+**Output**
+
+```text
+0
+```
+
+Explanation:
+
+* Memory is allocated for `x`.
+* JVM assigns the default value `0`.
+* Since there is no explicit initialization, `x` remains `0`.
+
+---
+
+# Step 2: Explicit Initialization
+
+A static variable may be assigned a value during declaration.
+
+```java
+class Test {
+
+    static int x = 100;
+
+    public static void main(String[] args) {
+        System.out.println(x);
+    }
+}
+```
+
+**Output**
+
+```text
+100
+```
+
+Initialization sequence:
+
+```text
+Memory Allocated
+      ↓
+x = 0        (Default Value)
+      ↓
+x = 100      (Explicit Initialization)
+```
+
+---
+
+# Step 3: Static Initialization Block
+
+A static block is executed immediately after static variable declarations are initialized.
+
+```java
+class Test {
+
+    static int x = 100;
+
+    static {
+        x = 200;
+    }
+
+    public static void main(String[] args) {
+        System.out.println(x);
+    }
+}
+```
+
+**Output**
+
+```text
+200
+```
+
+Initialization sequence:
+
+```text
+Memory Allocated
+      ↓
+x = 0
+      ↓
+x = 100
+      ↓
+Static Block Executes
+      ↓
+x = 200
+      ↓
+main()
+```
+
+---
+
+# Multiple Static Variables
+
+```java
+class Test {
+
+    static int x = 10;
+    static int y = 20;
+
+    public static void main(String[] args) {
+
+        System.out.println(x);
+        System.out.println(y);
+    }
+}
+```
+
+**Output**
+
+```text
+10
+20
+```
+
+Each static variable is initialized independently in the order of declaration.
+
+---
+
+# Multiple Static Blocks
+
+```java
+class Test {
+
+    static int x = 10;
+
+    static {
+        x += 5;
+    }
+
+    static {
+        x *= 2;
+    }
+
+    public static void main(String[] args) {
+        System.out.println(x);
+    }
+}
+```
+
+**Output**
+
+```text
+30
+```
+
+Execution order:
+
+```text
+x = 0
+      ↓
+x = 10
+      ↓
+First Static Block
+x = 15
+      ↓
+Second Static Block
+x = 30
+```
+
+---
+
+# Class Initialization Happens Only Once
+
+```java
+class Test {
+
+    static {
+        System.out.println("Static Block");
+    }
+
+    Test() {
+        System.out.println("Constructor");
+    }
+
+    public static void main(String[] args) {
+
+        new Test();
+        new Test();
+        new Test();
+    }
+}
+```
+
+**Output**
+
+```text
+Static Block
+Constructor
+Constructor
+Constructor
+```
+
+Explanation:
+
+* The static block executes **only once** because the class is initialized only once.
+* The constructor executes every time an object is created.
+
+---
+
+# Static Variable vs Instance Variable Initialization
+
+| Static Variable                         | Instance Variable                  |
+| --------------------------------------- | ---------------------------------- |
+| Belongs to the class                    | Belongs to an object               |
+| Memory allocated once                   | Memory allocated for every object  |
+| Initialized during class initialization | Initialized during object creation |
+| Shared by all objects                   | Each object has its own copy       |
+
+Example:
+
+```java
+class Test {
+
+    static int x;
+    int y;
+
+    public static void main(String[] args) {
+
+        Test t1 = new Test();
+        Test t2 = new Test();
+
+        t1.x = 100;
+        t1.y = 50;
+
+        System.out.println(t2.x);
+        System.out.println(t2.y);
+    }
+}
+```
+
+**Output**
+
+```text
+100
+0
+```
+
+Explanation:
+
+* `x` is shared by both objects.
+* `y` belongs to each object separately.
+
+---
+
+# Key Points
+
+* A static variable belongs to the **class**, not to an object.
+* Static variables are initialized **at runtime**, not during compilation.
+* Memory for static variables is allocated when the class is initialized by the JVM.
+* Every static variable first receives its **default value**.
+* Explicit initializers are executed next.
+* Static blocks execute after explicit static variable initialization.
+* Static initialization occurs **only once** during the lifetime of the class.
+* All objects share the same copy of a static variable.

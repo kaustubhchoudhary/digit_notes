@@ -1,0 +1,355 @@
+Java Library
+============
+Java is all about Classes and Objects.
+
+The Java Library contains a lot of predefined 
+	- classes
+	- interfaces
+	- enums
+	- methods
+	- variables
+
+There are 2 types of constructs that we will use:
+
+1. Pre-defined ones
+	- There are the many pre-defined classes in Java Library
+	- We have to learn to use them
+	- String, System, Math are predefined classes
+	
+	- print(), println(), pow() are predefined methods
+	
+	- out, in, PI are predefined variables
+	
+2. User-defined ones
+	- These are the classes that we as developers create
+	- We have to learn to create and use them
+	- Employee, Figure are user defined classes
+	- main() is the user-defined method
+	- number1, number2, area, circumference etc are user defined variables.
+
+Important predefined classes
+============================
+These are the frequently used classes in Java Library:
+1. Object class
+2. String Handling classes
+3. Wrapper classes
+4. Date/Time classes
+5. JDBC classes
+6. Exception handling classes
+7. File Handling classes
+8. Collection classes
+9. Network classes
+10. etc
+
+Object class
+============
+- Object class is the root of the Java class hierarchy.
+
+- Every class has Object as a superclass automatically.
+	1. Whenever we create any class, it implicitly extends the Object class
+	2. All the predefined class automatically extends the Object class
+	3. All the classes directly or indirectly extend the Object class
+
+- It contains following methods
+	- Object()
+	- clone()
+	- equals(Object)
+	- finalize()
+	- getClass()
+	- hashCode()
+	- notify()
+	- notifyAll()
+	- toString()
+	- wait()
+	- wait(long)
+	- wait(long, int)
+	- wait0(long)
+
+- All the methods of Object class are available for all its child classes
+- As Object class is the parent class of all classes, the methods that contain Object as a parameter can pass all class objects
+
+Object obj = new Figure();
+Object obj = new Student();
+Object obj = new Employee();
+Object obj = new Rectangle();
+
+If Object is a parameter, we can pass any object
+
+public boolean add(Object obj) {}
+		
+Student student = new Student();
+add(student);
+
+Employee emp1 = new Employee();
+add(emp1);
+
+instanceof
+==========
+- instanceof operator is used to test whether the object is an instance of the specified type (class or subclass or interface).
+- Whenever we create an instance, it is an instance of its own class and all its parent classes and interfaces.
+
+There are 3 things that can happen with `instanceof` operator
+1. It can return `true`
+2. It can return `false`
+3. It can give `Compile Time Error`
+
+✅ Returns true when
+- The object is not null, and
+- The object is an instance of:
+	- The specified class
+	- A subclass of the class
+	- A class that implements the specified interface
+
+❌ Returns false when
+- The object is null
+- The object does not belong to the specified type or its subclass/interface
+
+🛑 Compile-Time Error when
+- Occurs when there is no possibility of inheritance between the object reference and the type.
+
+Key points summary:
+
+| Scenario                              | Result                 |
+| ------------------------------------- | ---------------------- |
+| Object is `null`                      | `false`                |
+| Object is of the same type            | `true`                 |
+| Object is of a subtype                | `true`                 |
+| Object implements the interface       | `true`                 |
+| No inheritance/interface relationship | Compile-time error     |
+
+Ex:
+
+class Animal {}
+
+class Dog extends Animal {}
+
+class Cat extends Animal {}
+
+class Car {}  // Unrelated class
+
+public class InstanceOfDemo {
+    public static void main(String[] args) {
+        Animal a = new Dog();  // Upcasting: Dog as Animal
+
+        // ✅ 1. instanceof returns TRUE
+        System.out.println(a instanceof Dog);   // true — a is actually a Dog
+
+        // ❌ 2. instanceof returns FALSE
+        System.out.println(a instanceof Cat);   // false — Dog and Cat are siblings
+
+        // 🛑 3. Compile-time Error
+        // System.out.println(a instanceof Car); // ❌ Error — Animal and Car are unrelated
+    }
+}
+-----X-----X-----X-----
+Fully Qualified Name
+====================
+name of the package + name of the class
+Ex: ex01.object_class + Height => ex01.object_class.Height
+
+- We can have multiple classes in Java by the same name.
+Ex: java.sql.Date, java.util.Date
+- Class names are not unique
+- Fully Qualified names are unique
+
+getClass()
+----------
+getClass() returns the runtime class of this Object.
+
+Height h1 = new Height();
+
+System.out.println(h1.getClass()); // class ex01.object_class.Height
+System.out.println(h1.getClass().getName()); // ex01.object_class.Height
+
+Hashing
+-------
+Hashing is a mechanism to encrypt data.
+There are various hashing alogorithms available.
+Ex: MD5, SHA-256, SHA-512...
+
+Ex: 
+Hi   => 49f68a5c8493ec2c0bf489821c21fc3b
+H i  => 4afa9cbce065ea795f42922bf84cd0d6
+H    => 2510c39011c5be704182423e3a695e91
+
+hashCode()
+----------
+- It returns a hash code value for the object.
+- This hash code is a unique `integer` used to identify an object in memory
+- hashCode represents a memory address-based identity
+- This hash code uniquely identifies and locate an object in memory, or in data structures like hash-based collections.
+
+📌 Purpose
+- Mainly used in hash-based collections like:
+	- HashMap
+	- HashSet
+	- Hashtable
+	
+Signature: public native int hashCode();
+
+It’s a native method, so its implementation is in C/C++ (not Java).
+
+It typically returns a value derived from the object's memory address (though not exactly the raw address).
+
+The returned int is *unique per object*.
+
+toString()
+----------
+- Whenever we write an object inside print() method, it implicitly calls the toString() of object class.
+
+System.out.println(product);
+means
+System.out.println(product.toString());
+
+- toString() returns : fully qualified name of the class + @ + Hexadecimal String 
+
+* Hexadecimal string is obtained by converting hash code of the object to hex.
+
+Data Representation
+===================
+class Student {
+    int id;
+    String name;
+    String[] subjects;
+}
+
+Object Representation
+---------------------
+String[] subjects = {"Math", "Science", "History"};
+Student student = new Student(1, "Alice", subjects);
+
+String Represenation
+--------------------
+Student ID: 1, Name: Alice, Subjects: Math, Science, History
+
+JSON Representation
+--------------------
+{
+    "id": 1,
+    "name": "Alice",
+    "subjects": ["Math", "Science", "History"]
+}
+
+XML Represenation
+-----------------
+<Student>
+    <id>1</id>
+    <name>Alice</name>
+    <subjects>
+        <subject>Math</subject>
+        <subject>Science</subject>
+        <subject>History</subject>
+    </subjects>
+</Student>
+
+equals
+======
+Shallow Comparison
+------------------
+- Whenever we compare the references, its known as Shallow comparison
+- In Shallow Comparison we compare the adresses of objects
+Ex: Height h1 = new Height(5, 10), Height h2 = new Height(5, 10)
+
+- The equal to operator (==) does shallow comparison
+Ex: h1 == h2 will return false
+
+- The default implementation of equals() also does shallow comparison
+Ex: h1.equals(h2) will return false
+
+Deep Comparison
+---------------
+- When we compare the values in object fields, it is deep comparison. 
+- We can override equals() in Object class to do deep comparison
+-----X-----X-----X-----
+equals and hashCode
+-------------------
+We should override `hashCode()` only when we override `equals()` — to maintain correct behavior in hash-based collections like `HashMap`, `HashSet`, etc.
+
+❓ If Object’s `hashCode()` is already there, why override it?
+
+---
+
+🔍 Why override `hashCode()`
+
+1. ✅ To maintain the contract between `equals()` and `hashCode()`
+
+> Contract Rule:
+	> If two objects are equal according to `equals()`, they must have the same `hashCode()`.
+	> If you break this, your object will misbehave in collections.
+
+---
+
+2. 🛑 Default `hashCode()` breaks logical equality
+
+* Default `hashCode()` (from `Object`) is based on identity, not content.
+* So even if two objects look the same, they get different hash codes if not overridden.
+
+#🔁 Example:
+
+class Person {
+    int id;
+    String name;
+
+    public Person(int id, String name) {
+        this.id = id;
+        this.name = name;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        Person p = (Person) o;
+        return this.id == p.id && this.name.equals(p.name);
+    }
+
+    // ⚠ No hashCode() override!
+}
+```
+
+#Now:
+
+```java
+Person p1 = new Person(1, "Ram");
+Person p2 = new Person(1, "Ram");
+
+System.out.println(p1.equals(p2));       // ✅ true
+System.out.println(p1.hashCode());       // ❌ different
+System.out.println(p2.hashCode());       // ❌ different
+
+Set<Person> set = new HashSet<>();
+set.add(p1);
+set.add(p2); // Won't be detected as duplicate!
+System.out.println(set.size()); // ❌ 2 (should be 1)
+```
+
+---
+
+✅ Fix: Override `hashCode()` along with `equals()`
+
+```java
+@Override
+public int hashCode() {
+    return Objects.hash(id, name);
+}
+```
+
+Now:
+
+* `equals()` is true ✅
+* `hashCode()` is same ✅
+* `HashSet`, `HashMap` work correctly ✅
+
+---
+
+🧠 In short:
+
+| Condition                     | Should Override hashCode()? |
+| ----------------------------- | --------------------------- |
+| Only using `Object` methods   | ❌ No                        |
+| Overriding `equals()`         | ✅ Yes (always)              |
+| Using object in `HashSet/Map` | ✅ Yes (to avoid issues)     |
+
+-----X-----X-----X-----X-----
+Passing and Returning Objects
+-----------------------------
+Ex: Height totalHeight = h1.add(h2)
+-----X-----X-----X-----X-----X-----
