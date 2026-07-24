@@ -1,0 +1,64 @@
+Errors
+======
+What is Error?
+=> Represents serious system-level issues that are not meant to be handled.
+=> Usually thrown by the JVM, not user code.
+
+Examples:
+	OutOfMemoryError
+	StackOverflowError
+	InternalError
+
+Why Not Catch Error?
+
+-----------------------------------------------------------------------------
+Reason	                   | Explanation                                    |
+-----------------------------------------------------------------------------
+Not Recoverable	           | JVM is in a broken state — application can't recover safely.
+May Hide Critical Failures | Catching it might delay or mask serious system issues.
+Unsafe Continuation	       | Continuing after an Error can lead to data loss or corruption.
+Cleanup Risk	           | You may skip or corrupt proper cleanup (resources, txns).
+----------------------------------------------------------------------------------
+
+Then Why Is It Catchable?
+=> Java allows catching Error because all throwables are catchable.
+
+Rare use cases:
+
+=> Logging fatal crashes before exit.
+=> Emergency cleanup (e.g., closing open files or DB connections).
+
+| **Rule**                       | **Recommendation** |
+| ------------------------------ | ------------------ |
+| Catch `Exception`              | ✅ Yes             |
+| Catch `Error`                  | ❌ No (Avoid it)   |
+| Catch `Throwable` (base class) | ⚠️ Risky – Avoid   |
+
+🧠 Real-Life Analogy
+Trying to catch an Error is like trying to fix a car engine explosion with duct tape — not meant to be fixed at that level.
+
+Why not catch Throwable?
+=> Throwable is the root of all errors and exceptions
+
+Throwable
+├── Exception  → Recoverable issues (can be handled)
+└── Error      → Serious system failures (should not be handled)
+
+=> When you catch Throwable, you are catching both:
+	=> Exception (like IOException, NullPointerException)
+	=> Error (like OutOfMemoryError, StackOverflowError)
+
+⚠️ Problems with Catching Throwable
+| Reason              | Explanation                            |
+| --------------------| -------------------------------------- |
+| ✅ Too broad        | Catches both `Exception` and `Error`   |
+| ❌ Hides `Error`s   | Masks serious JVM-level issues         |
+| 🔄 No safe shutdown | App may keep running in a bad state    |
+| 🔒 Blocks cleanup   | Critical resources may not be released |
+| 😵 Hard to debug    | Suppresses real root cause             |
+
+
+🧠 Rule of Thumb:
+=> Catch only what you can handle.
+=> Catching Throwable is like using a fire extinguisher for both a small spark and a nuclear meltdown — not safe!
+-----X-----X-----X-----

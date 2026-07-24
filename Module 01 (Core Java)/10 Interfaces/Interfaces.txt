@@ -1,0 +1,250 @@
+Interfaces
+==========
+An interface
+- is a blueprint of a class.
+- defines the behavior of a class.
+- defines a contract between it and its child classes
+
+Interface Journey
+-----------------
+The journey of interfaces version by version:
+
+Till Java SE 7, an interface had only two kinds of things.:
+
+1.	Public Static Constant
+	- Constants for use of Interface
+2.	Abstract Methods
+	- Some functionality that Interface wants child classes to define
+
+From  Java SE 8, 2 more things were added:
+
+3.	Default methods 
+	- Some functionality that Interface provides to its child classes.
+	- The child class can override it optionally
+	
+4.	Static methods
+	- Some functionality for the use of Interface itself
+	- Child classes can neither use nor override it
+	
+Note:
+These methods cannot be overridden, methods that are:
+1. private
+2. static 
+3. final
+
+From Java SE 9, 2 more changes occurred:
+
+5.	Private methods
+	- For the internal use of default methods
+	
+6.	Private Static methods
+	- For the internal use of static methods
+	
+Finally now an interface contains following 6 things:
+1. public static constants
+2. public abstract methods
+3. public default methods
+4. public static methods
+5. private methods
+6. private static methods
+
+extends & implements
+--------------------
+One class [extends] another class
+One class [extends] another abstract class
+An abstract class [extends] another class
+An abstract class [extends] another abstract class
+	
+A class [implements] Interface
+An abstract class [implements] Interface
+
+An interface extends Interface
+
+Refer Figure : 01_extends_implements.jpg
+
+Abstract Class v/s Interface
+----------------------------
+1. Inheritance:
+   - Abstract class does not support multiple inheritance.
+   - Interface allows multiple inheritance.
+
+2. Constructors:
+   - Abstract class can have constructors.
+   - Interface cannot have constructors.
+
+3. Fields:
+   - Abstract class can have fields.
+   - Interface only supports constant fields (public static final).
+
+4. Access Modifiers:
+   - Abstract class provides more flexibility in choosing access modifiers.
+   - Interface methods are implicitly public and cannot have other access modifiers.
+
+Types of Interfaces 
+===================
+There are 2 types of interfaces:
+1. Marker Interface
+2. Functional Interface
+
+This classification is based on the number of abstract methods in the interface.
+
+Marker Interface
+----------------
+A marker interface does not contain abstract methods.
+It is a design pattern.
+It gives special permission to the class implementing it.
+
+Ex:
+1. Serializable : String, All Exception Classes
+2. Cloneable : ArrayList
+3. RandomAccess : ArrayList
+
+Serializable
+------------
+- The Serializable interface in Java is a marker interface (an interface with no methods)
+- It enables an object to be converted into a byte stream, which can then be reverted back into a copy of the object. 
+- This process is known as serialization. 
+- Serialization is useful for saving the state of an object to a file or sending it over a network.
+
+serialVersionUID
+----------------
+- serialVersionUID is a unique identifier for each class that implements the Serializable interface. 
+- It is used during deserialization to ensure that a loaded class is compatible with the serialized object. 
+- If the serialVersionUID of the class does not match the serialVersionUID of the serialized object, a InvalidClassException is thrown.
+
+Ex:
+1. Convert Employee object to String and transfer ---> file,  <----file
+
+employee object to string () : {"id":"101", "name" : "Jay", "salary":"20000"}
+
+employee object -----> String with toString()
+
+2. Convert Employee object to Binary and transfer ---> file,  <----file
+
+ObjectOutputStream lets convert new Employee(101, "Jay", 20000) into binary stream 
+
+1010101010101010111111 ------> FileOutputStream
+
+1234678L -> binary (10111111)
+
+ObjectOutputStream -> employee.dat (1010101010101010111111)
+
+employee.dat -----> give back the data ---> Employee emp (1234678L)
+
+10101010101010 10111111 -> 1234678L == 1234678L => converted from binary (10101010101010) to Employee emp 
+-----X-----X-----X-----X-----
+Functional Interface
+====================
+An interface with exactly 1 abstract method is known as a Functional Interface
+
+There are 3 ways to define the implementation class of a interface:
+
+1. Normal implementation class
+
+class Telephone implements Callable {
+	@Override
+	public void call() {
+		System.out.println("Calling someone");
+	}
+}
+
+2. Anonymous class
+
+Call c = new Callable() {
+	@Override
+	public void call() {
+		System.out.println("Calling my friend");
+
+	}
+};
+
+c.call();
+
+3. Lambda Expressions - This we will study later
+-----X-----X-----X-----
+🔷 Multiple Inheritance in Interfaces
+
+✅ Definition:
+
+Multiple inheritance allows a class or interface to inherit from more than one parent interface.
+
+In Java, a class can implement multiple interfaces, enabling multiple inheritance.
+
+---
+
+🔸 Why Interfaces Support Multiple Inheritance?
+
+* Interfaces contain only abstract methods (until Java 7), so no ambiguity arises.
+* From Java 8 onwards, interfaces can have `default` and `static` methods, so ambiguity is handled explicitly by Java rules.
+
+---
+
+🔸 Syntax:
+
+```java
+interface A {
+    void show();
+}
+
+interface B {
+    void display();
+}
+
+class C implements A, B {
+    public void show() {
+        System.out.println("Show from A");
+    }
+
+    public void display() {
+        System.out.println("Display from B");
+    }
+}
+```
+
+---
+
+🔸 Java 8 and Diamond Problem in Interfaces:
+
+✅ Problem:
+
+If two interfaces have `default` methods with the same signature, and a class implements both, it causes ambiguity.
+
+✅ Example:
+
+```java
+interface A {
+    default void greet() {
+        System.out.println("Hello from A");
+    }
+}
+
+interface B {
+    default void greet() {
+        System.out.println("Hello from B");
+    }
+}
+
+class C implements A, B {
+    public void greet() {
+        // Must override to resolve ambiguity
+        A.super.greet(); // or B.super.greet(); // or both // or none
+    }
+}
+```
+
+---
+
+✅ Rules to Resolve Ambiguity:
+
+1. Override the conflicting default method in the class.
+2. Use `InterfaceName.super.methodName()` to call a specific one.
+
+---
+
+🔸 Key Points:
+
+* Java does not support multiple inheritance with classes - to avoid ambiguity.
+* Java supports multiple inheritance via interfaces since there's no state.
+* Default methods introduced in Java 8 can lead to ambiguity which must be resolved by the implementing class.
+
+---
