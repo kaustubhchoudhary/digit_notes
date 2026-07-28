@@ -1,0 +1,61 @@
+Method References
+=================
+Reusing a method for defining the abstract method of functional interface in a lambda expression is known as Method Reference.
+
+Types of method references
+--------------------------
+There are 3 types of method references:
+
+1. Instance Method Reference
+=> Here we refer to an instance method.
+	containingObject::instanceMethodName  
+	
+2. Static Method Reference
+=> Here we refer to a static method.
+	ContainingClass::staticMethodName  
+
+3. Constructor Reference
+=> Here we reference to a constructor.
+What is the task of a constructor - to create an object out of a set of inputs
+
+Note:
+- When the abstract method in the functional interface has a void return type, Java does not require the method reference to have a matching return type. 
+
+Ex: 
+
+interface Callable {
+	void call(String message);
+}
+
+class Example {
+	String greet(String msg) {
+		return msg;
+	}
+}
+
+Example example = new Example();
+Callable c = example::greet;
+
+The return value of greet will be ignored
+String result = c.call();
+
+The above will give error as call is void, greet's String will be ignored
+
+- Non-void Return Type in Functional Interface: The method reference must exactly match or return a subtype of the expected return type.
+
+interface Addable {
+	double add(double num1, double num2);
+}
+
+class Example {
+	int sum(double n1, double n2) {
+		return (int)(n1 + n2);
+	}
+}
+
+Example example = new Example();
+Addable a = example::sum;
+
+The return value of sum - int is compatible with double, so it will work
+double result = a.add(10, 20);
+-----X-----X-----X-----

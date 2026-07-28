@@ -1,0 +1,134 @@
+Generics
+========
+- Generics mean dynamic types.
+- Using Generics, it is possible to create classes that work with different data types.
+- In the Java Library, Generics is used heavily in 
+	1. Functional Programming
+	2. Collection Framework
+	
+Generics offers following advantages:
+
+1) Type-safety: We can create methods and collection types to work with objects of common types, thus avoiding possible errors in future
+
+2) Type casting is not required: There is no need to typecast the object.
+
+Ex: 
+ArrayList menu = new ArrayList();
+
+menu.add("home");
+menu.add("about");
+menu.add("contact");
+
+String removedObject = (String)menu.remove(1);
+
+The remove method removes an object from a specified index and retuns the removed object.
+
+If we dont use generics to specify the type of elements held in ArrayList, then remove will return 'Object' type value.
+
+If we want to store this value in 'String' type variable, we have to down cast it, as Object is the parent class of String.
+
+If we use generics and declare ArrayList<String>,
+
+now remove will return 'String' type data, so no need to type cast.
+
+String removedObject = menu.remove(1);
+
+3) Compile-Time Checking
+- With generics, the type is checked at compile time.
+- The earlier we know the issue, the better it is. 
+-----X-----X-----
+Generic Notations
+=================
+- Every class has a name, ex: String, Double
+- When we use generics, we need notations to define placeholders for all classes
+- These are known as "Generic notations" or "Type Paramaters"
+- The common type parameters are:
+
+1. T - Type: A generic data type, typically representing any type.
+2. K - Key: Used for maps or other data structures that use keys.
+3. V - Value: Represents the value in key-value pairs, often used in conjunction with K.
+4. E - Element: Used to represent the element type in a collection (like List<E> or Set<E>).
+5. N - Number: Represents numeric types (Integer, Double, Float, etc.).
+6. R - Return: Represents returning types (Integer, Double, Float, etc.).
+
+For ex:
+
+interface Function<T, R> {
+	R apply(T t);
+}
+
+It means what we mention as T has to be passed as an argument through apply and R should be returned by it.
+
+interface Function<String, Integer> {
+	Integer apply(String stringInput);
+}
+-----X-----X-----
+Wildcards
+=========
+There are 3 types of wildcards in Generics:
+1. Unbounded Wildcard
+2. Upper Bound Wildcard
+3. Lower Bound Wildcard
+
+Unbounded Wildcard
+------------------
+- The ? (question mark) represents unbounded wildcard element. 
+- It represents an unknown type.
+- Useful when you don't care about the type parameter and just want to work with any generic type.
+
+Ex: 
+
+public void printList(List<?> list) {
+    for (Object obj : list) {
+        System.out.println(obj);
+    }
+}
+
+ArrayList<Student> students = new ArrayList<Student>();
+ArrayList<Product> products = new ArrayList<Product>();
+
+printList(students)
+printList(products)
+
+Here List<?> allows any type of List (ArrayList<Student>, ArrayList<Product>)
+----X-----X-----
+Upper Bounded Wildcard
+======================
+- <? extends T> represents an upper bounded wildcard
+- Represents an unknown type that is a subtype of T (i.e., T or any class that extends T).
+
+Ex:
+
+public void printNumbers(List<? extends Number> list) {
+    for (Number num : list) {
+        System.out.println(num);
+    }
+}
+
+ArrayList<Integer> ids = new ArrayList<Integer>();
+ArrayList<Double> marks = new ArrayList<Double>();
+
+printNumbers(ids)
+printNumbers(marks)
+
+Here, List<? extends Number> can accept List<Integer>, List<Double>, etc., since all these are subtypes of Number.
+-----X-----X-----
+Lower Boundes Wildcard
+======================
+- <? super T> represents a lower bounded wildcard
+- Represents an unknown type that is a supertype of T (i.e., T or any class that is a superclass of T).
+
+Ex:
+
+public void addIntegers(List<? super Integer> list) {
+    list.add(10); // Only Integer or its supertypes can be added.
+}
+
+ArrayList<Integer> ids = new ArrayList<Integer>();
+ArrayList<Number> marks = new ArrayList<Number>();
+
+addIntegers(ids)
+addIntegers(marks)
+
+Here, List<? super Integer> can accept List<Integer>, List<Number>, or List<Object> since all these are supertypes of Integer.
+-----X-----X-----X-----X-----X-----X-----

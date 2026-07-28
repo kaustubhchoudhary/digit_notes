@@ -1,0 +1,325 @@
+Collection Framework
+====================
+What is a Collection?
+---------------------
+Collection is a group of objects taken as a single entity.
+
+For ex: Employees in a company, students in a class, Fruits in a bag etc 
+
+Collection Framework
+--------------------
+Collection Framework is a group of classes, interfaces and methods that help in storing, accessing and manipulating objects
+
+Collection Classes v/s Arrays
+-----------------------------
+Use Arrays when
+- We need a simple, fixed-size data structure.
+- We require fast access to elements by index.
+- In arrays we don't have methods to do many operations
+- The number of elements is known in advance and won't change.
+
+Use Collections Over Arrays when:
+- We need a dynamically-sized data structure that grows or shrinks as needed.
+- We want to leverage utility methods for searching, sorting, and other common operations.
+- We require advanced data structures like lists, sets, or maps.
+- We need thread-safe or concurrent access to the data.
+
+Area of study in Collection classes
+===================================
+1. Data Structures
+2. Algorithms - Time Complexity, Space Complexity, Best case scenarios
+3. What is the benefit of using one class over the other?
+4. Method support
+
+What we will focus on?
+- Data Structures of some most used classes for understanding
+- What is the benefit of using one class over the other?
+- Method support
+
+Please refer `CollectionF.xlsx` for comparative analysis of classes: 
+
+Collection Hierarchy
+--------------------
+All the interfaces/classes are available in java.util package
+
+Refer image : 01_coll_frm.png
+
+Key Interfaces and classes
+==========================
+The following are key interfaces and classes in Collection Framework:
+
+Iterable (I)
+	- Collection (I)
+		- List (I)
+			- ArrayList (C)
+			- LinkedList (C)
+			- Vector (C)
+			- Stack (C)
+		- Set (I)
+			- HashSet (C)
+			- TreeSet (C)
+			- LinkedHashSet (C)
+		- Queue (I)
+			- PriorityQueue (C)
+			- Deque (I)
+				- ArrayDeque (C)
+
+1.	Iterable - Parent interface, gives the ability to iterate all elements in a collection
+
+2.	Collection - Declares all the general functionalites that can be done in any collection
+-----X-----X-----X-----X-----
+List
+====
+- In a List, the data is stored in a sequence
+- List indexes start from 0, just like arrays.
+- List preserves the insertion order. 
+- Hence, it allows positional access and insertion of elements.
+
+- In a List:
+	- Duplicate values can be stored
+	- null values can be stored
+
+Implementation classes - ArrayList, LinkedList, Vector and Stack.
+
+When to use any list?
+--------------------
+Use any implementation of list when, 
+- Duplicate objects have to be stored
+- null values have to be stored
+-----X-----X-----X-----
+ArrayList
+=========
+ArrayList is the purest implementation of List interface
+
+When to use an arraylist?
+-------------------------
+ArrayLists are preferred when
+- Duplicates and null objects are to be stored
+- The elements are to be traversed/retrieved frequently
+- Elements have to be added and/or removed at ends
+
+ArrayLists are not preferred when
+- Elements have to be added and/or removed in the middle
+-----X-----X-----X-----
+LinkedList
+==========
+- LinkedList implements both List & Deque interfaces
+
+When to use an LinkedList?
+-------------------------
+LinkedList are preferred when
+- Duplicates and null objects are to be stored
+- Elements have to be added and/or removed in the middle, front or end
+
+LinkedList are not preferred when
+- The elements are to be retrieved frequently
+----X-----X-----X-----
+Vector
+======
+- Vector class existed in JDK version 1, so it is known as a legacy class
+
+- Vector is similar to ArrayList in all aspects
+
+- The only difference is that all its methods are synchronized.
+
+- What it means is that it is better to use in thread safe environment
+----X-----X-----X-----
+Stack
+=====
+=> It is a class that represents a Last-In-First-Out (LIFO) stack of objects.
+=> Stack<E> extends Vector<E>
+
+Key Methods:
+
+| Method             | Description                                         |
+| ------------------ | --------------------------------------------------- |
+| `push(E item)`     | Adds an element to the top                          |
+| `pop()`            | Removes and returns the top element                 |
+| `peek()`           | Returns the top element without removing            |
+| `empty()`          | Checks if the stack is empty                        |
+| `search(Object o)` | Returns 1-based position from top if found, else -1 |
+
+---
+
+=> Elements are accessed in Last-In, First-Out order.
+=> Since it extends `Vector`, `Stack` is synchronized, but generally considered legacy.
+
+Cons
+----
+=> Being based on `Vector`, it’s synchronized by default — adds overhead.
+=> Not recommended in high-performance, multi-threaded apps.
+
+=> Use `Deque` (like `ArrayDeque`) from Java 1.6+ for non-synchronized stack behavior
+----X-----X-----X-----
+Set
+===
+- Set is a collection that stores only unique elements
+- Sets do not store its elements in any order
+- Implementation classes : HashSet, TreeSet & LinkedHashSet
+
+Usage:
+- Use sets when we want to store only unique elements
+----X-----X-----X-----
+HashSet
+=======
+- HashSet is the purest implementation of Set interface
+
+Use HashSet when
+- We want to store only unique elements
+- We wish to store a null object 
+
+Inorder for any set to not store a duplicate element, override equals() and hashCode() methods in the stored objects' class.
+
+We can customize in these methods as to which poperty can be the basis of equality.
+----X-----X-----X-----
+TreeSet
+=======
+- TreeSet is used to store unique sorted elements
+
+Use TreeSet when
+- We want to store only unique elements
+- We want not to store null values
+- We want elements to be sorted in some order (we need to define the sorting property)
+
+Compulsory condition
+- Only those elements can be stored in a TreeSet whose class implements the Comparable interface
+----X-----X-----X-----
+Comparable
+==========
+- Comparable is used for sorting according to any single property
+- The Comparable interface in Java is used to define the natural ordering of objects for a user-defined class. 
+- It is a functional interface
+- Define method: compareTo () to implement sorting for any property in desired order 
+
+Custom Sorting
+--------------
+Custom sorting at the place of declaration can be done using Comparator interface.
+
+Comparator
+----------
+- It is a functional interface
+- Define method: compare () to implement sorting for any property in desired order 
+
+compare() & compareTo()
+-----------------------
+For Ascending order:
+	p1 - p2 means: "smaller comes first"
+
+For Descending order:
+	p2 - p1 means: "larger comes first"
+
+-----X-----X-----X-----
+LinkedHashSet
+=============
+LinkedHashSet extends the HashSet class.
+
+- Follows all the properties of a Set and HashSet
+- LinkedHashSet preserves the insertion order.
+- It does store elements in the order they are inserted, but there is no positional access to elements
+-----X-----X-----X-----
+Queue (I)
+=========
+- It follows the FIFO or the First-In-First-Out principle.
+- It is an ordered list of objects
+- PriorityQueue is the direct implementation of Queue interface
+
+PriorityQueue
+=============
+- A priorityQueue does not maintain the sequence or sorting order for its elements
+- A PriorityQueue is used when the objects are supposed to be processed based on the priority.
+
+For ex: Printing papers, Calendar scheduling
+
+Features 
+--------
+ - PriorityQueue doesn’t permit null.
+ - PriorityQueue permits duplicates.
+ - PriorityQueue requires classes to implement the Comparable interface
+
+Method Support
+--------------
+- It defines the methods that facilitate addition at the end of queue and deletion from the front
+
+- offer() : Inserts the specified element in the queue
+- poll() : Retrieves and removes the head.
+- peek() :	Retrieves, but does not remove, the head
+
+DeQueue
+=======
+- It is the child interface of Queue. 
+- It is a linear collection that supports element insertion and removal at both ends. 
+- The name deque is short for "double ended queue"
+- Deque can be used as both Stack (LIFO) and Queue (FIFO)
+
+ArrayDeque
+==========
+- Direct implementation of Deque interface
+
+Stack->LIFO
+Queue->FIFO
+
+ArrayDeque is used for both LIFO and FIFO
+
+ArrayDeque is faster than Stack and Queue when it comes to insertion and deletion at both ends
+
+- Insertion order is preserved
+- Duplicates are allowed
+- null is not allowed
+- It contains the methods that are used to add/remove elements efficiently from head (first) and tail (last)
+- offerFirst, offerLast, removeFirst, removeLast, peek, poll 
+-----X-----X-----X-----X-----
+Map Framework
+=============
+Map Framework is a separate Framework to deal with Key-Value pairs.
+
+Map
+===
+Map is the parent interface of Map Framework.
+
+Refer figure: 02_map_framework.png
+
+HashMap
+=======
+ - The most used implementation of Map interface
+ - Contains key value pairs
+ - key and value can be of any data type
+ - null key is allowed but only once
+ - null values are allowed
+ - we can fetch a value using key
+ - keys form a hash set as they are unique
+ - values form a collection
+ - The entries are not sorted, nor is there insertion order preserved
+
+ConcurrentHashMap
+==================
+=> ConcurrentHashMap is a thread-safe variant of HashMap.
+=> Follows all properties of a Map and HashMap.
+=> Allows concurrent access without locking the entire map.
+=> Null keys and values are not allowed.
+=> Read operations are usually non-blocking and fast.
+=> Write operations are thread-safe and allow concurrent updates.
+=> Maintains no order of keys or values (unordered).
+=> Ideal for multi-threaded environments.
+
+LinkedHashMap
+=============
+- LinkedHashMap extends HashMap
+- It is the same as HashMap with an additional feature that it maintains insertion order
+
+Hashtable
+=========
+- Hashtable is a legacy class
+- Hashtable is similar to HashMap in the way that both of them store key-va;ue pairs with the only difference that all its methods are synchronized, i.e. thread safe.
+- We can't store a null key in a Hashtable
+
+TreeMap
+=======
+- The map is sorted according to the natural ordering (Comparable) of its keys, or by a Comparator provided at map creation time
+-----X-----X-----X-----X-----X-----
+Keys
+Uniqueness       - HashMap, LinkedHashMap, TreeMap, Hashtable
+Sequencing       - LinkedHashMap
+Sorting Order    - TreeMap [key->Employee].. implement some algorithm to sort. Comparable
+
+TreeMap<Product, List<Employee>> ... key [product]implement some algorithm to sort. Comparable
+-----X-----X-----X-----

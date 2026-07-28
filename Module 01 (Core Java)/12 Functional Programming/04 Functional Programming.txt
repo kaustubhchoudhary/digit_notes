@@ -1,0 +1,88 @@
+Functional programming
+======================
+- Java introduced functional programming in Java 8
+- Here we can pass a function definition as a function parameter
+
+ex: filter (item -> item.contains("TV"))
+
+- This mechanism is only possible with one abstract method interfaces (functional interfaces)
+
+- Java introduced the "java.util.function" package to house many functional interfaces
+- These are some of these interfaces:
+
+	1. Predicate<T>: Tests a condition on an argument.
+	
+	2. Function<T, R>: Transforms input of type `T` to `R`.
+	
+	3. Consumer<T>: Performs an operation on an argument.
+	
+	4. Supplier<T>: Provides a result without input.
+	
+	5. BiFunction<T, U, R>: Transforms two inputs into one output.
+	
+	6. UnaryOperator<T>: Operates on a single operand of type `T`.
+	
+	7. BinaryOperator<T>: Operates on two operands of the same type.
+	
+	8. BiConsumer<T, U>: Performs an operation on two arguments.
+	
+	9. ToIntFunction<T>: Converts input of type `T` to an `int`.
+	
+	10. LongSupplier: Supplies a `long` value without input.
+
+Functional Interfaces
+=====================
+These are the 4 major Functional Interfaces:
+1. Function (I)
+2. Predicate(I)
+3. Consumer (I)
+4. Supplier (I)
+
+Function<T, R>
+--------------
+abstract method : R apply(T t);
+
+Create a method that takes in a class and returns another class
+
+This method takes a String and returns Integer length
+
+Integer apply(String str){
+	return str.length();
+}
+
+Predicate<T>
+------------
+abstract method : boolean test(T t);
+
+Create a method that takes in any class and returns another either true/false
+
+This method takes a String and checks whether it is null or not, returns boolean
+
+boolean test(String str){
+	return str==null;
+}
+
+Consumer<T>
+-----------
+abstract method : void accept(T t);
+
+Create a method that takes in a class object and performs an operation but does not return anything
+
+This method takes a String name and prints it with a greeting
+
+void accept(String str){
+	System.out.println("Hi " + str);
+}
+
+Supplier<T>
+-----------
+abstract method :  T get();
+
+Create a method that does not take any parameters but returns an object
+
+This method returns Tax object
+
+Tax get(){
+	return new Tax();
+}
+-----X-----X-----X-----X----

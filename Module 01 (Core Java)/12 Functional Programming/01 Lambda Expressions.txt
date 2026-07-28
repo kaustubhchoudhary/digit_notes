@@ -1,0 +1,179 @@
+Lambda Expressions
+==================
+- A Lambda expression (or function) is just an anonymous function.
+- It is used in Functional Programming
+
+Ex:
+
+@FunctionalInterface
+interface Callable {
+	void call();
+} 
+
+Now we can define call() as a Lamdbda:
+
+Callable c = () -> {
+		System.out.println("Calling my friend");
+	};
+
+c.call();
+
+Inference
+---------
+How is this possible?
+
+This is possible through a Java Mechanism known as Inference.
+
+✅ Why Inference Works in This Case?
+Callable is a Functional Interface — it has only one abstract method: void call().
+
+When we write:
+
+Callable c =  () -> { System.out.println(...) }, Java knows that the definition on RHS is related to Callable at LHS.
+
+So, Java infers that on RHS the definition MUST be of call() that MUST return void that MUST take zero parameters
+
+So, Java infers all this from the context:
+
+Callable c = () -> {
+    System.out.println("Calling my friend");
+};
+
+✅ You didn’t need to write:
+
+Callable c = () -> { void call() { ... } };
+That's the power of type inference with Lambdas in Java.
+
+🔁 Behind the Scenes (What Java understands)
+Your line:
+
+Callable c = () -> System.out.println("Calling my friend");
+is essentially like saying:
+
+Callable c = new Callable() {
+    public void call() {
+        System.out.println("Calling my friend");
+    }
+};
+
+But much shorter, thanks to lambda + inference.
+
+Lambda Expressions
+==================
+Base Syntax: () -> {}
+
+(params-list) -> {body-of-method}
+
+Alternate Syntaxes
+------------------
+There are several alternate syntaxes for lambda expressions based on the number of parameters and the complexity of the body:
+
+1. No Parameters
+
+If the lambda expression has no parameters, we can use empty parentheses:
+
+Ex: abstract method => void printHello();
+
+Lambda Expression:
+
+() -> { 
+	System.out.println("Hello World");
+};
+							
+			OR
+
+() -> System.out.println("Hello World");
+			
+2. Specifying Parameter Types
+
+If you prefer to specify the parameter types explicitly, you can do so:
+
+Ex: abstract method => int add(int x, int y);
+
+Lambda Expression:
+
+(int x, int y) ->  {
+	return x + y;
+}
+
+3. Omitting Parameter Types
+
+If you prefer to omit the parameter types, you can do so:
+
+Ex: abstract method => int add(int x, int y);
+
+Lambda Expression:
+
+(x, y) ->  {
+	return x + y;
+}
+
+4. Remove single statement that is a return statment
+
+If the definition contains a single statement that is a return statement, we can omit it
+
+Ex: abstract method => int add(int x, int y);
+
+Lambda Expression:
+
+(x, y) ->  {
+	return x + y;
+}
+ 
+can be written as
+
+(x, y) ->  x + y;
+
+5. Single Parameter without Parentheses
+
+If the lambda expression has a single parameter, you can omit the parentheses around the parameter:
+
+int calculateSquare(int x);
+
+x -> x * x
+
+This is equivalent to:
+
+(int x) -> {
+	return x * x;
+}
+
+6. Code Block with Multiple Statements
+
+If the lambda body contains more than one statement, enclose the statements in curly braces `{}` and use a return statement if necessary:
+
+(x, y) -> {
+    int result = x + y;
+	System.out.println("\n Result = " + result);
+    return result;
+}
+
+7. Using a Method Reference
+
+Instead of writing a lambda expression, you can use a method reference, which is a shorthand for a lambda expression that simply calls an existing method:
+
+String::toUpperCase
+
+This is equivalent to:
+
+str -> str.toUpperCase()
+
+Summary of Alternate Lambda Syntaxes
+------------------------------------
+- No parameters: `() -> { ... }`
+- With specified parameter types: `(int x, int y) -> { ... }`
+- Without specifying parameter types: `(x, y) -> { ... }`
+- Single parameter without parentheses: `x -> { ... }`
+- Single parameter with parentheses: `(x) -> { ... }`
+- Code block with multiple statements: `(x, y) -> { statements; return expression; }`
+- Method reference: `ClassName::methodName`
+
+Each of these syntaxes allows us to express lambda expressions in different contexts depending on your needs.
+
+Features
+--------
+- Lambda expression was included in Java SE 8. 
+- It provides a clear and concise way to represent one method interface using an expression. 
+- It provides the implementation of a functional interface
+- It removes a lot of boilerplate code
+-----X-----X-----X-----X----
