@@ -1,0 +1,662 @@
+
+# Java Sealed Classes
+
+## 1. Introduction
+
+In Java, whenever we create a class, **any other class can extend it** (unless it is declared `final`).
+
+Example
+
+```java
+class Animal {
+}
+
+class Dog extends Animal {
+}
+
+class Cat extends Animal {
+}
+
+class Tiger extends Animal {
+}
+
+class Elephant extends Animal {
+}
+```
+
+Sometimes, we **do not want everyone to extend our class**.
+
+We want to allow **only a few specific subclasses**.
+
+To solve this problem, Java introduced **Sealed Classes**.
+
+> A Sealed Class is a class that restricts which classes are allowed to inherit from it.
+
+Introduced in
+
+* Java 15 (Preview)
+* Java 17 (Official)
+
+---
+
+# 2. Real-Life Example
+
+Imagine a Banking Application.
+
+There are only three types of accounts.
+
+* Savings Account
+* Current Account
+* Loan Account
+
+No one should create
+
+* CryptoAccount
+* GoldAccount
+* SecretAccount
+
+because the bank doesn't support them.
+
+A Sealed Class lets us enforce this rule.
+
+---
+
+# 3. Before Sealed Classes
+
+```java
+class Account {
+}
+
+class SavingsAccount extends Account {
+}
+
+class CurrentAccount extends Account {
+}
+
+class LoanAccount extends Account {
+}
+
+class CryptoAccount extends Account {
+}
+```
+
+Java allows every subclass.
+
+Sometimes this is undesirable.
+
+---
+
+# 4. Using Sealed Class
+
+```java
+public sealed class Account
+        permits SavingsAccount,
+                CurrentAccount,
+                LoanAccount {
+}
+```
+
+Only these classes can extend Account.
+
+Now create them.
+
+```java
+final class SavingsAccount extends Account {
+}
+
+final class CurrentAccount extends Account {
+}
+
+final class LoanAccount extends Account {
+}
+```
+
+Now this is illegal.
+
+```java
+class CryptoAccount extends Account {
+}
+```
+
+Compilation Error.
+
+---
+
+# 5. Syntax
+
+```java
+public sealed class ClassName
+        permits ClassA,
+                ClassB,
+                ClassC {
+
+}
+```
+
+The `permits` keyword lists the only classes that are allowed to inherit.
+
+---
+
+# 6. Rules of Sealed Classes
+
+Suppose
+
+```java
+public sealed class Vehicle
+        permits Car, Bike {
+}
+```
+
+Then
+
+```java
+final class Car extends Vehicle {
+}
+
+final class Bike extends Vehicle {
+}
+```
+
+works.
+
+But
+
+```java
+class Bus extends Vehicle {
+}
+```
+
+does not.
+
+Because
+
+Bus is not listed in `permits`.
+
+---
+
+# 7. Every Permitted Class Must Decide Its Future
+
+Every permitted subclass **must declare exactly one** of the following modifiers:
+
+* final
+* sealed
+* non-sealed
+
+This tells Java whether inheritance stops, continues with restrictions, or becomes unrestricted.
+
+---
+
+# 8. final
+
+Inheritance stops.
+
+```java
+sealed class Animal
+        permits Dog {
+}
+
+final class Dog extends Animal {
+}
+```
+
+Now
+
+```java
+class Labrador extends Dog {
+}
+```
+
+Compilation Error.
+
+Dog cannot be extended.
+
+---
+
+# 9. sealed
+
+Inheritance continues, but with restrictions.
+
+```java
+sealed class Animal
+        permits Dog {
+}
+
+sealed class Dog extends Animal
+        permits Labrador,
+                Pug {
+}
+```
+
+Now
+
+```java
+final class Labrador extends Dog {
+}
+
+final class Pug extends Dog {
+}
+```
+
+Only Labrador and Pug can extend Dog.
+
+---
+
+# 10. non-sealed
+
+Inheritance becomes unrestricted.
+
+```java
+sealed class Animal
+        permits Dog {
+}
+
+non-sealed class Dog extends Animal {
+}
+```
+
+Now
+
+```java
+class Labrador extends Dog {
+}
+
+class GermanShepherd extends Dog {
+}
+
+class Husky extends Dog {
+}
+```
+
+Everything is allowed again.
+
+---
+
+# 11. Visual Representation
+
+```text
+Animal (sealed)
+      |
+      +----------------+
+      |                |
+     Dog             Cat
+   (sealed)        (final)
+      |
+   +--------+
+   |        |
+Labrador   Pug
+```
+
+---
+
+# 12. Example Program
+
+```java
+sealed class Shape
+        permits Circle, Rectangle {
+
+    public abstract double area();
+}
+
+final class Circle extends Shape {
+
+    private double radius;
+
+    public Circle(double radius) {
+        this.radius = radius;
+    }
+
+    @Override
+    public double area() {
+        return 3.14 * radius * radius;
+    }
+}
+
+final class Rectangle extends Shape {
+
+    private double length;
+    private double width;
+
+    public Rectangle(double length,
+                     double width) {
+
+        this.length = length;
+        this.width = width;
+    }
+
+    @Override
+    public double area() {
+        return length * width;
+    }
+}
+
+public class Main {
+
+    public static void main(String[] args) {
+
+        Shape s1 = new Circle(5);
+
+        Shape s2 = new Rectangle(10, 4);
+
+        System.out.println(s1.area());
+
+        System.out.println(s2.area());
+    }
+}
+```
+
+Output
+
+```
+78.5
+40.0
+```
+
+---
+
+# 13. Example Using non-sealed
+
+```java
+sealed class Vehicle
+        permits Car {
+}
+
+non-sealed class Car extends Vehicle {
+}
+
+class BMW extends Car {
+}
+
+class Audi extends Car {
+}
+
+class Mercedes extends Car {
+}
+```
+
+Perfectly valid.
+
+---
+
+# 14. Example Using sealed
+
+```java
+sealed class Vehicle
+        permits Car {
+}
+
+sealed class Car
+        extends Vehicle
+        permits BMW, Audi {
+}
+
+final class BMW extends Car {
+}
+
+final class Audi extends Car {
+}
+```
+
+Now only BMW and Audi are allowed.
+
+---
+
+# 15. Example Using final
+
+```java
+sealed class Vehicle
+        permits Car {
+}
+
+final class Car extends Vehicle {
+}
+```
+
+Now
+
+```java
+class BMW extends Car {
+}
+```
+
+Compilation Error.
+
+---
+
+# 16. Can Sealed Classes Have Constructors?
+
+Yes.
+
+```java
+sealed class Employee
+        permits Manager {
+
+    Employee() {
+        System.out.println("Employee Constructor");
+    }
+}
+
+final class Manager extends Employee {
+
+    Manager() {
+        System.out.println("Manager Constructor");
+    }
+}
+```
+
+---
+
+# 17. Can Sealed Classes Have Methods?
+
+Yes.
+
+```java
+sealed class Animal
+        permits Dog {
+
+    void eat() {
+        System.out.println("Eating");
+    }
+}
+
+final class Dog extends Animal {
+}
+```
+
+---
+
+# 18. Can Sealed Classes Be Abstract?
+
+Yes.
+
+In fact, many sealed classes are also abstract.
+
+```java
+sealed abstract class Shape
+        permits Circle,
+                Rectangle {
+
+    abstract double area();
+}
+```
+
+---
+
+# 19. Can Interfaces Be Sealed?
+
+Yes.
+
+```java
+sealed interface Vehicle
+        permits Car, Bike {
+}
+
+final class Car
+        implements Vehicle {
+}
+
+final class Bike
+        implements Vehicle {
+}
+```
+
+The same rules apply.
+
+---
+
+# 20. Where Should We Use Sealed Classes?
+
+Use them when
+
+* Only a fixed set of subclasses should exist.
+* Designing frameworks or libraries.
+* Banking applications.
+* Payment systems.
+* Tax calculation.
+* Workflow states.
+* Vehicle types.
+* Compiler design (Expression Trees).
+
+Avoid them when
+
+* Users should freely create new subclasses.
+* Plugin-based architectures.
+* Extensible APIs.
+
+---
+
+# 21. Advantages
+
+* Restricts inheritance.
+* Better API design.
+* Prevents unauthorized subclasses.
+* Makes code easier to understand.
+* Improves maintainability.
+* Enables safer pattern matching in newer Java versions.
+
+---
+
+# 22. Differences Between final and sealed
+
+| final                        | sealed                            |
+| ---------------------------- | --------------------------------- |
+| No subclass allowed          | Only specified subclasses allowed |
+| Inheritance completely stops | Controlled inheritance            |
+| Simple restriction           | Flexible restriction              |
+
+---
+
+# 23. Differences Between sealed and non-sealed
+
+| sealed                | non-sealed                 |
+| --------------------- | -------------------------- |
+| Restricts inheritance | Removes restriction        |
+| Requires `permits`    | No `permits` needed        |
+| Controlled hierarchy  | Normal inheritance resumes |
+
+---
+
+# 24. Interview Questions
+
+**Q1. What is a Sealed Class?**
+
+A class that restricts which classes can inherit from it.
+
+---
+
+**Q2. Which Java version officially introduced Sealed Classes?**
+
+Java 17.
+
+---
+
+**Q3. Which keyword specifies the allowed subclasses?**
+
+`permits`
+
+---
+
+**Q4. What are the three modifiers that every permitted subclass must choose?**
+
+* final
+* sealed
+* non-sealed
+
+---
+
+**Q5. Can a Sealed Class be abstract?**
+
+Yes.
+
+---
+
+**Q6. Can interfaces be sealed?**
+
+Yes.
+
+---
+
+**Q7. Can an unlisted class extend a Sealed Class?**
+
+No.
+
+---
+
+# 25. Complete Example
+
+```java
+sealed abstract class Payment
+        permits CashPayment,
+                CardPayment,
+                UPIPayment {
+
+    abstract void pay(double amount);
+}
+
+final class CashPayment extends Payment {
+
+    @Override
+    void pay(double amount) {
+        System.out.println("Paid ₹" + amount + " using Cash");
+    }
+}
+
+final class CardPayment extends Payment {
+
+    @Override
+    void pay(double amount) {
+        System.out.println("Paid ₹" + amount + " using Card");
+    }
+}
+
+final class UPIPayment extends Payment {
+
+    @Override
+    void pay(double amount) {
+        System.out.println("Paid ₹" + amount + " using UPI");
+    }
+}
+
+public class Main {
+
+    public static void main(String[] args) {
+
+        Payment p1 = new CashPayment();
+        Payment p2 = new CardPayment();
+        Payment p3 = new UPIPayment();
+
+        p1.pay(5000);
+        p2.pay(1200);
+        p3.pay(250);
+    }
+}
+```
+
+Output
+
+```
+Paid ₹5000.0 using Cash
+Paid ₹1200.0 using Card
+Paid ₹250.0 using UPI
+```
+
+---

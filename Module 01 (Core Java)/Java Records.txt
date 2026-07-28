@@ -1,0 +1,620 @@
+
+# Java Records
+
+## 1. Introduction
+
+Before Java 16 (Preview in Java 14 & 15), whenever we wanted to create a class whose only purpose was to hold data, we had to write lots of boilerplate code.
+
+Example:
+
+* private variables
+* constructor
+* getters
+* equals()
+* hashCode()
+* toString()
+
+Even though there was very little business logic.
+
+To solve this problem, **Java introduced Records**.
+
+> A Record is a special type of class that is designed to store immutable data.
+
+---
+
+# 2. Real-life Example
+
+Suppose we want to represent a Student.
+
+Every student has
+
+* id
+* name
+* marks
+* dateOfJoining
+
+The object simply stores these values.
+
+There is no complex logic.
+
+A Record is perfect for this situation.
+
+---
+
+# 3. Traditional Class
+
+java
+public class Student {
+
+    private final int id;
+    private final String name;
+    private final double marks;
+	private LocalDate dateOfJoining;
+
+    public Student(int id, String name, double marks, LocalDate dateOfJoining) {
+        this.id = id;
+        this.name = name;
+        this.marks = marks;
+        this.dateOfJoining = dateOfJoining;
+    }
+
+    public int id() {
+        return id;
+    }
+
+    public String name() {
+        return name;
+    }
+
+    public double marks() {
+        return marks;
+    }
+	
+	public double dateOfJoining(){
+		return dateOfJoining;
+	}
+
+    @Override
+    public String toString() {
+        return id + " " + name + " " + marks + " " + dateOfJoining;
+    }
+}
+
+
+Notice how much code we wrote.
+
+---
+
+# 4. Same Class Using Record
+
+java
+public record Student(int id, String name, double marks, LocalDate dateOfJoining) {
+}
+
+
+That's it.
+
+Only one line.
+
+Java automatically generates everything.
+
+---
+
+# 5. What Java Automatically Generates
+
+For every Record Java generates
+
+✔ Private Final Fields
+
+java
+private final int id;
+private final String name;
+private final double marks;
+private final LocalDate dateOfJoining;
+
+
+---
+
+✔ Constructor
+
+java
+public Student(int id, String name, double marks, LocalDate dateOfJoining)
+
+
+---
+
+✔ Getter Methods
+
+Unlike normal classes,
+
+Record getters are simply the field names.
+
+java
+student.id();
+student.name();
+student.marks();
+student.dateOfJoining();
+
+
+NOT
+
+java
+student.getId();
+
+
+---
+
+✔ toString()
+
+text
+Student[id=101, name=Rahul, marks=92.5]
+
+
+---
+
+✔ equals()
+
+Compares object contents.
+
+---
+
+✔ hashCode()
+
+Generated automatically.
+
+---
+
+# 6. Creating Objects
+
+java
+public class Main {
+
+    public static void main(String[] args) {
+
+        Student s1 = new Student(101, "Rahul", 91.8, LocalDate.of(2026, 7, 7));
+
+        System.out.println(s1);
+
+        System.out.println(s1.id());
+        System.out.println(s1.name());
+        System.out.println(s1.marks());
+        System.out.println(s1.dateOfJoining());
+    }
+}
+
+
+Output
+
+
+Student[id=101, name=Rahul, marks=91.8, dateOfJoining=2026-07-07]
+
+101
+Rahul
+91.8
+2026-07-07
+
+
+---
+
+# 7. Records are Immutable
+
+Once created,
+
+their values cannot be changed.
+
+java
+Student s = new Student(1, "Amit", 90);
+
+
+This is NOT allowed.
+
+java
+s.id = 100;
+
+
+Nor
+
+java
+s.setId(100);
+
+
+Because
+
+* fields are final
+* setters are not generated
+
+---
+
+# 8. Why Immutable?
+
+Imagine
+
+Employee Salary
+
+
+₹50,000
+
+
+If someone accidentally changes it,
+
+
+₹90,000
+
+
+the application may produce incorrect results.
+
+Immutable objects are safer because their state never changes.
+
+---
+
+# 9. Record Components
+
+The variables declared inside the Record declaration are called
+
+**Record Components**
+
+java
+public record Student(
+        int id,
+        String name,
+        double marks
+) {}
+
+
+Here
+
+* id
+* name
+* marks
+
+are Record Components.
+
+---
+
+# 10. Compact Constructor
+
+Sometimes we want validation.
+
+Example
+
+Marks cannot be negative.
+
+java
+public record Student(int id,
+                      String name,
+                      double marks, LocalDate dateOfJoining) {
+
+    public Student {
+
+        if (marks < 0 || marks > 100)
+            throw new IllegalArgumentException("Invalid Marks");
+    }
+}
+
+
+Notice
+
+There are no parameters.
+
+Java automatically supplies them.
+
+This is called
+
+**Compact Constructor**
+
+---
+
+Example
+
+java
+Student s = new Student(101, "Rahul", 150);
+
+
+Output
+
+
+Exception
+Invalid Marks
+
+
+---
+
+# 11. Normal Constructor
+
+We can also write
+
+java
+public record Student(int id,
+                      String name,
+                      double marks) {
+
+    public Student(int id,
+                   String name,
+                   double marks) {
+
+        if(marks<0 || marks>100)
+            throw new IllegalArgumentException();
+
+        this.id=id;
+        this.name=name;
+        this.marks=marks;
+    }
+}
+
+
+Usually,
+
+the compact constructor is preferred because it's shorter and less error-prone.
+
+---
+
+# 12. Additional Methods
+
+Records can contain methods.
+
+java
+public record Student(int id,
+                      String name,
+                      double marks) {
+
+    public boolean isPassed() {
+        return marks >= 40;
+    }
+}
+
+
+Usage
+
+java
+Student s = new Student(1, "Rahul", 70);
+
+System.out.println(s.isPassed());
+
+
+Output
+
+
+true
+
+
+---
+
+# 13. Static Members
+
+Allowed.
+
+java
+public record Student(int id,
+                      String name,
+                      double marks) {
+
+    static String college = "ABC College";
+
+    public static void displayCollege() {
+        System.out.println(college);
+    }
+}
+
+
+---
+
+# 14. Instance Variables
+
+Not allowed.
+
+This is illegal.
+
+java
+public record Student(int id,
+                      String name) {
+
+    private int age;
+}
+
+
+Reason
+
+A Record's state is completely defined by its record components. Adding extra instance fields would violate that model.
+
+---
+
+# 15. Can Records Implement Interfaces?
+
+Yes.
+
+java
+interface Printable {
+
+    void print();
+}
+
+public record Student(int id,
+                      String name)
+        implements Printable {
+
+    @Override
+    public void print() {
+        System.out.println(this);
+    }
+}
+
+
+---
+
+# 16. Can Records Extend Classes?
+
+No.
+
+This is illegal.
+
+java
+class Person {}
+
+record Student(int id,
+               String name)
+        extends Person {
+}
+
+
+Reason
+
+Every Record already extends
+
+
+java.lang.Record
+
+
+Java supports only single inheritance.
+
+---
+
+# 17. Can Records be Extended?
+
+No.
+
+java
+record Student(int id,
+               String name) {
+}
+
+class CSStudent extends Student {
+}
+
+
+Not allowed.
+
+Records are implicitly final.
+
+---
+
+# 18. Where Should We Use Records?
+
+Use Records when
+
+* DTO (Data Transfer Objects)
+* API Responses
+* Database Result Objects
+* Configuration Objects
+* Employee Details
+* Student Details
+* Product Details
+* Address Objects
+
+Avoid Records when
+
+* object state must change
+* many setters are required
+* complex inheritance is needed
+
+---
+
+19. Summary
+
+Absolutely. This makes an excellent revision slide for students.
+
+| Feature                       | Allowed | Remarks                                    |
+| ----------------------------- | ------- | ------------------------------------------ |
+| Record Components             |    Yes  | Declared in the record header.             |
+| Instance Methods              |    Yes  | Can define your own business methods.      |
+| Static Methods                |    Yes  | Fully supported.                           |
+| Static Variables              |    Yes  | Allowed.                                   |
+| Constructors                  |    Yes  | Canonical, Compact, and additional constructors are allowed.                                |
+| No-Argument Constructor       |    Yes  | Only if it calls the canonical constructor |
+| Compact Constructor           |    Yes  | Used mainly for validation.                |
+| Canonical Constructor         |    Yes  | Can be written explicitly or generated     |
+| Additional Constructors       |    Yes  | Must call the canonical constructor        |
+| Interfaces                    |    Yes  | Records can implement one or more interfaces|
+| Nested Classes                |    Yes  | Can declare nested types inside a record.  |
+| Nested Records                |    Yes  | Allowed.                                   |
+| Nested Enums                  |    Yes  | Allowed.                                   |
+| Additional Instance Variables |    No   | State is defined only by the record components |
+| Setters                       |    No   | Components are immutable (`final`).        |
+| Mutable Components            |  ️ Yes   | A record can hold mutable objects (e.g., arrays, lists), but the reference itself is final. |
+| Extend Another Class          |    No   | Every record already extends class Record  |
+| Be Extended                   |    No   | Records are implicitly `final`.            |
+| Abstract Record               |    No   | A record cannot be `abstract`.             |
+
+---
+
+### Quick Memory Trick
+
+ **Records CAN have:**
+
+* Methods
+* Constructors
+* Static members
+* Nested types
+* Interfaces
+
+ **Records CANNOT have:**
+
+* Extra instance fields
+* Setters
+* Instance initializer blocks
+* Inheritance (`extends`)
+* Subclasses
+* Abstract modifier
+
+This table is usually sufficient for interviews and revision.
+
+---
+
+# 20. Interview Questions
+
+**Q1. What is a Record?**
+
+A special type of class used to store immutable data with minimal boilerplate code.
+
+---
+
+**Q2. Which Java version introduced Records?**
+
+Preview in Java 14 and 15, officially introduced in Java 16.
+
+---
+
+**Q3. Are Records immutable?**
+
+Yes.
+
+---
+
+**Q4. Can Records have methods?**
+
+Yes.
+
+---
+
+**Q5. Can Records implement interfaces?**
+
+Yes.
+
+---
+
+**Q6. Can Records extend another class?**
+
+No.
+
+---
+
+**Q7. Which class do Records extend?**
+
+
+java.lang.Record
+
+
+---
+
+**Q8. Do Records generate getters?**
+
+Yes, but the accessor methods are named after the components (id(), name()) rather than getId().
+
+---
+
+# 20. Complete Example
+
+java
+
+
+
+---

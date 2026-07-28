@@ -1,0 +1,18 @@
+Data to read => "Lorem ipsum dolor sit ametin"
+
+char[] buf = new char[5];
+
+
+1st iteration = "Lorem"  => sb.append() => "Lorem"
+2nd iteration = " ipsu"  => sb.append() => "Lorem ipsu"
+3rd iteration = "m dol"  => sb.append() => "Lorem ipsum dol"
+4th iteration = "or si"  => sb.append() => "Lorem ipsum dolor si"
+5th iteration = "t ame"  => sb.append() => "Lorem ipsum dolor sit ame"
+6th iteration = "tin"    => sb.append() => "Lorem ipsum dolor sit ametinme"
+
+
+read(buff) => t ame
+read(buff) => tinme
+
+char [] buf = {'t', ' ', 'a', 'm' , 'e'} => 2nd last run
+char [] buf = {'t', 'i', 'n', 'm' , 'e'} => last run

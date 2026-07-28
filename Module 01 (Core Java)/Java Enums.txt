@@ -1,0 +1,664 @@
+
+# Java Enums
+
+## 1. Introduction
+
+Suppose we want to represent the days of a week.
+
+Possible values are
+
+* Monday
+* Tuesday
+* Wednesday
+* Thursday
+* Friday
+* Saturday
+* Sunday
+
+One approach is to use Strings.
+
+```java
+String day = "Monday";
+```
+
+But someone may write
+
+```java
+String day = "Mondy";
+```
+
+or
+
+```java
+String day = "Holiday";
+```
+
+Java cannot prevent such invalid values.
+
+To solve this problem, Java introduced **Enums**.
+
+> An Enum (Enumeration) is a special type of class that represents a fixed set of predefined constants.
+
+Introduced in
+
+* Java 5
+
+---
+
+# 2. Real-Life Examples
+
+Many applications have fixed values.
+
+Examples
+
+Gender
+
+* Male
+* Female
+* Other
+
+Payment Status
+
+* Pending
+* Success
+* Failed
+
+Order Status
+
+* Ordered
+* Packed
+* Shipped
+* Delivered
+* Cancelled
+
+Traffic Signal
+
+* RED
+* YELLOW
+* GREEN
+
+These are perfect candidates for Enums.
+
+---
+
+# 3. Creating an Enum
+
+```java
+public enum Day {
+
+    MONDAY,
+    TUESDAY,
+    WEDNESDAY,
+    THURSDAY,
+    FRIDAY,
+    SATURDAY,
+    SUNDAY
+}
+```
+
+Notice
+
+* enum keyword
+* constants are usually written in UPPER_CASE
+
+---
+
+# 4. Using an Enum
+
+```java
+public class Main {
+
+    public static void main(String[] args) {
+
+        Day day = Day.MONDAY;
+
+        System.out.println(day);
+    }
+}
+```
+
+Output
+
+```
+MONDAY
+```
+
+---
+
+# 5. Enum is Type Safe
+
+This is allowed.
+
+```java
+Day day = Day.MONDAY;
+```
+
+This is not.
+
+```java
+Day day = "MONDAY";
+```
+
+Compilation Error.
+
+Only enum constants are allowed.
+
+---
+
+# 6. Enum Constants are Objects
+
+This surprises many students.
+
+```java
+enum Day {
+
+    MONDAY,
+    TUESDAY
+}
+```
+
+Each constant is actually an object.
+
+```
+Day.MONDAY
+```
+
+is an object of type
+
+```
+Day
+```
+
+---
+
+# 7. Comparing Enums
+
+Use
+
+```java
+==
+```
+
+instead of
+
+```java
+equals()
+```
+
+Example
+
+```java
+Day day = Day.MONDAY;
+
+if(day == Day.MONDAY)
+    System.out.println("Start of week");
+```
+
+Output
+
+```
+Start of week
+```
+
+Reason
+
+Each enum constant exists only once.
+
+---
+
+# 8. values()
+
+Returns all enum constants.
+
+```java
+for(Day day : Day.values()) {
+
+    System.out.println(day);
+}
+```
+
+Output
+
+```
+MONDAY
+TUESDAY
+WEDNESDAY
+THURSDAY
+FRIDAY
+SATURDAY
+SUNDAY
+```
+
+---
+
+# 9. valueOf()
+
+Converts String into Enum.
+
+```java
+Day day = Day.valueOf("FRIDAY");
+
+System.out.println(day);
+```
+
+Output
+
+```
+FRIDAY
+```
+
+If value doesn't exist
+
+```java
+Day.valueOf("Holiday");
+```
+
+Output
+
+```
+IllegalArgumentException
+```
+
+---
+
+# 10. ordinal()
+
+Returns the position.
+
+```java
+System.out.println(Day.MONDAY.ordinal());
+
+System.out.println(Day.THURSDAY.ordinal());
+```
+
+Output
+
+```
+0
+3
+```
+
+Index starts from zero.
+
+---
+
+# 11. name()
+
+Returns constant name.
+
+```java
+System.out.println(Day.SATURDAY.name());
+```
+
+Output
+
+```
+SATURDAY
+```
+
+---
+
+# 12. Enum in switch
+
+```java
+Day day = Day.SUNDAY;
+
+switch(day) {
+
+    case MONDAY:
+        System.out.println("Working");
+        break;
+
+    case SUNDAY:
+        System.out.println("Holiday");
+        break;
+
+    default:
+        System.out.println("Normal Day");
+}
+```
+
+Output
+
+```
+Holiday
+```
+
+---
+
+# 13. Enum Can Have Variables
+
+Enums are classes.
+
+Therefore they can have fields.
+
+```java
+enum Day {
+
+    MONDAY("Working Day"),
+    SUNDAY("Holiday");
+
+    private String type;
+
+    Day(String type) {
+        this.type = type;
+    }
+
+    public String getType() {
+        return type;
+    }
+}
+```
+
+Usage
+
+```java
+System.out.println(Day.SUNDAY.getType());
+```
+
+Output
+
+```
+Holiday
+```
+
+---
+
+# 14. Enum Can Have Constructors
+
+```java
+enum Status {
+
+    SUCCESS(200),
+    NOT_FOUND(404);
+
+    private int code;
+
+    Status(int code) {
+
+        this.code = code;
+    }
+
+    public int getCode() {
+
+        return code;
+    }
+}
+```
+
+Constructors are always
+
+* private
+
+(Java makes them private even if not written.)
+
+---
+
+# 15. Enum Can Have Methods
+
+```java
+enum Calculator {
+
+    ADD,
+    SUBTRACT;
+
+    public void display() {
+
+        System.out.println("Calculator Operation");
+    }
+}
+```
+
+Usage
+
+```java
+Calculator.ADD.display();
+```
+
+---
+
+# 16. Enum Can Implement Interfaces
+
+```java
+interface Printable {
+
+    void print();
+}
+
+enum Color implements Printable {
+
+    RED,
+    GREEN,
+    BLUE;
+
+    @Override
+    public void print() {
+
+        System.out.println(this);
+    }
+}
+```
+
+---
+
+# 17. Enum Cannot Extend Classes
+
+This is illegal.
+
+```java
+class Vehicle {
+}
+
+enum Car extends Vehicle {
+}
+```
+
+Reason
+
+Every enum already extends
+
+```
+java.lang.Enum
+```
+
+Java supports only single inheritance.
+
+---
+
+# 18. Enum Cannot Be Extended
+
+Illegal
+
+```java
+enum Color {
+
+    RED
+}
+
+class MyColor extends Color {
+}
+```
+
+Compilation Error.
+
+Enums are implicitly final.
+
+---
+
+# 19. Complete Example
+
+```java
+enum TrafficSignal {
+
+    RED("STOP"),
+    YELLOW("WAIT"),
+    GREEN("GO");
+
+    private String message;
+
+    TrafficSignal(String message) {
+
+        this.message = message;
+    }
+
+    public String getMessage() {
+
+        return message;
+    }
+}
+
+public class Main {
+
+    public static void main(String[] args) {
+
+        for(TrafficSignal signal : TrafficSignal.values()) {
+
+            System.out.println(
+                    signal +
+                    " -> " +
+                    signal.getMessage());
+        }
+    }
+}
+```
+
+Output
+
+```
+RED -> STOP
+YELLOW -> WAIT
+GREEN -> GO
+```
+
+---
+
+# 20. Advantages
+
+* Type Safe
+* Fixed set of constants
+* Readable code
+* Prevents invalid values
+* Can contain fields and methods
+* Works well with switch
+* Singleton-like constants
+
+---
+
+# 21. Where Should We Use Enums?
+
+Use Enums when values are fixed.
+
+Examples
+
+* Days
+* Months
+* Gender
+* Payment Status
+* Order Status
+* User Roles
+* Traffic Signals
+* Directions
+* Seasons
+* Log Levels
+
+Avoid Enums when
+
+* values change frequently
+* values come from database
+* values are entered by users
+
+---
+
+# 23. Difference Between Constants and Enum
+
+| Constants                     | Enum                   |
+| ----------------------------- | ---------------------- |
+| Usually `public static final` | Special Java type      |
+| Not type-safe                 | Type-safe              |
+| Can assign invalid values     | Only predefined values |
+| Collection of variables       | Collection of objects  |
+
+---
+
+# 24. Interview Questions
+
+**Q1. What is an Enum?**
+
+A special type of class that represents a fixed set of predefined constants.
+
+---
+
+**Q2. Which Java version introduced Enums?**
+
+Java 5.
+
+---
+
+**Q3. Can an Enum have constructors?**
+
+Yes.
+
+---
+
+**Q4. Can an Enum have methods?**
+
+Yes.
+
+---
+
+**Q5. Can an Enum implement interfaces?**
+
+Yes.
+
+---
+
+**Q6. Can an Enum extend another class?**
+
+No.
+
+---
+
+**Q7. Which class does every Enum extend?**
+
+```
+java.lang.Enum
+```
+
+---
+
+**Q8. Can we create objects using `new`?**
+
+No.
+
+Example
+
+```java
+Day d = new Day();
+```
+
+Compilation Error.
+
+Enum constants are created automatically by Java.
+
+---
+
+# 25. What Can and Cannot an Enum Have?
+
+| Feature                    | Allowed? |
+| -------------------------- | :------: |
+| Enum Constants             |   ✅ Yes  |
+| Instance Variables         |   ✅ Yes  |
+| Static Variables           |   ✅ Yes  |
+| Constructors               |   ✅ Yes  |
+| Methods                    |   ✅ Yes  |
+| Static Methods             |   ✅ Yes  |
+| Abstract Methods           |   ✅ Yes  |
+| Implement Interfaces       |   ✅ Yes  |
+| Nested Types               |   ✅ Yes  |
+| Switch Statement           |   ✅ Yes  |
+| Extend Another Class       |   ❌ No   |
+| Be Extended                |   ❌ No   |
+| Public Constructor         |   ❌ No   |
+| Create Objects using `new` |   ❌ No   |
+
+---

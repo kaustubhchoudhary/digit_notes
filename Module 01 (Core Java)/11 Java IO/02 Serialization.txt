@@ -1,0 +1,202 @@
+Serialization & Deserialization
+===============================
+🔹 What is Serialization?
+
+* Serialization is the process of converting a Java object into a byte stream, so it can be:
+
+  * Saved to a file
+  * Transmitted over a network
+  * Stored in a database as binary
+
+---
+
+🔹 What is Deserialization?
+
+* Deserialization is the reverse process — converting the byte stream back into a Java object.
+
+---
+
+🔹 Interface: `Serializable`
+
+* `java.io.Serializable` is a marker interface — it has no methods.
+* It indicates that a class's objects can be serialized.
+* Classes must explicitly implement it to be serializable.
+
+```java
+class Employee implements Serializable {
+    ...
+}
+```
+
+---
+
+🔹 Marker Interface
+
+* Marker interfaces (like `Serializable`, `Cloneable`) act as flags.
+* They provide metadata to the JVM or frameworks for special handling.
+
+---
+
+🔹 `serialVersionUID`
+
+* A unique identifier for each serializable class.
+* Ensures that the sender and receiver of a serialized object have compatible versions of the class.
+* If omitted, JVM generates one at runtime, which may lead to `InvalidClassException` on version mismatch.
+
+```java
+private static final long serialVersionUID = 1L;
+```
+
+---
+
+🔹 `transient` Keyword
+
+* Used to skip serialization of a field.
+* The field is not saved in the byte stream.
+* On deserialization, its value becomes default (e.g., `null`, `0`, `false`).
+
+```java
+transient String password; // Not saved during serialization
+```
+
+---
+
+🔹 `static` Fields
+
+* Static fields belong to the class, not individual objects.
+* Hence, they are not part of the object's state, and not serialized.
+
+```java
+static String company = "TechCorp"; // Not serialized
+```
+
+---
+
+🧪 What Is Saved During Serialization?
+
+| Field Type      | Serialized? | Value After Deserialization |
+| --------------- | ----------- | --------------------------- |
+| instance fields | ✅ Yes       | Restored as saved           |
+| `transient`     | ❌ No        | Set to default              |
+| `static`        | ❌ No        | Set to current class value  |
+
+---
+
+✅ Full Example: Serialization + `transient` + `static` + `serialVersionUID`
+
+1. `Employee.java`
+
+```java
+import java.io.*;
+
+class Employee implements Serializable {
+    private static final long serialVersionUID = 1L;
+
+    private int id;
+    private String name;
+    private double salary;
+
+    static String company = "TechCorp";        // Static field (Not serialized)
+    transient String password;                 // Transient field (Not serialized)
+
+    public Employee(int id, String name, double salary, String password) {
+        this.id = id;
+        this.name = name;
+        this.salary = salary;
+        this.password = password;
+    }
+
+    public void display() {
+        System.out.println("ID: " + id);
+        System.out.println("Name: " + name);
+        System.out.println("Salary: " + salary);
+        System.out.println("Password: " + password);
+        System.out.println("Company: " + company);
+        System.out.println("-------------");
+    }
+}
+```
+
+---
+
+2. `SerializeDemo.java`
+
+```java
+import java.io.*;
+
+public class SerializeDemo {
+    public static void main(String[] args) throws Exception {
+        Employee emp = new Employee(101, "Alice", 75000.0, "secret123");
+
+        FileOutputStream fos = new FileOutputStream("employee.ser");
+        ObjectOutputStream oos = new ObjectOutputStream(fos);
+
+        oos.writeObject(emp);
+
+        oos.close();
+        fos.close();
+
+        System.out.println("Employee object serialized.\n");
+
+        // Change static value after serialization
+        Employee.company = "NewCorp";
+    }
+}
+```
+
+---
+
+3. `DeserializeDemo.java`
+
+```java
+import java.io.*;
+
+public class DeserializeDemo {
+    public static void main(String[] args) throws Exception {
+        FileInputStream fis = new FileInputStream("employee.ser");
+        ObjectInputStream ois = new ObjectInputStream(fis);
+
+        Employee emp = (Employee) ois.readObject();
+
+        ois.close();
+        fis.close();
+
+        emp.display();
+    }
+}
+```
+
+---
+
+🔍 Output:
+
+```
+Employee object serialized.
+
+ID: 101
+Name: Alice
+Salary: 75000.0
+Password: null
+Company: NewCorp
+```
+
+---
+
+🧠 Summary
+
+| Concept          | Key Points                                                                            |
+| ---------------- | ------------------------------------------------------------------------------------- |
+| Serializable     | Marker interface to enable object serialization                                       |
+| serialVersionUID | Ensures version compatibility; recommended to define manually                         |
+| transient        | Excludes a field from serialization                                                   |
+| static           | Not serialized as it belongs to class not object                                      |
+| Deserialization  | Reconstructs object, but transient fields get default values, static reflects current |
+
+---
+
+Let me know if you want:
+
+* Example for serializing a list of objects
+* How to store serialized data in database
+* Serialization using JSON (e.g., with Jackson or Gson)
+* Or versioning strategies for serialized classes

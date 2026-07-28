@@ -1,0 +1,340 @@
+
+# Assignment: University Student Result Management System
+
+## Objective
+
+Develop a Java application to process student records stored in a file, evaluate their academic results, and generate a result report using modern Java features.
+
+---
+
+# Functional Requirements
+
+## 1. Create an Enum
+
+Create an enum named `Department` containing the following constants:
+
+* COMPUTER_SCIENCE
+* INFORMATION_TECHNOLOGY
+* ELECTRONICS
+* MECHANICAL
+* CIVIL
+
+---
+
+## 2. Create a Custom Annotation
+
+Create a custom annotation named `@StudentInfo` with the following elements:
+
+* `String createdBy();`
+* `String version();`
+* `String[] reviewers();`
+
+Annotate the `Student` record using this annotation.
+
+---
+
+## 3. Create a Record
+
+Create a record named `Student` containing the following fields:
+
+* int rollNo
+* String name
+* Department department
+* int[] marks
+* LocalDate dateOfBirth
+
+### Additional Requirements
+
+* Use a *compact constructor* to validate:
+
+  * Roll number must be greater than zero.
+  * Exactly five subject marks must be supplied.
+  * Each mark must be between 0 and 100.
+* Create a method
+
+```java
+double getPercentage()
+```
+
+to calculate the percentage.
+
+---
+
+## 4. Use Varargs
+
+Inside the `Student` record, create the following method:
+
+```java
+double calculateAverage(int... marks)
+```
+
+The method should calculate and return the average of all supplied marks.
+
+Call this method from `getPercentage()`.
+
+---
+
+## 5. Create a Sealed Class Hierarchy
+
+Create a sealed class named `Result`.
+
+```
+                Result
+                   │
+      ┌────────────┼────────────┐
+      │            │            │
+ PassResult   FailResult   DistinctionResult
+```
+
+Requirements:
+
+* `Result` must be sealed.
+* All three subclasses must be `final`.
+* Each subclass must override
+
+```java
+String getResultMessage();
+```
+
+Expected outputs:
+
+```
+Pass
+Fail
+Passed with Distinction
+```
+
+---
+
+## 6. Read Student Data from a File
+
+Create a file named
+
+```
+students.txt
+```
+
+Sample data:
+
+```
+101,Rahul,COMPUTER_SCIENCE,75|82|91|68|88,2005-04-15
+102,Priya,INFORMATION_TECHNOLOGY,30|28|35|40|32,2004-11-21
+103,Aman,ELECTRONICS,95|94|91|90|96,2005-02-18
+104,Neha,CIVIL,70|65|75|72|68,2005-09-10
+```
+
+Read all student records using *BufferedReader*.
+
+---
+
+## 7. Use Exception Handling
+
+Handle all possible exceptions appropriately.
+
+Examples include:
+
+* File not found
+* Invalid department name
+* Invalid date format
+* Invalid marks
+* Invalid number format
+* Incorrect file format
+
+If a student's record is invalid, display a suitable error message and continue processing the remaining records.
+
+---
+
+## 8. Determine Student Result
+
+Use the following rules:
+
+| Percentage   | Result Class      |
+| ------------ | ----------------- |
+| Below 40     | FailResult        |
+| 40 to 74.99  | PassResult        |
+| 75 and above | DistinctionResult |
+
+Create and return the appropriate subclass object.
+
+---
+
+## 9. Generate Report
+
+Display the following information for every student:
+
+```
+---------------------------------------------------------
+Roll No      : 101
+Name         : Rahul
+Department   : COMPUTER_SCIENCE
+Percentage   : 80.80
+Result       : Passed with Distinction
+---------------------------------------------------------
+```
+
+---
+
+## 10. Save Report
+
+Write the complete report into
+
+```
+result.txt
+```
+
+using *BufferedWriter*.
+
+---
+
+## 11. Use the `var` Keyword
+
+Use the `var` keyword wherever local variable type inference is appropriate.
+
+Examples:
+
+```java
+var reader = new BufferedReader(new FileReader("students.txt"));
+
+var student = new Student(...);
+
+var result = evaluateResult(student);
+
+var percentage = student.getPercentage();
+```
+
+---
+
+# Concepts Covered
+
+| Concept                       | Required |
+| ----------------------------- | :------: |
+| Record                        |     ✅    |
+| Compact Constructor           |     ✅    |
+| Enum                          |     ✅    |
+| Custom Annotation             |     ✅    |
+| Annotation Elements           |     ✅    |
+| Sealed Class                  |     ✅    |
+| Final Subclasses              |     ✅    |
+| File Reading (BufferedReader) |     ✅    |
+| File Writing (BufferedWriter) |     ✅    |
+| `var` Keyword                 |     ✅    |
+| Varargs                       |     ✅    |
+| Exception Handling            |     ✅    |
+| LocalDate                     |     ✅    |
+| Arrays                        |     ✅    |
+| Polymorphism                  |     ✅    |
+| Method Overriding             |     ✅    |
+
+---
+
+# Bonus Tasks (Optional)
+
+1. Read the `@StudentInfo` annotation at runtime using Reflection and display:
+
+   * Created By
+   * Version
+   * Reviewers
+
+2. Sort students in descending order of percentage before generating the report.
+
+3. Display the department-wise average percentage.
+
+4. Display the topper of the class.
+
+5. Count and display:
+
+   * Number of Pass students
+   * Number of Fail students
+   * Number of Distinction students
+
+---
+
+### Learning Outcome
+
+After completing this assignment, students will have applied:
+
+* *Records* for immutable data modeling.
+* *Enums* for type-safe department values.
+* *Custom annotations* for metadata and optional reflection.
+* *Sealed classes* to model a restricted result hierarchy.
+* *File I/O* to read input and generate reports.
+* *`var`* for local variable type inference.
+* *Varargs* to process a variable number of marks.
+* *Exception handling* to build a robust application that continues processing even when some input records are invalid.
+
+---
+
+# Milestone 1 (15%) – Project Setup
+
+* Create the `Department` enum.
+* Create the `@StudentInfo` annotation.
+* Create the `Student` record.
+* Apply the annotation to the record.
+
+*Checkpoint:* The project compiles successfully.
+
+---
+
+# Milestone 2 (30%) – Student Record
+
+* Add validation using a compact constructor.
+* Implement `calculateAverage(int... marks)`.
+* Implement `getPercentage()`.
+* Use the `var` keyword wherever applicable.
+
+*Checkpoint:* Create a few `Student` objects manually and verify the percentage calculation.
+
+---
+
+# Milestone 3 (45%) – Result Hierarchy
+
+* Create the sealed `Result` class.
+* Create `PassResult`, `FailResult`, and `DistinctionResult`.
+* Override `getResultMessage()` in each subclass.
+* Write logic to determine the correct result.
+
+*Checkpoint:* A manually created student should display the correct result.
+
+---
+
+# Milestone 4 (65%) – File Reading
+
+* Read student records from `students.txt`.
+* Parse each record.
+* Create `Student` objects.
+* Handle invalid input using exception handling.
+* Continue processing even if one record is invalid.
+
+*Checkpoint:* All valid students are loaded successfully.
+
+---
+
+# Milestone 5 (80%) – Report Generation
+
+* Display student details.
+* Display percentage.
+* Display the appropriate result message.
+* Use polymorphism while displaying results.
+
+*Checkpoint:* Console output matches the expected format.
+
+---
+
+# Milestone 6 (95%) – File Writing
+
+* Write the complete report to `result.txt`.
+
+*Checkpoint:* Report file is generated successfully.
+
+---
+
+# Milestone 7 (100%) – Reflection (Bonus but Required for Full Marks)
+
+* Read the `@StudentInfo` annotation using Reflection.
+* Display:
+
+  * Created By
+  * Version
+  * Reviewers
+
+---

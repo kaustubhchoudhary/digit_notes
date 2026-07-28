@@ -1,0 +1,1148 @@
+
+# Java Annotations
+
+## 1. Introduction
+
+Suppose we have a method in a parent class.
+
+```java
+class Animal {
+
+    public void sound() {
+
+        System.out.println("Animal Sound");
+    }
+}
+```
+
+Now we want to override it.
+
+```java
+class Dog extends Animal {
+
+    public void sound() {
+
+        System.out.println("Bark");
+    }
+}
+```
+
+Everything works.
+
+But suppose we accidentally write
+
+```java
+class Dog extends Animal {
+
+    public void sounds() {
+
+        System.out.println("Bark");
+    }
+}
+```
+
+Notice
+
+```text
+sound()
+```
+
+became
+
+```text
+sounds()
+```
+
+The compiler doesn't report an error.
+
+Instead,
+
+Dog now has a completely new method.
+
+To prevent such mistakes, Java introduced **Annotations**.
+
+---
+
+# 2. What is an Annotation?
+
+> An Annotation is metadata (information about the program) that provides instructions to the compiler, JVM or other tools.
+
+Annotations do **not** directly change the program logic.
+
+They provide additional information.
+
+Introduced in
+
+* Java 5
+
+---
+
+# 3. Syntax
+
+Annotations start with
+
+```text
+@
+```
+
+Example
+
+```java
+@Override
+```
+
+or
+
+```java
+@Deprecated
+```
+
+---
+
+# 4. Built-in Annotations
+
+Java provides several built-in annotations.
+
+Some common ones are
+
+* @Override
+* @Deprecated
+* @SuppressWarnings
+* @FunctionalInterface
+* @SafeVarargs
+
+---
+
+# 5. @Override
+
+Most commonly used annotation.
+
+Example
+
+```java
+class Animal {
+
+    public void sound() {
+
+        System.out.println("Animal");
+    }
+}
+
+class Dog extends Animal {
+
+    @Override
+    public void sound() {
+
+        System.out.println("Bark");
+    }
+}
+```
+
+Compiler verifies
+
+* method exists in parent
+* correct signature
+
+---
+
+## Incorrect Override
+
+```java
+class Dog extends Animal {
+
+    @Override
+    public void sounds() {
+
+        System.out.println("Bark");
+    }
+}
+```
+
+Compilation Error
+
+Because
+
+```text
+sounds()
+```
+
+doesn't override any parent method.
+
+---
+
+# 6. @Deprecated
+
+Indicates
+
+> This method/class should no longer be used.
+
+Example
+
+```java
+class Calculator {
+
+    @Deprecated
+    public void add() {
+
+        System.out.println("Old Method");
+    }
+}
+```
+
+Usage
+
+```java
+Calculator c = new Calculator();
+
+c.add();
+```
+
+Compiler gives a warning.
+
+Program still runs.
+
+---
+
+# 7. @SuppressWarnings
+
+Suppresses compiler warnings.
+
+Example
+
+```java
+@SuppressWarnings("unchecked")
+```
+
+Example
+
+```java
+import java.util.ArrayList;
+
+public class Main {
+
+    @SuppressWarnings("rawtypes")
+    public static void main(String[] args) {
+
+        ArrayList list = new ArrayList();
+
+        list.add("Java");
+    }
+}
+```
+
+Without annotation
+
+Compiler shows warning.
+
+With annotation
+
+Warning disappears.
+
+---
+
+# 8. @FunctionalInterface
+
+Applied on interfaces.
+
+Ensures
+
+exactly one abstract method exists.
+
+Example
+
+```java
+@FunctionalInterface
+interface Printable {
+
+    void print();
+}
+```
+
+Valid.
+
+---
+
+Invalid
+
+```java
+@FunctionalInterface
+interface Printable {
+
+    void print();
+
+    void display();
+}
+```
+
+Compilation Error.
+
+---
+
+# 9. @SafeVarargs
+
+Used with methods having generic varargs.
+
+Example
+
+```java
+@SafeVarargs
+public final <T> void display(T... values) {
+
+}
+```
+
+Suppresses unsafe generic varargs warning.
+
+Mostly used in library code.
+
+---
+
+# 10. Where Can We Apply Annotations?
+
+Annotations can be applied to
+
+* Class
+* Interface
+* Enum
+* Record
+* Method
+* Constructor
+* Field
+* Parameter
+* Local Variable
+* Package
+
+Example
+
+```java
+@Override
+public void display() {
+}
+```
+
+---
+
+# 11. Multiple Annotations
+
+Allowed.
+
+```java
+@Deprecated
+@SuppressWarnings("deprecation")
+public void test() {
+
+}
+```
+
+---
+
+# 12. Custom Annotation
+
+We can create our own annotation.
+
+Example
+
+```java
+@interface Author {
+
+}
+```
+
+Usage
+
+```java
+@Author
+class Student {
+
+}
+```
+
+---
+
+# 13. Annotation with Elements
+
+Annotations can have values.
+
+```java
+@interface Author {
+
+    String name();
+}
+```
+
+Usage
+
+```java
+@Author(name="Kaustubh")
+class Student {
+
+}
+```
+
+---
+
+# 14. Multiple Elements
+
+```java
+@interface StudentInfo {
+
+    int id();
+
+    String name();
+
+    double marks();
+}
+```
+
+Usage
+
+```java
+@StudentInfo(
+
+        id=101,
+
+        name="Rahul",
+
+        marks=90.5)
+
+class Student {
+
+}
+```
+
+---
+
+# 15. default Value
+
+Annotation elements can have default values.
+
+```java
+@interface Author {
+
+    String name() default "Unknown";
+}
+```
+
+Usage
+
+```java
+@Author
+class Student {
+
+}
+```
+
+Output
+
+```text
+name = Unknown
+```
+
+---
+
+# 16. value Element
+
+If annotation has only one element named
+
+```text
+value
+```
+
+then
+
+```java
+@interface Author {
+
+    String value();
+}
+```
+
+Usage
+
+Instead of
+
+```java
+@Author(value="Kaustubh")
+```
+
+we can simply write
+
+```java
+@Author("Kaustubh")
+```
+
+---
+
+# 17. Marker Annotation
+
+No elements.
+
+Example
+
+```java
+@interface Test {
+
+}
+```
+
+Usage
+
+```java
+@Test
+public void demo() {
+
+}
+```
+
+---
+
+# 18. Single Value Annotation
+
+```java
+@interface Version {
+
+    int value();
+}
+```
+
+Usage
+
+```java
+@Version(2)
+class Student {
+
+}
+```
+
+---
+
+# 19. Runtime Processing
+
+Annotations themselves do nothing.
+
+Some framework or Java Reflection reads them.
+
+Example
+
+Spring Boot
+
+```java
+@RestController
+```
+
+JPA
+
+```java
+@Entity
+```
+
+JUnit
+
+```java
+@Test
+```
+
+The framework scans the annotation and performs the required action.
+
+---
+
+# 20. Common Framework Annotations
+
+Spring Boot
+
+```java
+@RestController
+```
+
+```java
+@Service
+```
+
+```java
+@Repository
+```
+
+```java
+@Autowired
+```
+
+Hibernate
+
+```java
+@Entity
+```
+
+```java
+@Table
+```
+
+JUnit
+
+```java
+@Test
+```
+
+---
+
+# 21. Advantages
+
+* Better readability
+* Compiler checks
+* Reduces errors
+* Used by frameworks
+* Adds metadata
+* Cleaner code
+
+---
+
+# 22. Where Should We Use Annotations?
+
+Examples
+
+* Spring Boot
+* Hibernate
+* JPA
+* JUnit
+* Serialization
+* Validation
+* Dependency Injection
+
+---
+
+# 23. Difference Between Comments and Annotations
+
+| Comments            | Annotations                     |
+| ------------------- | ------------------------------- |
+| For humans          | For compiler/tools/frameworks   |
+| Ignored by compiler | Processed by compiler/JVM/tools |
+| No behavior         | Can influence processing        |
+
+---
+
+# 24. Interview Questions
+
+**Q1. What is an Annotation?**
+
+Metadata that provides information to the compiler, JVM or tools.
+
+---
+
+**Q2. Which Java version introduced Annotations?**
+
+Java 5.
+
+---
+
+**Q3. Which annotation checks method overriding?**
+
+```text
+@Override
+```
+
+---
+
+**Q4. Which annotation marks old APIs?**
+
+```text
+@Deprecated
+```
+
+---
+
+**Q5. Which annotation suppresses compiler warnings?**
+
+```text
+@SuppressWarnings
+```
+
+---
+
+**Q6. Which annotation ensures a functional interface?**
+
+```text
+@FunctionalInterface
+```
+
+---
+
+**Q7. Can we create custom annotations?**
+
+Yes.
+
+---
+
+**Q8. Do annotations change program logic?**
+
+No.
+
+They provide metadata.
+
+---
+
+# 25. What Can and Cannot Annotations Have?
+
+| Feature                              | Allowed? |
+| ------------------------------------ | :------: |
+| Built-in Annotations                 |   ✅ Yes  |
+| Custom Annotations                   |   ✅ Yes  |
+| Elements (Members)                   |   ✅ Yes  |
+| Default Values                       |   ✅ Yes  |
+| Multiple Elements                    |   ✅ Yes  |
+| Marker Annotations                   |   ✅ Yes  |
+| Single Value Annotations             |   ✅ Yes  |
+| Multiple Annotations on Same Element |   ✅ Yes  |
+| Methods (Annotation Elements)        |   ✅ Yes  |
+| Constructors                         |   ❌ No   |
+| Instance Variables                   |   ❌ No   |
+| Static Variables                     |   ❌ No   |
+| Inheritance (`extends`)              |   ❌ No   |
+
+---
+
+# 26. Complete Example
+
+```java
+@interface StudentInfo {
+
+    int id();
+
+    String name();
+
+    String course() default "Java";
+}
+
+@StudentInfo(
+
+        id=101,
+
+        name="Harsh")
+
+class Student {
+
+}
+
+public class Main {
+
+    public static void main(String[] args) {
+
+        System.out.println("Program Executed");
+    }
+}
+```
+
+Output
+
+```text
+Program Executed
+```
+
+Notice
+
+The annotation itself does nothing because no code is reading it.
+
+---
+
+# 27. How Do Frameworks Use Annotations?
+
+Suppose we write
+
+```java
+@RestController
+class StudentController {
+
+}
+```
+
+Spring Boot scans your class using **Reflection**.
+
+It detects
+
+```text
+@RestController
+```
+
+and automatically registers the class as a REST controller.
+
+Similarly,
+
+```java
+@Entity
+```
+
+tells Hibernate to map a class to a database table.
+
+The annotation is **just metadata**; the framework decides what to do with it.
+
+---
+
+## Types of Annotations
+
+Java annotations can be classified into three main types.
+
+---
+
+# 1. Marker Annotation
+
+A marker annotation does **not** contain any elements (members).
+
+It is simply used to mark or identify a program element.
+
+Example
+
+```java
+@interface Test {
+}
+```
+
+Usage
+
+```java
+@Test
+class Student {
+
+}
+```
+
+Some built-in marker annotations
+
+* `@Override`
+* `@Deprecated`
+
+---
+
+# 2. Single Value Annotation
+
+A single value annotation contains only one element, usually named `value`.
+
+Example
+
+```java
+@interface Version {
+
+    int value();
+}
+```
+
+Usage
+
+```java
+@Version(2)
+class Student {
+
+}
+```
+
+The above is equivalent to
+
+```java
+@Version(value = 2)
+class Student {
+
+}
+```
+
+If the only element is named `value`, Java allows us to omit `value=`.
+
+---
+
+# 3. Multi Value Annotation
+
+A multi value annotation contains two or more elements.
+
+Example
+
+```java
+@interface StudentInfo {
+
+    int id();
+
+    String name();
+
+    String[] skills();
+}
+```
+
+Usage
+
+```java
+@StudentInfo(
+        id = 101,
+        name = "Harsh",
+        skills = {"Java", "Spring Boot", "SQL"}
+)
+class Student {
+
+}
+```
+
+---
+
+# Summary
+
+| Annotation Type         | Elements              | Example                                               |
+| ----------------------- | --------------------- | ----------------------------------------------------- |
+| Marker Annotation       | No elements           | `@Override`, `@Deprecated`                            |
+| Single Value Annotation | One element (`value`) | `@Version(2)`                                         |
+| Multi Value Annotation  | Two or more elements  | `@StudentInfo(id=101, name="Harsh", skills={"Java"})` |
+
+### Teaching Tip
+
+Tell students to remember the three types like this:
+
+* **Marker** → Just marks something (`@Override`)
+* **Single Value** → One piece of information (`@Version(2)`)
+* **Multi Value** → Multiple pieces of information (`@StudentInfo(...)`)
+
+---
+
+# Allowed Types for Annotation Elements
+
+Annotation elements can have **only the following data types**.
+
+| Data Type                                          | Allowed? | Example              |
+| -------------------------------------------------- | :------: | -------------------- |
+| Primitive Types (`int`, `double`, `boolean`, etc.) |   ✅ Yes  | `int id();`          |
+| `String`                                           |   ✅ Yes  | `String name();`     |
+| `Class`                                            |   ✅ Yes  | `Class<?> type();`   |
+| `enum`                                             |   ✅ Yes  | `Day day();`         |
+| Annotation                                         |   ✅ Yes  | `Author author();`   |
+| Array of Allowed Types                             |   ✅ Yes  | `String[] skills();` |
+
+---
+
+# Examples
+
+### Primitive
+
+```java
+@interface StudentInfo {
+    int id();
+}
+```
+
+---
+
+### String
+
+```java
+@interface StudentInfo {
+    String name();
+}
+```
+
+---
+
+### Class
+
+```java
+@interface StudentInfo {
+    Class<?> course();
+}
+```
+
+Usage
+
+```java
+@StudentInfo(course = String.class)
+```
+
+---
+
+### Enum
+
+```java
+enum Department {
+    IT, HR, SALES
+}
+
+@interface EmployeeInfo {
+    Department department();
+}
+```
+
+Usage
+
+```java
+@EmployeeInfo(department = Department.IT)
+```
+
+---
+
+### Annotation
+
+```java
+@interface Author {
+    String name();
+}
+
+@interface Book {
+    Author author();
+}
+```
+
+Usage
+
+```java
+@Book(
+    author = @Author(name = "Kaustubh")
+)
+```
+
+---
+
+### Array
+
+```java
+@interface StudentInfo {
+    String[] skills();
+}
+```
+
+Usage
+
+```java
+@StudentInfo(
+    skills = {"Java", "Spring", "SQL"}
+)
+```
+
+---
+
+# Not Allowed
+
+| Data Type                                   | Allowed? |
+| ------------------------------------------- | :------: |
+| `LocalDate`                                 |   ❌ No   |
+| `List<String>`                              |   ❌ No   |
+| `Map<K,V>`                                  |   ❌ No   |
+| Any Custom Class                            |   ❌ No   |
+| Wrapper Classes (`Integer`, `Double`, etc.) |   ❌ No   |
+
+Example (Invalid)
+
+```java
+@interface StudentInfo {
+
+    LocalDate dob();    // ❌ Not Allowed
+}
+```
+
+---
+
+## Memory Trick
+
+Annotation elements can contain only:
+
+* ✅ Primitive types
+* ✅ `String`
+* ✅ `Class`
+* ✅ `enum`
+* ✅ Another annotation
+* ✅ Arrays of the above
+---
+
+A good classroom example is an annotation that stores **metadata about a student project**.
+
+### Step 1: Create the Annotation
+
+```java
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.time.LocalDate;
+
+@Retention(RetentionPolicy.RUNTIME)
+@interface ProjectInfo {
+
+    String name();
+
+    String value();
+
+    String[] technologies();
+
+    String startDate();
+}
+```
+
+> **Note:** Although you asked for a `LocalDate` field, **annotation elements cannot be of type `LocalDate`**. The allowed types are:
+>
+> * Primitive types
+> * `String`
+> * `Class`
+> * `enum`
+> * Annotation
+> * Arrays of the above
+>
+> Therefore, dates are typically stored as `String` or an `enum`.
+
+---
+
+### Step 2: Apply the Annotation
+
+```java
+@ProjectInfo(
+        name = "Student Management System",
+        value = "Final Year Project",
+        technologies = {"Java", "Spring Boot", "MySQL"},
+        startDate = "2026-07-25"
+)
+class StudentProject {
+
+}
+```
+
+---
+
+### Step 3: Read the Annotation Using Reflection
+
+```java
+public class Main {
+
+    public static void main(String[] args) {
+
+        Class<StudentProject> cls = StudentProject.class;
+
+        ProjectInfo info = cls.getAnnotation(ProjectInfo.class);
+
+        System.out.println("Name         : " + info.name());
+        System.out.println("Value        : " + info.value());
+        System.out.println("Start Date   : " + info.startDate());
+
+        System.out.println("Technologies :");
+
+        for (String tech : info.technologies()) {
+            System.out.println(tech);
+        }
+    }
+}
+```
+
+---
+
+### Output
+
+```text
+Name         : Student Management System
+Value        : Final Year Project
+Start Date   : 2026-07-25
+Technologies :
+Java
+Spring Boot
+MySQL
+```
+
+---
+
+## Interview Question
+
+**Q:** Why didn't we use `LocalDate` in the annotation?
+
+**A:** Because annotation elements can only be of specific types:
+
+* Primitive types
+* `String`
+* `Class`
+* `enum`
+* Another annotation
+* Arrays of the above
+
+`LocalDate` is a regular class, so it **cannot** be used as an annotation element. In practice, dates are stored as `String` or represented using an `enum`.

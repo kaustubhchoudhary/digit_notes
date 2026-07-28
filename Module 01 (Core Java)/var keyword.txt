@@ -1,0 +1,445 @@
+
+# Java `var` Keyword
+
+## 1. Introduction
+
+Before Java 10, we had to explicitly declare the data type of every local variable.
+
+Example
+
+```java
+String name = "Rahul";
+
+ArrayList<String> names = new ArrayList<>();
+
+BufferedReader reader = new BufferedReader(new FileReader("students.txt"));
+```
+
+Sometimes the type becomes long and repetitive.
+
+Java 10 introduced the **`var` keyword** to reduce unnecessary type declarations.
+
+---
+
+# 2. What is `var`?
+
+> `var` allows the compiler to automatically determine (infer) the data type of a **local variable** from the assigned value.
+
+Introduced in:
+
+* Java 10
+
+Example
+
+```java
+var name = "Rahul";
+```
+
+The compiler automatically infers
+
+```java
+String name = "Rahul";
+```
+
+---
+
+# 3. Basic Examples
+
+```java
+var age = 20;
+```
+
+Equivalent to
+
+```java
+int age = 20;
+```
+
+---
+
+```java
+var salary = 55000.50;
+```
+
+Equivalent to
+
+```java
+double salary = 55000.50;
+```
+
+---
+
+```java
+var active = true;
+```
+
+Equivalent to
+
+```java
+boolean active = true;
+```
+
+---
+
+```java
+var message = "Hello";
+```
+
+Equivalent to
+
+```java
+String message = "Hello";
+```
+
+---
+
+# 4. Object Examples
+
+```java
+var list = new ArrayList<String>();
+```
+
+Compiler infers
+
+```java
+ArrayList<String> list = new ArrayList<>();
+```
+
+---
+
+```java
+var date = LocalDate.now();
+```
+
+Compiler infers
+
+```java
+LocalDate date = LocalDate.now();
+```
+
+---
+
+```java
+var student = new Student(101, "Rahul");
+```
+
+Compiler infers
+
+```java
+Student student = new Student(101, "Rahul");
+```
+
+---
+
+# 5. Common Uses
+
+```java
+var reader = new BufferedReader(new FileReader("students.txt"));
+
+var writer = new BufferedWriter(new FileWriter("result.txt"));
+
+var scanner = new Scanner(System.in);
+
+var map = new HashMap<Integer, String>();
+```
+
+---
+
+# 6. Where Can We Use `var`?
+
+`var` can be used only for **local variables**.
+
+Examples
+
+Inside methods
+
+```java
+public static void main(String[] args) {
+
+    var name = "Rahul";
+}
+```
+
+Inside loops
+
+```java
+for (var i = 1; i <= 5; i++) {
+
+    System.out.println(i);
+}
+```
+
+Enhanced for loop
+
+```java
+for (var name : names) {
+
+    System.out.println(name);
+}
+```
+
+---
+
+# 7. Where Can't We Use `var`?
+
+## Instance Variables ❌
+
+```java
+class Student {
+
+    var name = "Rahul";
+}
+```
+
+Compilation Error
+
+---
+
+## Static Variables ❌
+
+```java
+static var count = 10;
+```
+
+Compilation Error
+
+---
+
+## Method Parameters ❌
+
+```java
+public void display(var name) {
+
+}
+```
+
+Compilation Error
+
+---
+
+## Return Type ❌
+
+```java
+public var getName() {
+
+}
+```
+
+Compilation Error
+
+---
+
+## Without Initialization ❌
+
+```java
+var number;
+```
+
+Compilation Error
+
+Compiler cannot determine the type.
+
+---
+
+## Initialized with null ❌
+
+```java
+var name = null;
+```
+
+Compilation Error
+
+Compiler cannot infer the type.
+
+---
+
+# 8. Type Cannot Change
+
+Once inferred, the type is fixed.
+
+```java
+var number = 10;
+
+number = 20;
+```
+
+Valid
+
+---
+
+```java
+var number = 10;
+
+number = "Java";
+```
+
+Compilation Error
+
+`number` is an `int`.
+
+---
+
+# 9. Advantages
+
+* Less typing
+* Cleaner code
+* Improves readability for obvious types
+* Useful with long generic declarations
+* Reduces repetition
+
+---
+
+# 10. Disadvantages
+
+* Can reduce readability if the assigned value is unclear.
+* Beginners may not immediately know the inferred type.
+* Can only be used for local variables.
+
+---
+
+# 11. Best Practices
+
+✅ Use `var` when the type is obvious.
+
+```java
+var list = new ArrayList<String>();
+
+var date = LocalDate.now();
+
+var scanner = new Scanner(System.in);
+```
+
+❌ Avoid `var` when the inferred type is not immediately clear.
+
+```java
+var value = calculate();
+```
+
+Prefer
+
+```java
+Student student = calculate();
+```
+
+if it makes the code easier to understand.
+
+---
+
+# 12. Interview Questions
+
+**Q1. In which Java version was `var` introduced?**
+
+Java 10.
+
+---
+
+**Q2. Is `var` a keyword?**
+
+No. It is a **reserved type name**, not a Java keyword.
+
+---
+
+**Q3. Does `var` make Java dynamically typed?**
+
+No.
+
+Java remains **statically typed**. The type is determined at **compile time** and cannot change.
+
+---
+
+**Q4. Can `var` be used for instance variables?**
+
+No.
+
+---
+
+**Q5. Can `var` be initialized with `null`?**
+
+No.
+
+---
+
+**Q6. Can we write `var x;`?**
+
+No.
+
+The compiler cannot infer the type.
+
+---
+
+**Q7. Can `var` be used in a for loop?**
+
+Yes.
+
+Example
+
+```java
+for (var i = 1; i <= 5; i++) {
+
+    System.out.println(i);
+}
+```
+
+---
+
+# 13. Feature Summary
+
+| Feature                         | Allowed? |
+| ------------------------------- | :------: |
+| Local Variables                 |   ✅ Yes  |
+| Loop Variables                  |   ✅ Yes  |
+| Enhanced for Loop               |   ✅ Yes  |
+| Object References               |   ✅ Yes  |
+| Instance Variables              |   ❌ No   |
+| Static Variables                |   ❌ No   |
+| Method Parameters               |   ❌ No   |
+| Return Types                    |   ❌ No   |
+| Variable without Initialization |   ❌ No   |
+| Initialized with `null`         |   ❌ No   |
+| Change Inferred Type Later      |   ❌ No   |
+
+---
+
+# 14. Complete Example
+
+```java
+import java.io.*;
+import java.time.LocalDate;
+import java.util.ArrayList;
+
+public class Main {
+
+    public static void main(String[] args) throws Exception {
+
+        var name = "Rahul";
+        var age = 22;
+        var date = LocalDate.now();
+
+        var list = new ArrayList<String>();
+        list.add("Java");
+        list.add("Spring");
+
+        var reader = new BufferedReader(new FileReader("students.txt"));
+
+        System.out.println(name);
+        System.out.println(age);
+        System.out.println(date);
+        System.out.println(list);
+
+        reader.close();
+    }
+}
+```
+
+---
+
+# Teaching Tip
+
+Many beginners think `var` is like JavaScript's `var`. Emphasize this distinction:
+
+* **Java `var`** → Only helps the compiler infer the type. The variable still has a fixed type determined at compile time.
+* **JavaScript `var`** → Declares a dynamically typed variable whose type can change at runtime.
+
+This comparison helps students avoid one of the most common misconceptions about Java's `var`.
+
+---

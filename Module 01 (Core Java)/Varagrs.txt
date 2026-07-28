@@ -1,0 +1,516 @@
+# Java Varargs (`...`)
+
+## 1. Introduction
+
+Suppose we want to calculate the sum of numbers.
+
+Without varargs, we need multiple overloaded methods.
+
+```java
+public int sum(int a, int b) {
+    return a + b;
+}
+
+public int sum(int a, int b, int c) {
+    return a + b + c;
+}
+
+public int sum(int a, int b, int c, int d) {
+    return a + b + c + d;
+}
+```
+
+As the number of parameters increases, we need more overloaded methods.
+
+Java solves this problem using **Varargs**.
+
+---
+
+# 2. What are Varargs?
+
+> Varargs (Variable Arguments) allow a method to accept **zero or more arguments** of the same type.
+
+Introduced in:
+
+* Java 5
+
+Syntax
+
+```java
+dataType... variableName
+```
+
+Example
+
+```java
+public void display(String... names) {
+
+}
+```
+
+---
+
+# 3. Basic Example
+
+```java
+public class Main {
+
+    static void display(String... names) {
+
+        for (String name : names) {
+            System.out.println(name);
+        }
+    }
+
+    public static void main(String[] args) {
+
+        display();
+
+        display("Rahul");
+
+        display("Rahul", "Amit");
+
+        display("Rahul", "Amit", "Neha");
+    }
+}
+```
+
+Output
+
+```text
+Rahul
+
+Rahul
+Amit
+
+Rahul
+Amit
+Neha
+```
+
+---
+
+# 4. Varargs with Numbers
+
+```java
+public class Main {
+
+    static int sum(int... numbers) {
+
+        int total = 0;
+
+        for (int number : numbers) {
+            total += number;
+        }
+
+        return total;
+    }
+
+    public static void main(String[] args) {
+
+        System.out.println(sum());
+
+        System.out.println(sum(10));
+
+        System.out.println(sum(10, 20));
+
+        System.out.println(sum(10, 20, 30, 40));
+    }
+}
+```
+
+Output
+
+```text
+0
+10
+30
+100
+```
+
+---
+
+# 5. How Does Varargs Work?
+
+Internally, Java converts varargs into an array.
+
+Method
+
+```java
+sum(int... numbers)
+```
+
+is treated as
+
+```java
+sum(int[] numbers)
+```
+
+So this call
+
+```java
+sum(10, 20, 30);
+```
+
+is internally converted to
+
+```java
+sum(new int[]{10, 20, 30});
+```
+
+---
+
+# 6. Accessing Elements
+
+Since varargs are converted into an array, we can use
+
+* for loop
+* enhanced for loop
+* array indexing
+
+Example
+
+```java
+static void display(int... numbers) {
+
+    System.out.println(numbers[0]);
+
+    System.out.println(numbers.length);
+}
+```
+
+---
+
+# 7. Passing an Array
+
+We can pass an array directly.
+
+```java
+int[] marks = {70, 80, 90};
+
+display(marks);
+```
+
+Valid because varargs internally use arrays.
+
+---
+
+# 8. Multiple Parameters
+
+A method may contain normal parameters before the varargs parameter.
+
+```java
+static void display(String department, int... marks) {
+
+}
+```
+
+Usage
+
+```java
+display("IT", 70, 80, 90);
+```
+
+---
+
+# 9. Varargs Must Be Last
+
+Correct
+
+```java
+static void display(String name, int... marks) {
+
+}
+```
+
+Incorrect
+
+```java
+static void display(int... marks, String name) {
+
+}
+```
+
+Compilation Error
+
+Reason:
+
+The compiler would not know where the variable arguments end and the next parameter begins.
+
+---
+
+# 10. Only One Varargs Parameter
+
+Correct
+
+```java
+static void display(String... names) {
+
+}
+```
+
+Incorrect
+
+```java
+static void display(String... names, int... marks) {
+
+}
+```
+
+Compilation Error
+
+A method can have **only one** varargs parameter.
+
+---
+
+# 11. Method Overloading with Varargs
+
+Example
+
+```java
+static void display(int n) {
+
+    System.out.println("One Parameter");
+}
+
+static void display(int... numbers) {
+
+    System.out.println("Varargs");
+}
+```
+
+Call
+
+```java
+display(10);
+```
+
+Output
+
+```text
+One Parameter
+```
+
+The compiler prefers the more specific method.
+
+---
+
+# 12. Another Overloading Example
+
+```java
+static void display(int a, int b) {
+
+    System.out.println("Two Parameters");
+}
+
+static void display(int... numbers) {
+
+    System.out.println("Varargs");
+}
+```
+
+Call
+
+```java
+display(10, 20);
+```
+
+Output
+
+```text
+Two Parameters
+```
+
+Again, the compiler selects the most specific match.
+
+---
+
+# 13. Advantages
+
+* Accepts any number of arguments.
+* Reduces method overloading.
+* Cleaner and more flexible code.
+* Easy to use.
+
+---
+
+# 14. Disadvantages
+
+* Slight overhead because an array is created internally.
+* Excessive use may reduce readability.
+* Can create ambiguity with poorly designed overloaded methods.
+
+---
+
+# 15. Where is Varargs Used?
+
+Common examples include:
+
+* `System.out.printf()`
+* `String.format()`
+* Logging frameworks
+* Utility methods
+
+Example
+
+```java
+System.out.printf(
+        "Name: %s Age: %d",
+        "Rahul",
+        22
+);
+```
+
+The additional arguments are passed using varargs.
+
+---
+
+# 16. Interview Questions
+
+**Q1. In which Java version was varargs introduced?**
+
+Java 5.
+
+---
+
+**Q2. How many varargs parameters can a method have?**
+
+Only one.
+
+---
+
+**Q3. Where must the varargs parameter appear?**
+
+It must be the **last parameter** in the method signature.
+
+---
+
+**Q4. Internally, varargs are converted into what?**
+
+An array.
+
+---
+
+**Q5. Can we pass an array to a varargs method?**
+
+Yes.
+
+Example
+
+```java
+int[] numbers = {10, 20, 30};
+
+sum(numbers);
+```
+
+---
+
+**Q6. Can a varargs method accept zero arguments?**
+
+Yes.
+
+Example
+
+```java
+sum();
+```
+
+---
+
+**Q7. Can we overload a varargs method?**
+
+Yes.
+
+However, the compiler always prefers the **most specific method**.
+
+---
+
+# 17. Feature Summary
+
+| Feature                          | Allowed? |
+| -------------------------------- | :------: |
+| Zero Arguments                   |   ✅ Yes  |
+| One Argument                     |   ✅ Yes  |
+| Multiple Arguments               |   ✅ Yes  |
+| Pass an Array                    |   ✅ Yes  |
+| Overloading                      |   ✅ Yes  |
+| Normal Parameters Before Varargs |   ✅ Yes  |
+| Multiple Varargs Parameters      |   ❌ No   |
+| Varargs Not in Last Position     |   ❌ No   |
+
+---
+
+# 18. Complete Example
+
+```java
+public class Main {
+
+    static double average(int... marks) {
+
+        if (marks.length == 0) {
+            return 0;
+        }
+
+        int total = 0;
+
+        for (int mark : marks) {
+            total += mark;
+        }
+
+        return (double) total / marks.length;
+    }
+
+    public static void main(String[] args) {
+
+        System.out.println(average());
+
+        System.out.println(average(80));
+
+        System.out.println(average(80, 90));
+
+        System.out.println(average(80, 90, 70, 60, 100));
+    }
+}
+```
+
+Output
+
+```text
+0.0
+80.0
+85.0
+80.0
+```
+
+---
+
+# Teaching Tip
+
+Students often think `int...` is a new data type. Clarify that it is **not**.
+
+`int...` is simply a convenient syntax for accepting a variable number of arguments. Inside the method, it behaves exactly like an `int[]`.
+
+A useful demonstration is:
+
+```java
+static void demo(int... numbers) {
+
+    System.out.println(numbers.getClass().getName());
+}
+```
+
+Calling
+
+```java
+demo(10, 20, 30);
+```
+
+prints
+
+```text
+[I
+```
+
+which is the runtime type of an `int[]`. This clearly shows that **varargs are implemented as arrays internally**.
+
+---
