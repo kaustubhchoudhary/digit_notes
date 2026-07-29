@@ -1,0 +1,20 @@
+        List<Product> products = new ArrayList<>();
+        products.add(
+                new Product(1, "Mi Note 10S", 20000, 10,
+                        LocalDate.of(2020, 10, 5), new String[]{"64GB", "128GB", "256GB"}));
+
+        products.add(
+                new Product(3, "Apple i Phone Pro max", 150000, 20,
+                        LocalDate.of(2025, 1, 10), new String[]{"32GB", "64GB", "128GB"}));
+
+        products.add(
+                new Product(2, "Moto Laser M", 30000, 40,
+                        LocalDate.of(2022, 8, 2), new String[]{"128GB", "256GB", "512GB"}));
+
+        products.add(
+                new Product(5, "Mi max", 25000, 15,
+                        LocalDate.of(2021, 1, 9), new String[]{"16GB", "64GB", "512GB"}));
+
+        products.add(
+                new Product(4, "Redmi Note", 25000, 32,
+                        LocalDate.of(2021, 3, 2), new String[]{"16GB", "512GB", "1024GB"}));

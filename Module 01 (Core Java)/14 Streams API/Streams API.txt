@@ -1,0 +1,230 @@
+Streams API
+===========
+- Stream API was introduced in Java 8
+- Streams API is used to filter, sort and convert Collections
+- It heavily depends on
+	- Generics
+	- Functional Interfaces
+	- Lambda Expressions
+	- Method references
+- Streams API work on Arrays, as well as any Collection classes
+
+Steps
+=====
+The whole operation of sorting and filtering can be divided into 3 steps:
+
+1. Creating a Stream
+2. Calling the intermediate function(s)
+3. Calling a terminal function
+
+1. Creating a Stream
+	- Is compulsory
+	- To get a stream on
+		- collection classes use strList.stream()
+		- array use Stream.of(arr)
+
+A stream is a sequence of elements that supports various operations to perform computations in a functional-style, such as filtering, mapping, reducing, and more.
+
+Stream
+-------	
+- Stream<T> is an Interface
+- It is central to the mechanism of Streams API
+- It is present in java.util.stream package
+
+stream()
+--------
+- The stream() method is a default method defined in the Collection interface. 
+- It is available to all collection classes
+
+Ex: 
+
+ArrayList<String> aL = new ArrayList<String>();
+Stream<String> arrStream = aL.stream()
+
+Arrays.stream()
+---------------
+- The Arrays.stream() method is used to convert any type of array into a stream 
+
+Ex:
+int[] numbers = new int[10];
+Stream<Integer> strArr = Arrays.stream(numbers);
+
+Working
+=======
+- When we call stream() on any collection or Arrays.stream() on an array, a new Stream instance is created with the elements of the collection/array. 
+- This new stream is capable of internal iteration.
+
+Iteration : Go to every element in a collection
+
+Internal Iteration
+------------------
+- When we wish to iterate over the elements in a Collection, we use while, do-while, for, or enhanced for loops.
+- When we obtain Stream, the methods will work on each object turn by turn, this is known as Internal Iteration
+
+For ex: 
+List<Integer> l = Arrays.asList(1,2,3,4,5);
+Stream<Integer> s = l.stream();
+
+s = [1,2,3,4,5]
+
+Parallel Processing
+-------------------
+- Now the intermediate methods and terminal methods can work on 1 element at the same time. 
+- This is known as parallel processing
+
+2. Calling the intermediate function(s)
+	- is optional
+	- we can have even 0 intermediate functions
+	- All the intermediate functions chained together
+	- will not even start working if there is no terminal function
+	- These are some intermediate operations:
+		1.	filter()
+		2.	map()
+		3.	flatMap()
+		4.	distinct()
+		5.	sorted()
+		6.	peek()
+		7.	limit()
+		8.	skip()
+
+3. Calling a terminal function
+	- is compulsory
+	- we can have only 1 terminal function
+	- it makes the intermediate functions operate on the data
+	- It is also known as aggregate function
+	- These are some terminal operations: 
+		1.	toArray()
+		2.	collect()
+		3.	count()
+		4.	reduce()
+		5.	forEach()
+		6.	forEachOrdered()
+		7.	min()
+		8.	max()
+		9.	anyMatch()
+		10.	allMatch()
+		11.	noneMatch()
+		12.	findAny()
+		13.	findFirst()
+
+Lazy Evaluation
+---------------
+- Streams in Java are lazily evaluated, meaning the intermediate operations (like filter(), map()) are not executed until a terminal operation is invoked. 
+- This can lead to more efficient execution of data processing.
+
+Key Points about stream()
+=========================
+
+1) Non-Destructive: Using stream() does not modify the original collection.
+
+2) Single-Use: A stream can only be used once; after a terminal operation is executed, the stream is considered consumed.
+
+3) Functional Programming Style: The Streams API promotes a more declarative, functional programming style, which often results in cleaner and more readable code.
+-----X-----X-----X-----
+Important methods
+=================
+filter
+------
+- filter is used to filter the collections and arrays
+- We have to pass a test condition (definition of boolean test(T t))  for filtration
+- It is an intermediate function
+
+map
+---
+- It is used to transform each element of a stream into another form.
+- It does not filter or remove elements — it just converts them.
+- In it we need to pass the definition of R apply (T t)
+
+forEach
+-------
+- If we want to perform some operation to each element of a collect we use the forEach method 
+- forEach takes in Consumer
+- It is a terminal method
+
+collect
+-------
+- Stream.collect() is one of the Java 8's Stream API‘s terminal methods. 
+- It helps to repackage elements to some data structures
+- The strategy for this operation is provided via the Collector interface implementation.
+
+reduce()
+--------
+- It is a terminal operation.
+- It combines all elements of the stream into one result
+- Uses an accumulator function
+
+Collectors class
+================
+Collectors.toList()
+-------------------
+- The toList collector can be used for collecting all Stream elements into a List instance. 
+
+Collectors.toSet()
+------------------
+- The toSet collector can be used for collecting all Stream elements into a Set instance.
+
+In both the above - The important thing to remember is that we can't assume any particular List/Set implementation with this method.
+
+Collectors.toCollection()
+-------------------------
+- When using the toSet and toList collectors, we can't make any assumptions of their implementations. 
+
+- If we want to use a custom implementation, we'll need to use the toCollection collector with a provided collection of our choice.
+
+ex: collect(toCollection(LinkedList::new));
+
+Static Import
+-------------
+If we want to use a static method say Collectors.toList()
+
+We can do: import static java.util.stream.Collectors.toList;
+Now we can use: collect(toList()) directly
+-----X-----X-----X-----
+Stream API use cases for practice
+=================================
+
+public class Product {
+	private int id;
+	private String name;
+	private String category;
+	private double price;
+	private double rating;
+}
+
+List<Product> products = Arrays.asList(
+		new Product(202, "Microwave", "Kitchen", 22000.0, 4.4),
+		new Product(102, "Smartphone", "Electronics", 25000.0, 4.7),
+		new Product(302, "Sofa", "Furniture", 38000.0, 4.2),
+		new Product(103, "Smart Watch", "Electronics", 20000.0, 4.3),
+		new Product(201, "Toaster", "Kitchen", 4400.0, 3.5),
+		new Product(303, "Chair", "Furniture", 4500.0, 4.1),
+		new Product(101, "Laptop", "Electronics", 40000.0, 4.5),
+		new Product(203, "Blender", "Kitchen", 3500.0, 3.9),
+		new Product(301, "Desk", "Furniture", 4000.0, 3.8));
+
+Streams API use cases:
+
+1. Filter the products to show only those in the "Electronics" category
+
+2. Sort Products by Price
+
+3. Extract just the names of the products
+
+4. Find the product with the highest/lowest price
+
+5. Count the number of products with a rating above 4.0.
+
+6. Calculate the total price of all products
+
+7. Group the products by their category
+
+8. Get a list of all unique product categories.
+
+9. Limit the output to the first 3 products
+
+10. Limit the output to the last 3 products.
+
+11. Create a list of ProductCategory objects from a list of Product objects
+
+12. Apply a discount of 30% on all items
+-----X-----X-----X-----X-----X-----X-----
