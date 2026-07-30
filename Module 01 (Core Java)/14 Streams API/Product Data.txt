@@ -286,7 +286,17 @@ false
 **Hint**
 
 ```
-Collectors.groupingBy(Product::isInStock)
+source -> convert to stream -> collect as Collectors.groupingBy(Product::isInStock)
 ```
 
 ---
+
+
+
+
+
+
+
+
+
+

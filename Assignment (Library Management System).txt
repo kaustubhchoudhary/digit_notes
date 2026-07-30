@@ -1,0 +1,410 @@
+
+# Assignment: Library Management System
+
+## Objective
+
+Develop a **console-based Library Management System** using Core Java concepts learned in the course.
+
+The application should demonstrate the use of:
+
+* Object-Oriented Programming
+* Collections Framework
+* Exception Handling
+* File Handling
+* Enums
+* Streams API
+* Input Validation
+
+---
+
+# Problem Statement
+
+A library wants to automate its book management process.
+
+The application supports two types of users:
+
+* **Librarian**
+* **Borrower**
+
+The system should read all data from files when the application starts and save all updated data back to the files before exiting.
+
+---
+
+# Files Provided
+
+## users.txt
+
+Contains user details.
+
+```
+id,name,email,password,role
+```
+
+Sample
+
+```
+1,Admin,admin@library.com,admin123,LIBRARIAN
+2,Rahul,rahul@gmail.com,rahul123,BORROWER
+3,Priya,priya@gmail.com,priya123,BORROWER
+```
+
+---
+
+## books.txt
+
+Contains book details.
+
+```
+bookId,title,author,category,price,status,borrowedBy
+```
+
+Sample
+
+```
+101,Effective Java,Joshua Bloch,Programming,750,AVAILABLE,-
+102,Clean Code,Robert Martin,Programming,650,BORROWED,2
+103,Atomic Habits,James Clear,Self Help,500,AVAILABLE,-
+```
+
+`borrowedBy` stores the Borrower ID. Use `-` when the book is available.
+
+---
+
+# Classes
+
+## Person
+
+```
+id
+name
+email
+password
+role
+```
+
+---
+
+## Book
+
+```
+bookId
+title
+author
+category
+price
+status
+borrowedBy
+```
+
+---
+
+# Enums
+
+## Role
+
+```
+LIBRARIAN
+BORROWER
+```
+
+---
+
+## BookStatus
+
+```
+AVAILABLE
+BORROWED
+```
+
+---
+
+# Main Menu
+
+```
+========= Library Management =========
+
+1. Register Borrower
+2. Login
+3. Exit
+```
+
+---
+
+# Functional Requirements
+
+## 1. Register Borrower
+
+Allow only **Borrowers** to register.
+
+Validate
+
+* Email format
+* Email should be unique
+* Password should contain at least
+
+  * 8 characters
+  * One uppercase letter
+  * One lowercase letter
+  * One digit
+  * One special character
+
+Save the new borrower before application exit.
+
+---
+
+## 2. Login
+
+Allow both
+
+* Librarian
+* Borrower
+
+to login using
+
+```
+Email
+Password
+```
+
+Display the appropriate menu after successful login.
+
+---
+
+# Librarian Menu
+
+```
+========= Librarian =========
+
+1. Add Book
+2. View All Books
+3. Change Password
+4. Logout
+```
+
+---
+
+### Add Book
+
+Validate
+
+* Unique Book ID
+* Positive Price
+
+Status should be
+
+```
+AVAILABLE
+```
+
+BorrowedBy should be
+
+```
+-
+```
+
+---
+
+### View All Books
+
+Display all books in a formatted manner.
+
+---
+
+### Change Password
+
+Ask for
+
+```
+Old Password
+```
+
+If it matches,
+
+Allow user to enter
+
+```
+New Password
+Confirm Password
+```
+
+Update the password.
+
+---
+
+# Borrower Menu
+
+```
+========= Borrower =========
+
+1. View All Books
+2. Borrow Book
+3. Return Book
+4. Change Password
+5. Logout
+```
+
+---
+
+### Borrow Book
+
+Borrow a book only if
+
+* Book exists
+* Book is AVAILABLE
+* Borrower has borrowed fewer than **3 books**
+
+After borrowing
+
+```
+Status = BORROWED
+BorrowedBy = Borrower's ID
+```
+
+---
+
+### Return Book
+
+Return only books borrowed by the logged-in borrower.
+
+After returning
+
+```
+Status = AVAILABLE
+BorrowedBy = -
+```
+
+---
+
+### View All Books
+
+Display all books.
+
+---
+
+### Change Password
+
+Same functionality as Librarian.
+
+---
+
+# Streams API (Mandatory)
+
+Implement the following reports using **Streams API only**.
+
+1. Display all available books.
+2. Display all borrowed books.
+3. Display books sorted by title.
+4. Display books sorted by price.
+5. Find the most expensive book.
+6. Find the cheapest book.
+7. Calculate the average price of all books.
+8. Count books in each category.
+9. Count available and borrowed books.
+10. Display all books borrowed by the logged-in borrower.
+
+> **Note:** Use appropriate Stream operations such as `filter()`, `map()`, `sorted()`, `max()`, `min()`, `count()`, `collect()`, `groupingBy()`, `averagingDouble()`, etc.
+
+---
+
+# File Handling
+
+### On Application Startup
+
+Load
+
+* Users
+* Books
+
+from their respective files.
+
+---
+
+### Before Application Exit
+
+Save
+
+* Users
+* Books
+
+back to their respective files.
+
+---
+
+# Exception Handling
+
+Create appropriate custom exceptions wherever required.
+
+Examples
+
+```
+DuplicateUserException
+
+DuplicateBookException
+
+BookNotFoundException
+
+BookAlreadyBorrowedException
+
+BorrowLimitExceededException
+
+InvalidPasswordException
+```
+
+---
+
+# Constraints
+
+Students should decide:
+
+* Which Collection implementation should store users?
+* Which Collection implementation should store books?
+* How should duplicate checking be performed efficiently?
+* Which Stream operations are most suitable for each report?
+* How should file reading and writing be organized?
+
+---
+
+# Milestones
+
+## Milestone 1 (20 %)
+
+* Create classes and enums
+* Read users and books from files
+* Display Main Menu
+
+---
+
+## Milestone 2 (20 %)
+
+* Register Borrower
+* Login
+* Logout
+* Change Password
+
+---
+
+## Milestone 3 (25 %)
+
+Implement:
+
+* Add Book
+* View All Books
+* Borrow Book
+* Return Book
+
+---
+
+## Milestone 4 (25 %)
+
+Implement all **10 Streams API reports**.
+
+---
+
+## Milestone 5 (10 %)
+
+* Save updated data to files
+* Exception handling
+* Input validations
+* Code quality
+
+---
