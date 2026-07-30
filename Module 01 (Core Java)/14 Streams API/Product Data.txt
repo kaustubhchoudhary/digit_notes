@@ -1,0 +1,292 @@
+
+List<Product> products = new ArrayList<>();
+
+products.add(new Product(
+        101,
+        "Laptop",
+        65999.99,
+        15,
+        true,
+        LocalDate.of(2026, 1, 10),
+        new String[]{"8GB RAM", "16GB RAM", "32GB RAM"}
+));
+
+products.add(new Product(
+        102,
+        "Smartphone",
+        28999.50,
+        30,
+        true,
+        LocalDate.of(2026, 2, 5),
+        new String[]{"128GB", "256GB"}
+));
+
+products.add(new Product(
+        103,
+        "Wireless Mouse",
+        899.00,
+        0,
+        false,
+        LocalDate.of(2026, 3, 12),
+        new String[]{"Black", "White", "Blue"}
+));
+
+products.add(new Product(
+        104,
+        "Mechanical Keyboard",
+        3499.75,
+        18,
+        true,
+        LocalDate.of(2026, 1, 28),
+        new String[]{"Red Switch", "Blue Switch", "Brown Switch"}
+));
+
+products.add(new Product(
+        105,
+        "Monitor",
+        14999.00,
+        8,
+        true,
+        LocalDate.of(2026, 4, 18),
+        new String[]{"24-inch", "27-inch", "32-inch"}
+));
+
+products.add(new Product(
+        106,
+        "USB-C Charger",
+        1299.99,
+        0,
+        false,
+        LocalDate.of(2026, 5, 20),
+        new String[]{"30W", "65W", "100W"}
+));
+
+products.add(new Product(
+        107,
+        "Bluetooth Speaker",
+        4599.00,
+        12,
+        true,
+        LocalDate.of(2026, 2, 25),
+        new String[]{"Black", "Red"}
+));
+
+products.add(new Product(
+        108,
+        "Smart Watch",
+        8999.99,
+        25,
+        true,
+        LocalDate.of(2026, 6, 15),
+        new String[]{"Silver", "Black", "Rose Gold"}
+));
+
+products.add(new Product(
+        109,
+        "External SSD",
+        7499.50,
+        5,
+        true,
+        LocalDate.of(2026, 3, 30),
+        new String[]{"512GB", "1TB", "2TB"}
+));
+
+products.add(new Product(
+        110,
+        "Gaming Headset",
+        2799.99,
+        0,
+        false,
+        LocalDate.of(2026, 7, 1),
+        new String[]{"Wired", "Wireless"}
+));
+
+---------------
+
+Here are 10 progressively challenging use cases based on your `Product` class. They force students to think about **filter**, **map**, **sorted**, **distinct**, **limit**, **skip**, **reduce**, **collect**, **groupingBy**, and **counting**.
+
+---
+
+## 1. Find Available Products
+
+Display all products that are currently in stock.
+
+**Hint:** `filter()`
+
+**Expected Output**
+
+```
+Laptop
+Smartphone
+Mechanical Keyboard
+...
+```
+
+---
+
+## 2. Premium Products
+
+Display names of products whose price is greater than ₹10,000.
+
+**Hint:** `filter()`, `map()`
+
+**Expected Output**
+
+```
+Laptop
+Smartphone
+Monitor
+```
+
+---
+
+## 3. Product Names in Uppercase
+
+Display all product names in uppercase.
+
+**Hint:** `map()`
+
+**Expected Output**
+
+```
+LAPTOP
+SMARTPHONE
+WIRELESS MOUSE
+...
+```
+
+---
+
+## 4. Sort by Price
+
+Display all products sorted by price in ascending order.
+
+**Hint:** `sorted(Comparator.comparing())`
+
+**Expected Output**
+
+```
+Wireless Mouse
+USB-C Charger
+Gaming Headset
+...
+Laptop
+```
+
+---
+
+## 5. Top 3 Most Expensive Products
+
+Find the three most expensive products.
+
+**Hint**
+
+```
+sorted(descending)
+limit(3)
+```
+
+---
+
+## 6. Products Purchased After March 2026
+
+Display products purchased after `2026-03-31`.
+
+**Hint**
+
+```
+filter(product -> product.getPurchaseDate().isAfter(...))
+```
+
+---
+
+## 7. Total Inventory Value
+
+Calculate the total inventory value.
+
+Formula:
+
+```
+price × quantity
+```
+
+Example
+
+```
+65999.99 × 15
++
+28999.50 × 30
++
+...
+```
+
+**Hint**
+
+```
+map()
+reduce()
+```
+
+---
+
+## 8. Average Price of Available Products
+
+Find the average price of products that are currently available.
+
+**Hint**
+
+```
+filter()
+mapToDouble()
+average()
+```
+
+---
+
+## 9. Products Having More Than Two Variants
+
+Display names of products having more than two variants.
+
+Example
+
+```
+Laptop
+Mechanical Keyboard
+Monitor
+```
+
+**Hint**
+
+```
+filter(p -> p.getVariants().length > 2)
+map(Product::getName)
+```
+
+---
+
+## 10. Group Products by Stock Status
+
+Create a `Map<Boolean, List<Product>>`.
+
+Output should conceptually look like
+
+```
+true
+    Laptop
+    Monitor
+    Smart Watch
+    ...
+
+false
+    Wireless Mouse
+    USB-C Charger
+    Gaming Headset
+```
+
+**Hint**
+
+```
+Collectors.groupingBy(Product::isInStock)
+```
+
+---
