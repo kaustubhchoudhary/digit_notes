@@ -1,0 +1,211 @@
+Sub Queries
+===========
+What is a Subquery?
+
+> A subquery is a query written inside another SQL query to provide input to the main query.
+
+* Also called a nested query
+* The inner query executes first
+* Its result is used by the outer query
+
+---
+
+Where Can Subqueries Be Used?
+
+Subqueries can be used in:
+
+* `SELECT` (DQL)
+* `WHERE` clause
+* `FROM` clause
+* `INSERT`
+* `UPDATE`
+* `DELETE`
+
+👉 Subqueries are a technique, not a command category.
+
+---
+
+Types of Subqueries (Conceptual)
+
+1. Single-row subquery → returns one value
+2. Multi-row subquery → returns multiple values
+3. Correlated subquery → depends on outer query
+
+---
+
+# SUBQUERIES IN DQL (SELECT)
+
+---
+
+🟢 EASY LEVEL (Single-row subquery)
+
+#1. Find products priced above the average price
+
+```sql
+SELECT product_name, price
+FROM products
+WHERE price > (
+    SELECT AVG(price)
+    FROM products
+);
+```
+
+📌 Inner query returns one value (average price).
+
+---
+
+🟡 INTERMEDIATE LEVEL (Multi-row subquery)
+
+#2. Find users who have placed at least one order
+
+```sql
+SELECT user_name
+FROM users
+WHERE user_id IN (
+    SELECT user_id
+    FROM orders
+);
+```
+
+📌 Inner query returns multiple user_ids.
+
+---
+
+#3. Find products that have been ordered
+
+```sql
+SELECT product_name
+FROM products
+WHERE product_id IN (
+    SELECT product_id
+    FROM order_items
+);
+```
+
+---
+
+🔴 DIFFICULT LEVEL (Nested subqueries)
+
+#4. Find users who ordered “Campus Running Shoes”
+
+```sql
+SELECT user_name
+FROM users
+WHERE user_id IN (
+    SELECT user_id
+    FROM orders
+    WHERE order_id IN (
+        SELECT order_id
+        FROM order_items
+        WHERE product_id = (
+            SELECT product_id
+            FROM products
+            WHERE product_name = 'Campus Running Shoes'
+        )
+    )
+);
+```
+
+📌 This shows step-by-step logical filtering.
+
+---
+
+# SUBQUERIES IN DML
+
+---
+
+A. INSERT with Subquery
+
+#🟢 Easy
+
+#5. Insert a new order for the user “Rahul Sharma”
+
+```sql
+INSERT INTO orders (order_id, user_id, order_date)
+VALUES (
+    200,
+    (SELECT user_id FROM users WHERE user_name = 'Rahul Sharma'),
+    CURDATE()
+);
+```
+
+📌 Subquery fetches the required foreign key.
+
+---
+
+B. UPDATE with Subquery
+
+---
+
+#🟡 Intermediate
+
+#6. Increase price of products that have been ordered
+
+```sql
+UPDATE products
+SET price = price + 100
+WHERE product_id IN (
+    SELECT product_id
+    FROM order_items
+);
+```
+
+---
+
+#🔴 Difficult (Correlated logic)
+
+#7. Increase the price of all products that are currently priced below the average price of all products by 10%.
+
+```sql
+UPDATE products
+SET price = price * 1.10
+WHERE price < (
+    SELECT avg_price
+    FROM (
+        SELECT AVG(price) AS avg_price
+        FROM products
+    ) AS temp
+);
+```
+
+📌 Inner query recalculates average price dynamically.
+
+---
+
+C. DELETE with Subquery
+
+---
+
+#🟡 Intermediate
+
+#8. Delete users who have never placed an order
+
+```sql
+DELETE FROM users
+WHERE user_id NOT IN (
+    SELECT user_id
+    FROM orders
+);
+```
+---
+
+# Important Rules (Must Remember)
+
+* Use `IN` for multi-row subqueries
+* Use `=` for single-row subqueries
+* Ensure subqueries do not return NULL unexpectedly
+* Subqueries can often be rewritten using JOINs
+
+---
+
+Subquery vs Join (One-liner)
+
+> Joins are table-oriented; subqueries are logic-oriented.
+
+---
+
+Trainer-Grade Closing Line
+
+> Subqueries allow us to solve complex problems step by step by feeding the result of one query into another.
+
+---

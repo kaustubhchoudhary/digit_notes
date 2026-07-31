@@ -1,0 +1,195 @@
+Table and Column Options
+========================
+Topics:
+=> Table Options
+=> Column Options
+	* Naming Conventions
+	* Data Types
+	* Constraints
+	
+----X-----X-----X-----
+
+Table Options
+=============
+Common table options:
+
+ENGINE: This option defines the storage engine for the table. For example, InnoDB, MyISAM, MEMORY, etc. Each engine has its own features and performance characteristics.
+
+CHARACTER SET: Specifies the character set used for the table, indicating how character data is stored and interpreted. For instance, utf8, latin1, etc.
+
+COLLATE: Defines the collation for the table, determining the rules for comparing and sorting character strings. For example, utf8_general_ci, latin1_general_cs, etc.
+
+COMMENT: Allows you to add a comment or description to the table for documentation purposes.
+
+Ex: CREATE TABLE my_table (
+    id INT AUTO_INCREMENT PRIMARY KEY,    ...
+) ENGINE=InnoDB CHARSET=utf8 COMMENT='My Table Description';
+-----X-----X-----X-----
+Column Options
+==============
+When we create a column, we decide on following things:
+1. Name of column
+2. Data type
+3. Constraints
+4. Key types
+
+Lets see them one by one.
+
+Naming Conventions
+==================
+
+## ✅ Good Practices (Naming Conventions)
+
+* Use lowercase names for databases, tables, and columns
+* Use snake_case for multi-word names (student_id)
+* Keep names short, meaningful, and readable
+* Use plural nouns for table names (`employees`, `orders`)
+* Use `id` as the primary key column name
+* Use `<table>_id` for foreign key columns (course_id)
+* Follow one convention across the entire database
+* Choose clarity over brevity when naming
+
+---
+
+## ❌ Bad Practices (Naming Conventions)
+
+* Mixing naming styles (`studentName`, `student_id`, `StudentMarks`)
+* Using uppercase or camelCase inconsistently
+* Prefixing every column with the table name unnecessarily (course_fees, course_date)
+* Using vague names (`col1`, `data`, `value`, `temp`)
+* Using abbreviations that are not obvious (`emp_nm`, `dept_cd`)
+* Changing naming conventions midway in a project
+* Using reserved keywords as names (`order`, `group`, `user`)
+
+---
+
+## 🧠 Trainer-Grade One-Liner
+
+> A naming convention is successful only when it is applied consistently everywhere.
+
+-----X-----X-----X-----
+Data Types
+==========
+Here is a list of commonly used data types in MySQL:
+
+1. Numeric Data Types:
+   
+   -  INT or INTEGER : Integer values (whole numbers).
+   
+   -  DOUBLE : Double-precision floating-point numbers
+   
+   -  DECIMAL : Fixed-point numbers with exact precision for decimal calculations.
+   
+   For ex : Decimal (5, 2) => 999.99
+            35,00,000.89 => Decimal(9, 2)
+
+2. String Data Types:
+
+In Java, we have
+	- char = 'A'
+	- String = "A"
+
+In MySQL, we have no concept of single quoted single char values
+Here char, varchar and text - all are sequence of characters enclosed in single or double quotes
+	- char = 'Hi how are you'
+	- varchar = 'Hi how are you'
+	- text = 'Hi how are you'
+		
+   
+   -  CHAR : Fixed-length character strings.
+   
+   for ex: If data type is CHAR (5), whether we store 'h', 'hi', or 'hello' it will always allocate a memory of 5 to store them
+   
+   Note: In SQL/MySQL there is not "char" type, CHAR, VARCHAR and Text are all strings and here the string are represented by single quotes ('hi')
+   
+   -  VARCHAR : Variable-length character strings.
+   
+   for ex: If data type is VARCHAR (5), a memory of 1 will be allocated for 'h', 2 for 'hi', and 5 for 'hello'
+   
+   -  TEXT : Large text values with a maximum size of around 65,535 characters. ex: Story, book summary, blog etc
+
+How to store address?
+---------------------
+It depends upon what we want with data? 
+If we want to query the database by location, say for ex: Find the customers in Delhi, we should create separate columns for address units such as - house no, street, city, state, country, pincode etc
+
+Otherwise a VARCHAR is good enough
+
+How to store mobile no?
+-----------------------
+Mobile numbers are numeric - that's fine, but they are not to be a part of any calculation so we can store it as a char, with fixed length as per your need, size 10 or 12. 
+   
+3. Date and Time Data Types:
+
+   -  DATE : Dates in the format 'YYYY-MM-DD'. This is known as ISO Format
+
+   -  TIME : Time values in the format 'HH:MM:SS'.
+
+   -  DATETIME : Date and time combined in the format 'YYYY-MM-DD HH:MM:SS'.
+
+   -  TIMESTAMP : Same as DATETIME  but with automatic time zone conversion and update features.
+   
+   -  YEAR : A year in a four-digit format.
+
+DATETIME & TIMESTAMP
+--------------------
+Similarities
+------------
+Both are used for values that contain both date and time parts.
+
+In both the data is displayed in 'YYYY-MM-DD hh:mm:ss' format. 
+
+Difference
+----------
+In datetime, the range is '1000-01-01 00:00:00' to '9999-12-31 23:59:59'.
+
+In timestamp,the range is '1970-01-01 00:00:01' to '2038-01-19 03:14:07'.
+
+Epoch Date - 1970-01-01 00:00:01
+
+In summary, DATETIME is like writing a date and time on a calendar, allowing you to store any specific moment in time. 
+
+TIMESTAMP is more like a time counter that measures the number of seconds since a reference point, often used for automatic time zone conversions and updates.
+
+4. Boolean Data Types:
+   -  BOOL  or  BOOLEAN : A boolean value representing true or false. Surprisingly we cannot set the data type as Boolean. It is in the list. But when we select it, it gets converted to TinyInt.
+   
+   The best data type in MySQL to store boolean data is BIT (1) -> 0/1
+   
+   In Java -> isPresent => true/false
+   In MySQL -> isPresent => 1/0
+
+5. Binary Data Types:
+
+   -  BLOB : Binary Large Object for storing binary data like images or documents.
+
+   -  BINARY : Fixed-length binary data. Working is similar to CHAR
+
+   -  VARBINARY : Variable-length binary data. Working is similar to VARCHAR
+
+-----X-----X-----X-----
+Constraints
+============
+There are following constraints:
+
+1. PK : If checked => This column is a primary key
+
+2. NN : If checked => Inserting a value is compulsory
+
+3. UQ : If checked => Each entry must be unique
+
+4. AI : If checked => The integer field will be auto incrememnted
+
+5. ZF : If checked => It pads numeric values with leading zeros up to a specified display width, ensuring a consistent length for output.
+
+Ex:  roll_no int(5) ZF checked
+Data  00001
+Data  00102
+
+Note: ZeroFill works only with numerical data types.
+
+Ex: If the display length is 8:
+	- For integer data types : 00098765
+	- For decimal data types : 00987.65
+
+-----X-----X-----X-----

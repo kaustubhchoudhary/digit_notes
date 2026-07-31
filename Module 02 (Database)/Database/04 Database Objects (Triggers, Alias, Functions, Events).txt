@@ -1,0 +1,517 @@
+Database Objects
+================
+Topics
+======
+=> Triggers
+=> Alias
+=> Functions
+	String Functions
+	Numeric Functions
+	Date Functions
+=> Events
+
+---
+
+Triggers
+========
+- A trigger is a stored procedure that automatically executes or "fires" in response to certain events on a specific table or view in a database.
+
+It is used to
+- Enforce business rules.
+- Automatically update other tables or logs.
+- Validate data before insertion or update.
+
+---
+
+Types of Triggers
+-----------------
+There are 2 types of triggers
+
+BEFORE Trigger: Executes before the specified event.
+AFTER Trigger: Executes after the specified event.
+
+---
+
+Triggers are associated with DML operations:
+
+=> INSERT
+=> UPDATE
+=> DELETE
+
+---
+
+Trigger Events
+--------------
+Triggers can be associated with these events:
+
+BEFORE INSERT: Executes before a new row is inserted into the table.
+AFTER INSERT: Executes after a new row is inserted into the table.
+BEFORE UPDATE: Executes before an existing row is updated.
+AFTER UPDATE: Executes after an existing row is updated.
+BEFORE DELETE: Executes before a row is deleted from the table.
+AFTER DELETE: Executes after a row is deleted from the table.
+
+Most important are: **BEFORE INSERT** and **BEFORE UPDATE**
+
+Syntax:
+
+CREATE TRIGGER trigger_name
+{BEFORE | AFTER} {INSERT | UPDATE | DELETE}
+ON table_name
+FOR EACH ROW
+BEGIN
+    -- SQL statements go here
+END;
+
+Practice
+========
+-- Alter the employees table
+
+**Query:
+
+ALTER TABLE employees
+ADD COLUMN bonus DECIMAL(10,2),
+ADD COLUMN deduction DECIMAL(10,2),
+ADD COLUMN final_salary DECIMAL(10,2),
+ADD COLUMN total_experience INT;
+
+Trigger No 1 - Before Update Trigger 
+-------------
+**Query
+
+DELIMITER //
+
+CREATE TRIGGER before_update_employees
+BEFORE UPDATE ON employees
+FOR EACH ROW
+BEGIN
+    -- Calculate bonus (10% of basic salary)
+    SET NEW.bonus = NEW.basic_salary * 0.10;
+
+    -- Calculate deduction (5% of basic salary)
+    SET NEW.deduction = NEW.basic_salary * 0.05;
+
+    -- Calculate final salary
+    SET NEW.final_salary = NEW.basic_salary + NEW.bonus - NEW.deduction;
+
+    -- Calculate total experience (in years)
+    SET NEW.total_experience =
+        TIMESTAMPDIFF(YEAR, NEW.joining_date, CURDATE());
+END//
+
+DELIMITER ;
+
+-- Test (update all with same value)
+-- Turn off safe updates
+
+**Query
+
+SET SQL_SAFE_UPDATES = 0;
+
+**Query
+
+UPDATE employees
+SET basic_salary = basic_salary;
+
+** All rows will be updated
+
+
+Trigger No 2 - Before Insert Trigger 
+-------------
+**Query
+
+INSERT INTO employees
+(name, email, department, designation, joining_date, basic_salary)
+VALUES
+('Rohit Malhotra', 'rohit.malhotra@gmail.com', 'IT', 'Backend Developer', '2020-05-12', 65000);
+
+-- Display Triggers
+
+Query:
+
+SHOW TRIGGERS;
+
+-- Modifying a trigger
+
+MySQL doesn't suppport modifying triggers. Instead we can recreate an trigger with a new name or formula
+
+-- Remove Triggers
+
+DROP TRIGGER IF EXISTS trg_set_actual_fees_before_update;
+
+---X---X---X---
+Alias
+=====
+- An alias is a temporary name given to a table or column for the purpose of a particular SQL query to make table or column names more readable. 
+
+- The renaming is just a temporary change and the table name does not change in the original database.
+
+- Aliases are useful when table or column names are big or not very readable.
+
+- These are preferred when there is more than one table involved in a query.
+
+Ex: total_employees is the alias
+
+1. Use AS for more clarity
+- SELECT COUNT(*) AS total_employees FROM employees
+
+2. However we can avoid it totally
+- SELECT COUNT(*) total_employees FROM employees
+
+---
+
+MySQL Functions
+===============
+MySQL has many built-in functions.
+
+There are following functions:
+1. String Functions
+2. Date and time functions
+3. Numeric Functions
+4. Aggregate Functions
+
+---
+
+String functions
+================
+**Query:
+
+SELECT CONCAT(name, ' - ', department) AS employee_info
+FROM employees;
+
+SELECT CONCAT(name, ' <', email, '>') AS contact_details
+FROM employees;
+
+Note: Suppose we are writing Java Code and your MySQL table has 2 fields : first_name and last_name and we want to get full_name as the final result.
+
+So, what should we do : 
+- should we use concat() in MySQL and fetch single row?
+- should we fetch both columns and concat them in Java code?
+
+The answer to this is
+- If we want to do complex manipulations (such as handling null values, localization, or different name conventions.) to the string, we use Java
+- If we want to do simple concatenation of some string, we do this in MySQL and fetch single column instead of two
+
+**Query:
+
+SELECT SUBSTRING(name, 2, 3) AS ExtractString 
+FROM employees;
+
+**Query:
+
+SELECT UPPER(name) AS upper_name
+FROM employees;
+
+**Query:
+
+SELECT LOWER(name) AS lower_name
+FROM employees;
+
+**Query:
+
+SELECT name, LENGTH(name) AS name_length
+FROM employees;
+
+-----X-----X-----
+Numeric functions
+=================
+Inorder to show numeric functions we will introduce 1 more column to the table:
+
+- Add monthly tax to the table
+
+**Query
+ALTER TABLE employees
+ADD COLUMN monthly_tax DECIMAL(10,4);
+
+- Let Monthly tax = 7.85% of basic_salary + id * 0.137; // just some calculation
+
+**Query
+UPDATE employees
+SET monthly_tax = basic_salary * 0.0785 + id * 0.137;
+
+---
+
+Round the tax value to 2 decimal place
+
+**Query:
+
+SELECT name, monthly_tax, ROUND(monthly_tax, 2) AS rounded_tax
+FROM employees;
+
+---
+
+Calculate the CEIL value (nearest higher integer) of monthly tax.
+
+**Query:
+
+SELECT name, monthly_tax, CEIL(monthly_tax) AS ceiled_tax
+FROM employees;
+
+**Query:
+
+Calculate the FLOOR value (nearest lower integer) of monthly tax
+
+SELECT name, monthly_tax, FLOOR(monthly_tax) AS floored_tax
+FROM employees;
+
+**Query:
+
+Calculate the absolute difference from a benchmark salary
+
+SELECT name, basic_salary, ABS(basic_salary - 60000) AS salary_difference
+FROM employees;
+```
+-----X-----X-----
+Date functions
+==============
+**Query:
+
+-- Get the current date
+SELECT CURDATE() AS current_date;
+
+The above line will give error : 
+
+"Error Code: 1064. You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near 'current_date' at line"
+
+The reason is that "current_date" is a keyword in MySQL. 
+The keywords occur in light-blue color in the editor.
+
+How to solve?
+
+Solution 1: Change the name
+Solution 2: Enclose current_date within backticks, i.e `current_date`
+
+**Query:
+
+SELECT CURDATE() AS `current_date`;
+
+-- Get the current date and time
+
+**Query:
+
+SELECT NOW() AS current_date_time;
+
+-- Insert todays date in table employees;
+
+**Query:
+
+INSERT INTO employees
+(name, email, department, designation, joining_date, basic_salary)
+VALUES
+('Arjun Khanna', 'arjun.khanna@gmail.com', 'IT', 'Full Stack Developer', CURDATE(), 72000);
+
+-- Format the joining_date to display only the year
+
+**Query:
+
+SELECT name, DATE_FORMAT(joining_date, '%Y') AS hire_year FROM employees;
+
+**Query:
+
+SELECT name, joining_date,
+DATE_FORMAT(joining_date, '%Y') AS hire_year,
+DATE_FORMAT(joining_date, '%y') AS hire_y,
+DATE_FORMAT(joining_date, '%D') AS hire_day,
+DATE_FORMAT(joining_date, '%d') AS hire_d,
+DATE_FORMAT(joining_date, '%M') AS hire_month,
+DATE_FORMAT(joining_date, '%m') AS hire_m
+FROM employees;
+
+-- Add 3 months/years/days to the joining_date for each employee
+
+**Query:
+
+SELECT name, joining_date, 
+DATE_ADD(joining_date, INTERVAL 3 MONTH) 
+AS new_joining_date FROM employees;
+
+** Replace MONTH with YEAR or DAY and run the queries again
+
+-- Use methods in insert and update
+
+**Query:
+
+UPDATE employees SET joining_date = DATE_ADD(joining_date, INTERVAL 20 DAY) where id = 1;
+
+-- Calculate the number of days employed for each employee (till today) 
+
+**Query:
+
+SELECT 
+name, joining_date, DATEDIFF(NOW(), joining_date) AS days_employed 
+FROM employees 
+ORDER BY days_employed DESC;
+
+-- Extract the month from the joining_date for each employee
+
+**Query:
+
+SELECT name, joining_date, EXTRACT(MONTH FROM joining_date) AS hire_month FROM employees;
+
+Question: For this table, how can we extract the total number of years, months and days the person has worked till today?
+
+Refer Fig - 04_Question_SQL_Date_Diff.png
+
+Solution 1:
+
+**Query:
+
+SELECT 
+    first_name,
+    joining_date,
+    CONCAT(
+        TIMESTAMPDIFF(YEAR, joining_date, CURDATE()), ' years ',
+        TIMESTAMPDIFF(MONTH, joining_date, CURDATE()) % 12, ' months ',
+        FLOOR(DATEDIFF(CURDATE(), joining_date) - TIMESTAMPDIFF(YEAR, joining_date, CURDATE()) * 365.25 - 
+        (TIMESTAMPDIFF(MONTH, joining_date, CURDATE()) % 12) * 30.44), ' days'
+    ) AS difference
+FROM 
+    employees order by joining_date asc;
+
+Solution 2:
+
+**Query:
+
+SELECT 
+    name
+    joining_date,
+    TIMESTAMPDIFF(YEAR, joining_date, CURDATE()) AS years,
+    TIMESTAMPDIFF(MONTH, joining_date, CURDATE()) % 12 AS months,
+    FLOOR(DATEDIFF(CURDATE(), joining_date) - 
+          (TIMESTAMPDIFF(YEAR, joining_date, CURDATE()) * 365.25) - 
+          ((TIMESTAMPDIFF(MONTH, joining_date, CURDATE()) % 12) * 30.44)) AS days
+FROM 
+    employees order by joining_date asc;
+-----X-----X-----X-----X-----
+Events
+======
+* An **Event** in MySQL is a database object that **executes SQL automatically based on time**.
+* Events are managed by the **MySQL Event Scheduler**.
+* They run **independently of applications or users**.
+* Events are defined using **DDL** and are **time-driven**, not data-driven.
+
+---
+
+Key Characteristics of MySQL Events:
+
+* Time-based execution (one-time or recurring)
+* Executes inside the database engine
+* Similar to a **cron job**, but at database level
+* Used mainly for:
+
+  * Periodic updates
+  * Cleanup tasks
+  * Automated maintenance
+* Unlike triggers, events are **not tied to INSERT/UPDATE/DELETE**
+
+---
+
+### **Events vs Triggers (Quick Recall)**
+
+| Feature      | Trigger                | Event         |
+| ------------ | ---------------------- | ------------- |
+| Triggered by | Data change            | Time          |
+| Executes     | Automatically          | Automatically |
+| Depends on   | DML operation          | Scheduler     |
+| Use case     | Validation, automation | Scheduling    |
+
+---
+
+## **Important MySQL Event Queries (Using `employees` Table)**
+
+---
+
+### **1. Enable Event Scheduler (Mandatory)**
+
+```sql
+SET GLOBAL event_scheduler = ON;
+```
+
+> Without this, **no event will run**.
+
+---
+
+### **2. One-Time Event**
+
+**Use case:** Update `monthly_tax` once for all employees
+
+```sql
+CREATE EVENT update_tax_once
+ON SCHEDULE AT CURRENT_TIMESTAMP + INTERVAL 1 MINUTE
+DO
+UPDATE employees
+SET monthly_tax = (basic_salary * 0.0785) + (id * 0.137);
+```
+
+---
+
+### **3. Recurring Event**
+
+-- Every minute salary increases by 100
+
+**Query
+
+CREATE EVENT update_salary_every_minute
+ON SCHEDULE EVERY 1 MINUTE
+DO
+UPDATE employees
+SET basic_salary = basic_salary + 100;
+
+SELECT * from employees;
+
+---
+
+### **4. Monthly Salary Recalculation Event**
+
+**Use case:** Recalculate final salary on the 1st of every month
+
+```sql
+CREATE EVENT recalculate_final_salary
+ON SCHEDULE EVERY 1 MONTH
+STARTS CURRENT_DATE + INTERVAL 1 MONTH
+DO
+UPDATE employees
+SET final_salary = basic_salary + bonus - deduction;
+```
+
+**Important : 👉 MySQL does NOT invoke triggers for DML executed by an EVENT.
+
+Remember we created triggers to update bonus, deduction etc on basic_salary
+---
+
+### **5. View Existing Events**
+
+```sql
+SHOW EVENTS;
+```
+
+---
+
+### **6. Disable an Event**
+
+```sql
+ALTER EVENT update_experience_daily DISABLE;
+```
+
+---
+
+### **7. Drop an Event**
+
+```sql
+DROP EVENT IF EXISTS update_experience_daily;
+```
+
+---
+
+## **Trainer-Grade Summary Line**
+
+> **Events allow MySQL to automate time-based operations without relying on application code.**
+
+---
+
+Remove the sample database
+
+**Query
+DROP SCHEMA db_objects;
+
+---X---X---X---

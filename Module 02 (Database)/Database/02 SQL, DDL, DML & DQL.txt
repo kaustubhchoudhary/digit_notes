@@ -1,0 +1,728 @@
+SQL, DDL, DML & DQL
+===================
+Topics
+======
+=> SQL
+	- What is SQL?
+	- What Can SQL do?
+	- CRUD Operation
+	- SQL Commands
+=> DDL - Create/Alter
+	- Creating a Database
+	- Make schema - active schema 
+	- Creating a Table
+	- Rename the Schema
+	- Rename the Table
+	- Alter the table
+	- Showing How a Table Was Created
+=> DML
+	- INSERT 
+	- UPDATE 
+	- Enable/Disable Safe Updates
+	- DELETE
+=> DQL
+	- SELECT
+	- WHERE
+	- AND, OR
+	- <, >, ==
+	- LIKE, BETWEEN
+	- ORDER BY
+=> DDL - Cloning
+	- Cloning
+	- Partial Cloning
+	- Full Cloning
+=> DDL - Delete tables/schema
+	- Truncate
+	- DROP Table
+	- DROP SCHEMA 
+---
+
+SQL
+===
+What is SQL?
+
+-> Client programs can talk with the MySQL database server only with commands.
+
+-> These command are known as SQL
+
+-> SQL stands for Structured Query Language
+
+-> It is the official language to communicate with the any RDBMS software
+
+-> Simply put, to work with any database we need to write SQL Instructions
+
+-> SQL instructions are also known as SQL Queries
+
+-> SQL lets us access and manipulate databases
+
+---
+
+What Can SQL Do?
+
+SQL can:
+
+- retrieve data from a database
+- insert, update, and delete records in/from a database
+- create new databases and tables
+- alter existing database objects (tables, constraints, columns)
+- delete database objects such as tables or databases
+- control access to data using permissions
+- enforce data integrity using constraints
+
+👉 In short:
+SQL allows us to define the structure of data, manipulate the data, and control access to it.
+
+---
+
+CRUD Operations
+---------------
+- CRUD represents the four basic operations that we can perform on data stored in a database.
+[C]reate
+[R]ead
+[U]pdate
+[D]elete
+
+- Create: Adds new data (records/rows) into an existing table using the `INSERT` statement.
+
+- Read: Fetches existing data from one or more tables using the `SELECT` statement without changing it.
+
+- Update: Changes existing data in a table using the `UPDATE` statement, usually with a `WHERE` condition.
+
+- Delete: Removes existing records from a table using the `DELETE` statement, either selectively or completely.
+
+---
+
+SQL Commands
+============
+SQL uses certain commands like Create, Drop, Insert, etc. to carry out the required tasks.
+ 
+These SQL commands are mainly categorized into following 5 categories as: 
+
+1. DDL - Data Definition Language
+2. DML - Data Manipulation Language
+3. DQL - Data Query Language
+4. DCL - Data Control Language
+5. TCL - Transaction Control Language
+
+---
+
+SQL DDL
+=======
+
+SQL DDL (Data Definition Language)
+
+* DDL is used to define and manage the structure of database objects.
+* It works on schema-level objects, not on individual records.
+* DDL commands are used to create, modify, and delete database structures.
+* Changes made using DDL are auto-committed in most databases.
+* DDL affects objects such as databases, tables, views, and constraints.
+
+Common DDL Commands
+
+* `CREATE`
+* `ALTER`
+* `DROP`
+* `TRUNCATE`
+
+👉 In short:
+DDL defines what the database looks like and how it is structured.
+
+---
+
+Creating a Database
+-------------------
+Syntax: 
+
+CREATE DATABASE database_name;
+
+OR
+
+CREATE SCHEMA schema_name;
+
+Ex: 
+
+**Query:
+
+CREATE SCHEMA school;
+
+**SQL commands accept input and return results, just like method calls in programming languages.**
+
+In the above query, **`school`** is the input (schema name), while a **success status (1 / OK)** is returned indicating successful execution.
+
+** Open you Action Output tab in workbench and watch the output after every query you fire.
+
+Make the schema, active schema
+------------------------------
+Syntax: USE schema_name;
+
+Ex:
+
+**Query: 
+
+USE school;
+
+Creating a Table
+----------------
+Syntax:
+
+CREATE TABLE table_name (
+    column1_name data_type [constraints],
+    column2_name data_type [constraints],
+    ...
+);
+
+Constraints: PRIMARY KEY, FOREIGN KEY, NOT NULL, UNIQUE, CHECK, DEFAULT, AUTO_INCREMENT
+
+Ex:
+
+**Query:
+
+CREATE TABLE student (
+  _id INT NOT NULL AUTO_INCREMENT,
+  name VARCHAR(45) NULL,
+  email VARCHAR(45) NULL,
+  course VARCHAR(45) NOT NULL,
+  course_fees VARCHAR(45) NOT NULL,
+  enrollment_date DATE NOT NULL,
+  completion_date DATE NOT NULL,
+  PRIMARY KEY (_id),
+  UNIQUE INDEX _id_UNIQUE (_id),
+  UNIQUE INDEX email_UNIQUE (email)
+);
+
+#Some queries return something, some queries don't
+
+Rename the Schema
+-----------------
+- Renaming a schema (or database) is not directly supported in most SQL databases, including MySQL. 
+
+- Instead, we typically need to create a new schema with the desired name and then migrate the data from the old schema to the new one.
+
+Rename the Table
+----------------
+Syntax: RENAME TABLE old_table_name TO new_table_name;
+
+Ex:
+
+**Query: 
+
+RENAME TABLE student TO students;
+
+Alter the structure of table
+----------------------------
+The ALTER TABLE statement in SQL is used to modify the structure of an existing table. You can use it to add, modify, or drop columns, as well as to add or drop constraints.
+
+We can use ALTER TABLE command to perform the following actions:
+- Add/Modify/Drop a new column
+- Add/Modify/Drop an index
+- Add/Modify/Drop a constraint
+- Add/Modify/Drop a trigger/view etc
+
+Add a new column
+----------------
+Syntax: ALTER TABLE table_name ADD column_name data_type [constraints];
+
+Modify a column
+---------------
+Syntax: ALTER TABLE table_name MODIFY COLUMN column_name new_data_type [constraints];
+
+Rename a column
+---------------
+Syntax: ALTER TABLE table_name CHANGE COLUMN old_column_name new_column_name data_type [constraints];
+
+Note: 
+
+- When renaming a column with the ALTER TABLE ... CHANGE COLUMN statement, it is necessary to also specify the data type and the constraints for the column. 
+
+- This is because the CHANGE COLUMN statement is used to modify both the name and the definition of the column, including its data type and constraints.
+
+- If you do not want to change the data type or constraints, you still need to include them in the statement to maintain the column’s definition otherwise they will be changed to default values.
+
+Modify v/s Change
+-----------------
+Change command can also rename a column, while modify cannot.
+
+Modify can change a column's definition, but not its name.
+
+Dropping a Column
+-----------------
+Syntax: ALTER TABLE table_name DROP COLUMN column_name;
+
+Add Constraint
+--------------
+ALTER TABLE table_name ADD CONSTRAINT constraint_name constraint_type (column_name);
+
+Mixed Commands
+--------------
+Suppose we wish to rename, alter data types, drop some columns, So we can mix the commands:
+
+Syntax: 
+
+ALTER TABLE table_name
+CHANGE COLUMN old_column_name1 new_column_name1 new_data_type1 [constraints1],
+CHANGE COLUMN old_column_name2 new_column_name2 new_data_type2 [constraints2],
+ADD COLUMN new_column_name data_type [constraints],
+DROP COLUMN column_name_to_drop;
+
+**Query: Change the name, data type and length of some columns with alter command.
+
+Syntax: Altering multiple columns
+
+Ex:
+
+**Query:
+
+ALTER TABLE students
+CHANGE COLUMN _id student_id INT NOT NULL,
+CHANGE COLUMN name student_name VARCHAR(30) NOT NULL,
+CHANGE COLUMN email student_email VARCHAR(30) NOT NULL,
+CHANGE COLUMN course student_course VARCHAR(20) NULL,
+MODIFY COLUMN course_fees DECIMAL(8, 2) NULL,
+CHANGE COLUMN enrollment_date course_enrollment_date DATE NULL,
+DROP COLUMN completion_date;
+
+** Watch closely how _id modifies to student_id and *auto increment is removed* because we didn't specify it.
+
+Generate Error : Run the above query again
+
+Showing How a Table Was Created
+-------------------------------
+Now that the original table has been changed drastically, use below query to generate create table query for our latest table
+
+Syntax: SHOW CREATE TABLE table_name;
+
+Ex:
+
+**Query:
+
+SHOW CREATE TABLE students;
+
+Result: The create table query for current table will show.
+
+** It is a DQL, not a DDL
+-----X-----X-----X-----X-----
+DML
+===
+1. INSERT : It is used to insert data into a table.
+
+Syntax1: INSERT INTO table_name (column1, column2, column3, ...) VALUES (value1, value2, value3, ...); 
+
+Ex:
+
+**Query:
+
+INSERT INTO students 
+(student_id, student_name, student_email, 
+student_course, course_fees, course_enrollment_date) 
+VALUES (101, 'Harsh', 'harsh@gmail.com', 'Core Java', 5000, '2023-05-29');
+
+Run this query after any DML to see the result: SELECT * FROM students;
+
+Quotes
+======
+- Numerical values MUST be written without single/double quotes
+- CHAR, VARCHAR, TEXT, BLOB values MUST be written with single/double quotes
+- The column names can be written in Back ticks (` `)
+
+Ex:
+
+**Query: Insert query without column names
+
+INSERT INTO students VALUES 
+(102, 'Madhavi', 'madhavi@yahoo.com', 'Core Python', 18000, '2023-06-01');
+
+Ex:
+
+**Query: Insert multiple records at once
+
+INSERT INTO students 
+(student_id, student_name, student_email, 
+student_course, course_fees, course_enrollment_date) 
+VALUES 
+(103, 'Yash', 'yash@hotmail.com', 'Advance Java', 12000, '2022-12-31'),
+(104, 'Mithun', 'mithun@hotmail.com', 'Core Java', 5000, '2023-06-30'),
+(105, 'Raj', 'raj@gmail.com', 'Advance Java', 8000, '2022-12-31'),
+(106, 'Shekhar', 'shekhar@yahoo.com', 'Core Python', 5000, '2023-01-01'), 
+(107, 'Sapna', 'sapna@gmail.com', 'Advanced PHP', 10000, '2023-06-07');
+-----X-----X-----
+2. UPDATE : It is used to update existing data within a table.
+
+Update single record/row
+------------------------
+In the WHERE condition, mention a condition that gives unique record
+
+Syntax: UPDATE table_name SET column1 = value1, column2 = value2, ... WHERE condition;
+
+Ex:
+
+**Query: 
+
+UPDATE students 
+SET student_course = 'Advance Java', course_fees = 8000 
+WHERE student_id = 101;
+
+Update multiple columns
+-----------------------
+In the WHERE condition, mention a condition that gives multiple records
+
+Ex: 
+
+**Query: 
+
+UPDATE students 
+SET course_fees = 10000 
+WHERE student_course = 'Advance Java';
+
+Note: You may get "safe update mode" Error.
+What it means is: Safe Update Mode is ON in MySQL that is saving us from accidently updating/deleting multiple records at once
+
+Disable Safe Update Mode Temporarily
+------------------------------------
+**Query:
+
+SET SQL_SAFE_UPDATES = 0;
+
+Re-enable Safe Update Mode
+--------------------------
+**Query:
+
+SET SQL_SAFE_UPDATES = 1;
+
+Disable Safe Update Mode Permanently
+------------------------------------
+**Query:
+
+SET GLOBAL sql_safe_updates=0;
+
+Note: We have to reconnect to Server for changes to take place:
+Menu -> Query -> Reconnect to Server
+
+Re-enable Safe Update Mode
+--------------------------
+**Query:
+
+SET GLOBAL sql_safe_updates=1;
+
+Note: Again we have to reconnect to Server for changes to take place:
+Menu -> Query -> Reconnect to Server
+
+3. DELETE : It is used to delete records from a database table.
+
+Syntax: DELETE FROM table_name WHERE condition;
+
+Ex:
+
+**Query:
+
+DELETE FROM students WHERE `student_email` = 'yash@hotmail.com';
+-----X-----X-----X-----X-----
+DQL
+===
+DQL statements are used to fetch data from one table or multiple tables
+
+SELECT FROM
+-----------
+It is used to retrieve data from the database.
+
+SELECT <column-list> FROM <table-name> WHERE <condition(s)>
+
+Syntax 1: Fetch specific columns from table
+SELECT column1, column2, ... FROM table_name;
+
+**Query:
+
+SELECT student_name, student_course FROM students;
+
+Syntax 2: To select all columns at once
+
+SELECT * FROM table_name;
+
+**Query:
+
+SELECT * FROM students;
+
+Data Filter
+===========
+We can restrict Data with WHERE, AND, OR, comparison and other operators
+
+Syntax: To fetch columns based on a condition
+SELECT column1, column2, ... FROM table_name WHERE condition;
+
+WHERE
+-----
+**Query: 
+
+SELECT student_name, student_course, course_fees 
+FROM students 
+WHERE course_fees > 10000;
+
+WHERE & AND
+-----------
+**Query: 
+
+SELECT student_name, student_course, course_fees 
+FROM students 
+WHERE student_course = 'Advance Java' AND course_fees <= 10000;
+
+WHERE & OR
+----------
+Query : 
+
+SELECT student_name, student_course, course_fees 
+FROM students 
+WHERE student_course = 'Advance Java' OR course_fees <= 10000;
+
+WHERE & BETWEEN
+---------------
+Admissions BETWEEN 1st Jan 2023 and 30th June 2023 in ascending order of joining
+
+**Query: 
+
+SELECT student_name, student_course, course_enrollment_date 
+FROM students 
+WHERE course_enrollment_date 
+BETWEEN '2023-01-01' AND '2023-06-30' 
+ORDER BY course_enrollment_date ASC;
+
+Note: '2023-01-01' AND '2023-06-30' are inclusive
+
+The same result can be achieved with:
+
+**Query:
+
+SELECT student_name, student_course, course_enrollment_date
+FROM students
+WHERE course_enrollment_date >= '2023-01-01'
+  AND course_enrollment_date <= '2023-06-30'
+ORDER BY course_enrollment_date ASC;
+
+WHERE & LIKE
+------------
+**Query: 
+
+SELECT student_name, student_course 
+FROM students 
+WHERE student_course LIKE ('%Java');
+
+**Query
+
+SELECT student_name, student_course 
+FROM students 
+WHERE student_course LIKE ('Core%');
+
+**Query: 
+
+SELECT * FROM students WHERE student_email LIKE '%gmail%';
+
+Sorting - ORDER BY
+------------------
+**Query: 
+
+SELECT * FROM students ORDER BY student_id DESC;
+
+**Query: Java Students arranged in descending order of their fees
+
+SELECT * FROM students 
+WHERE student_course 
+LIKE '%JAVA%' ORDER BY course_fees DESC;
+-----X-----X-----X-----
+DDL Again
+=========
+Cloning
+=======
+Creating a new table from an existing one is known as Cloning.
+
+There are 2 types of cloning:
+1. Partial cloning
+2. Full cloning
+
+Partial Cloning
+===============
+=> Copying either the data, and the structure, or only the constraints, keys, or indexes is known as Partial/Shallow cloning.
+
+=> This is done with 
+	=> CREATE TABLE ... AS SELECT ...	
+	=> CREATE TABLE ... LIKE ...
+
+Example 1 – Clone complete table:
+
+CREATE TABLE new_tbl SELECT * FROM orig_tbl;
+
+**Query:
+
+CREATE TABLE course_1 SELECT * FROM students;
+
+Result:
+=> Creates a new table `course_1`
+=> Copies both columns and data from `students`
+=> Does not copy primary key, foreign keys, indexes, or unique constraints
+=> Does copy `NOT NULL` constraint
+
+* Compare setting of both tables
+
+Example 2 – Clone with filtered data:
+
+**Query:
+
+CREATE TABLE course_2 AS
+SELECT * FROM students
+WHERE course_fees >= 8000;
+
+Same as above, but creates a new table with only those records having `course_fees` ≥ 8000.
+
+Example 3 – Clone with additional columns and selected fields:
+
+**Query:
+
+CREATE TABLE course_3 (
+  id INT NOT NULL AUTO_INCREMENT,
+  PRIMARY KEY (id)
+)
+AS
+SELECT student_name, student_course
+FROM students
+WHERE course_fees <= 8000;
+
+=> Adds a new column `id`
+=> Copies selected columns (`student_name`, `student_course`)
+=> Filters data where `course_fees <= 8000`
+=> Maintains the constraints mentioned for new columns
+
+**Note:
+=> These queries are known as CTAS (CREATE TABLE AS SELECT) queries.
+=> They are often used for data cloning, backup, or creating filtered datasets**.
+
+Example 4 – Clone the full structure with constraints
+
+Syntax : CREATE TABLE new_table LIKE old_table;
+
+**Query: 
+
+CREATE TABLE course_4 LIKE students;
+
+Full Cloning
+============
+Copying the structure, data and constraints from an existing table is known as Full Cloning.
+
+Surprisingly there is no one statment that can do this.
+
+It can be done by firing these 2 queries back to back:
+
+Query
+
+CREATE TABLE course_5 LIKE students;
+
+INSERT INTO course_5 SELECT * FROM students;
+-----X-----X-----X-----
+Deleting database & tables
+==========================
+1. Delete all the data
+
+Syntax: TRUNCATE table_name; 
+
+**Query: TRUNCATE course_1;
+
+2. Drop the table
+
+Syntax: DROP TABLE table_name;
+
+**Query: DROP TABLE course_1;
+
+3. Drop multiple tables
+
+Syntax: DROP TABLE table_name1, table_name2;
+
+**Query: DROP TABLE course_2, course_3, course_4;
+
+4. Drop table through GUI:
+	- Right click on table course_5
+	- Select the Option : DROP Table
+
+4. Drop the schema/database;
+
+Syntax: 
+
+DROP DATABASE schema_name;
+
+OR
+
+DROP SCHEMA schema_name;
+
+**Query: DROP DATABASE school;
+**Query: DROP SCHEMA school;
+
+---
+
+## **TRUNCATE vs DELETE**
+
+| Aspect                  | **TRUNCATE TABLE**         | **DELETE**                       |
+| ----------------------- | -------------------------- | -------------------------------- |
+| SQL Type                | DDL                        | DML                              |
+| Deletes specific rows   | No (all rows only)         | Yes (supports `WHERE`)           |
+| Deletes all rows        | Always                     | Optional                         |
+| WHERE clause            | Not allowed                | Allowed                          |
+| Speed                   | Very fast                  | Slower                           |
+| Transaction support     | Cannot be rolled back      | Can be rolled back (InnoDB)      |
+| Trigger execution       | Does not fire triggers     | Fires DELETE triggers            |
+| Auto-increment reset    | Yes                        | No (unless manually reset)       |
+| Foreign key constraints | Fails if referenced        | Enforced row-by-row              |
+| Logging                 | Minimal                    | Row-level logging                |
+| Use case                | Clear entire table quickly | Selective or controlled deletion |
+
+---
+
+## **Conceptual Difference (Very Important)**
+
+### **TRUNCATE**
+
+> **Structure-level operation**
+
+* Removes *all data at once*
+* No filtering
+* No safety net
+
+---
+
+### **DELETE**
+
+> **Row-level operation**
+
+* Can remove **some rows**
+* Can remove **all rows**
+* Fully transactional
+
+---
+
+## **Key Insight (Must Remember)**
+
+> **TRUNCATE is not an alternative to DELETE with WHERE.**
+
+If you need:
+
+* Conditions
+* Rollback
+* Triggers
+* Referential safety
+
+👉 **DELETE is the only option.**
+
+---
+
+## **Common Misconception**
+
+❌ “TRUNCATE is DELETE without WHERE”
+✅ **Wrong**
+
+Correct understanding:
+
+> **TRUNCATE ignores rows entirely and works at table level.**
+
+---
+
+## **Interview-Grade One-Liner**
+
+> **DELETE removes rows conditionally and safely; TRUNCATE removes all data unconditionally and instantly.**
+
+This distinction is **fundamental**, especially for production databases.
+
+-----X-----X-----X-----

@@ -1,0 +1,281 @@
+
+# Connect PostgreSQL with DBeaver
+
+## Step 1: Open DBeaver
+
+Launch DBeaver.
+
+---
+
+## Step 2: Create a New Connection
+
+You can use any of these methods:
+
+* Click the New Database Connection icon (plug with a + sign) on the toolbar.
+* Or go to Database → New Database Connection.
+* Or press Ctrl + Shift + N.
+
+---
+
+## Step 3: Select PostgreSQL
+
+* Search for PostgreSQL.
+* Select PostgreSQL.
+* Click Next.
+
+---
+
+## Step 4: Enter Connection Details
+
+Fill in the following:
+
+| Field    | Value                                                   |
+| -------- | ------------------------------------------------------- |
+| Host     | `localhost`                                             |
+| Port     | `5432`                                                  |
+| Database | `postgres`                                              |
+| Username | `postgres`                                              |
+| Password | *(Password you entered during PostgreSQL installation)* |
+
+* Host → The computer where PostgreSQL is running.
+* Port → The communication channel (default is 5432).
+* Database → The database to connect to PostgreSQL creates a default database named `postgres`.
+* Username → Usually `postgres`.
+* Password → The password set during installation.
+
+---
+
+## Step 5: Download JDBC Driver
+
+The first time you connect, DBeaver will ask to download the PostgreSQL JDBC driver.
+
+Click Download.
+
+This requires an internet connection.
+
+---
+
+## Step 6: Test Connection
+
+Click Test Connection.
+
+If everything is correct, you'll see:
+
+> Connected
+
+Then click Finish.
+
+---
+
+# Common Errors
+
+### 1. Connection Refused
+
+```
+Connection refused
+```
+
+Reason: PostgreSQL service is not running.
+
+Fix: Start the PostgreSQL service from Services (`services.msc`).
+
+---
+
+### 2. Password Authentication Failed
+
+```
+password authentication failed
+```
+
+Reason: Incorrect password.
+
+Fix: Use the password you set during PostgreSQL installation.
+
+---
+
+### 3. Database Does Not Exist
+
+```
+database "xyz" does not exist
+```
+
+Fix: Use `postgres` as the database name initially.
+
+---
+
+### 4. Driver Not Found
+
+Simply click Download when prompted.
+
+---
+
+# After Connecting
+
+Students should see something like:
+
+```
+postgres (localhost:5432)
+   └─ Databases
+         └─ postgres
+			   └─ Schemas
+				    └─ public
+					└─ sales
+```
+
+---
+
+## PostgreSQL Hierarchy
+
+The hierarchy of objects in PostgreSQL is:
+
+```text
+PostgreSQL Server
+    │
+    ├── Database
+    │      │
+    │      ├── Schema
+    │      │      │
+    │      │      ├── Tables
+    │      │      ├── Views
+    │      │      ├── Functions
+    │      │      ├── Sequences
+    │      │      └── Other Database Objects
+    │      │
+    │      ├── Extensions
+    │      ├── Roles
+    │      └── ...
+    │
+    └── Other Databases
+```
+
+### Why are there two `postgres` in DBeaver?
+
+When you connect to PostgreSQL in DBeaver, you may see:
+
+```text
+postgres (localhost:5432)
+    │
+    └── Databases
+            │
+            └── postgres
+```
+
+These represent different things.
+
+* **`postgres (localhost:5432)`**
+
+  * This is the **connection** created in DBeaver.
+  * It represents the PostgreSQL server running on `localhost` at port `5432`.
+  * The connection name can be changed without affecting the database.
+
+* **`postgres` under Databases**
+
+  * This is the **actual database**.
+  * It is the default database created automatically during PostgreSQL installation.
+
+---
+
+## Database vs Schema
+
+### MySQL
+
+In MySQL, **Database** and **Schema** are treated as synonyms.
+
+```sql
+CREATE DATABASE trainingdb;
+
+CREATE SCHEMA trainingdb;
+```
+
+Both statements create the same object.
+
+---
+
+### PostgreSQL
+
+In PostgreSQL, **Database** and **Schema** are different.
+
+* A **PostgreSQL Server** can contain multiple **Databases**.
+* Each **Database** can contain multiple **Schemas**.
+* Each **Schema** contains tables, views, functions, sequences, and other database objects.
+
+Example:
+
+```text
+Server
+│
+├── companydb
+│      ├── public
+│      ├── hr
+│      └── sales
+│
+└── trainingdb
+       └── public
+```
+
+---
+
+## What is a Schema?
+
+A **Schema** is a logical container inside a database used to organize database objects.
+
+A schema can contain:
+
+* Tables
+* Views
+* Functions
+* Sequences
+* Procedures
+* Triggers
+* Other database objects
+
+Different schemas within the same database can contain objects with the same name.
+
+Example:
+
+```text
+public.employee
+
+hr.employee
+
+sales.employee
+```
+
+These are three different tables because they belong to different schemas.
+
+---
+
+## What is the `public` Schema?
+
+* Every PostgreSQL database automatically contains a schema named **`public`**.
+* It is the **default schema**.
+* If a schema is not specified while creating a table, PostgreSQL creates it in the `public` schema.
+
+Example:
+
+```sql
+CREATE TABLE student (
+    id INT,
+    name VARCHAR(50)
+);
+```
+
+is equivalent to:
+
+```sql
+CREATE TABLE public.student (
+    id INT,
+    name VARCHAR(50)
+);
+```
+
+---
+
+## Summary
+
+* A PostgreSQL **Server** contains multiple **Databases**.
+* A **Database** contains multiple **Schemas**.
+* A **Schema** contains tables and other database objects.
+* `public` is the default schema created automatically in every PostgreSQL database.
+* In **MySQL**, Database and Schema are the same.
+* In **PostgreSQL**, Database and Schema are separate concepts.

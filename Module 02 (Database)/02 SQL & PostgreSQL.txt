@@ -1,0 +1,1390 @@
+Day 09 Notes
+============
+SQL & PostgreSQL
+================
+In these notes we will learn:
+
+=> Setting up the database
+=> Parts of an Application
+=> Database
+  - Types of databases
+  - Storage Approaches
+=> RDBMS
+  - Schema
+  - Database
+  - Table
+  - Row/tuple
+  - Columns
+=> PostgreSQL Overview
+=> PostgreSQL Client/Server Model
+  - PostgreSQL Server
+  - PostgreSQL Client
+  - PostgreSQL Connectors
+=> SQL
+  - What Can SQL do?
+  - CRUD Operation
+  - SQL Commands
+=> SQL DDL
+  - Creating a Database
+  - Make schema
+  - Creating a Table
+  - Rename the Schema
+  - Rename the Table
+  - Alter the table
+  - Showing How a Table Was Created
+=> DML
+  - INSERT
+  - UPDATE
+  - DELETE
+=> DQL
+  - SELECT
+  - WHERE
+  - AND, OR
+  - <, >, ==
+  - LIKE, BETWEEN
+=> DDL Again
+  - Cloning
+   - Full Cloning
+   - Shallow Cloning
+=> Delete tables/schema
+  - Truncate
+  - DROP Table
+  - DROP SCHEMA
+XXXXXXXXXXXXXXXXXXXX
+Setting up the Database
+=======================
+Download and Install
+
+- PostgreSQL Server (e.g., 17.x 64-bit)
+- DBeaver (Community Edition or Enterprise)
+- pgAdmin (Official GUI for PostgreSQL)
+- psql Shell (comes with PostgreSQL installer)
+
+Make sure PostgreSQL DB Server is up and running.
+
+---
+
+DBeaver Font Size
+=================
+To increase the UI font : Window > Preferences > User Interface > Appearance > Colors and Fonts > DBeaver Fonts > Main font.
+
+To increase the Script font : Window > Preferences > User Interface > Appearance > Colors and Fonts > DBeaver Fonts > Monospace font.
+
+---
+
+Parts of an Application
+=======================
+Every software application contains 3 components:
+
+1. Frontend
+2. Backend – Server-Side Code
+3. Backend – Database
+
+📎 Refer image: `01_application_layers.png`
+
+---
+
+Database
+========
+
+- A database is a structured collection of data.
+- In a database, data is stored permanently (data is persisted)
+
+📎 Refer fig: `02_data_persistence.png`
+
+---
+
+Types of Databases
+==================
+Below are the types of databases:
+
+1. Relational Databases (RDBMS)
+
+2. NoSQL Databases
+
+   - Key-Value Databases
+
+   - Document-Oriented Databases
+
+   - Graph Databases
+   
+   - Ex: MongoDB, Apache Cassandra, Redis, CouchDB, Neo4j
+
+3. Object-Oriented Databases
+
+4. Hierarchical Databases
+
+5. Network Databases
+
+---
+
+Storage Approaches
+==================
+These are some different types of storage:
+
+1. On-Disk Storage (Traditional databases stored on HDDs/SSDs)
+
+2. In-Memory Storage (Data stored primarily in RAM, e.g., H2, Redis)
+
+3. Cloud Storage (Hosted on cloud platforms, e.g., AWS RDS, Firebase)
+
+4. Hybrid Storage (Combination of in-memory and disk storage)
+
+5. Distributed Storage (Data spread across multiple nodes, e.g., Cassandra)
+
+---
+
+RDBMS
+=====
+
+- RDBMS stands for Relational Data Base Management System
+
+- In an RDBMS, entities are organized according to relationships.
+
+- Some key terms in an RDBMS are:
+  database, schema, table, records, properties, constraints, keys, relations, alias, etc.
+
+- Ex: Oracle Database, MySQL, PostgreSQL, Microsoft SQL Server, IBM Db2, MariaDB, SQLite, SAP HANA, Teradata, Firebird
+
+---
+
+PostgreSQL Overview
+===================
+=> PostgreSQL is an open-source RDBMS server.
+
+=> It can manage multiple databases.
+
+=> When it's installed, it comes with a default database named `postgres`.
+
+=> It was originally named POSTGRES and later renamed to PostgreSQL to reflect its support for SQL.
+
+=> The latest version is 18.x (as of July 2025).
+
+=> PostgreSQL ranks as one of the top relational databases, competing closely with MySQL and Oracle.
+
+=> Many companies such as Instagram, Reddit, Spotify, Apple, IMDB and GoDigit use PostgreSQL.
+
+---
+
+Database
+========
+- A database is the physical structure of data.
+
+Connection with DBeaver
+=======================
+=> When we first connect to PostgreSQL using DBeaver (or psql or pgAdmin), it usually connects to the default `postgres` database.
+
+=> This is often used for admin tasks.
+
+Creating a New Database
+-----------------------
+=> If we create a new database (e.g., ecommerce), it becomes independent.
+
+=> PostgreSQL does not support cross-database queries, so each database is isolated.
+
+=> New Database = New Connection in DBeaver
+
+=> We need to create a separate DBeaver connection to work with the new database.
+
+=> We can copy the existing connection and just change the database name in the settings.
+
+---
+
+Schema
+======
+- In PostgreSQL, a schema is like a folder inside a database that helps organize and group database objects like tables, views, indexes, functions, etc.
+
+So we can say that:
+
+1. Schema is a namespace inside a database
+
+   * It helps prevent name conflicts.
+   * For example, we can have two tables named `users`, each in different schemas.
+
+2. Every database starts with a default schema called `public`
+
+   * If we don’t specify a schema, PostgreSQL assumes `public`.
+
+3. Schemas help organize large databases
+
+   * We can group related tables logically (e.g., `sales`, `hr`, `inventory`).
+
+---
+
+🔗 Relationship: Database → Schema → Tables (and other objects)
+
+```
+PostgreSQL Server
+└── Database: ecommerce
+    ├── Schema: customer_data
+    │   ├── Table: customers
+    │   └── Table: addresses
+    └── Schema: order_data
+        ├── Table: orders
+        └── Table: payments
+
+	└── Database: university
+		├── Schema: academics
+		│   ├── Table: students
+		│   ├── Table: courses
+		│   └── Table: enrollments
+		└── Schema: administration
+			├── Table: departments
+			└── Table: faculty
+
+```
+
+---
+
+⚠️ Important:
+
+* Schemas are *inside* databases — not across them.
+* We can join tables across schemas within the same database.
+* But we cannot join tables across different *databases*.
+
+---
+
+Table
+=====
+- Tables contain all the data in a database.
+- In tables, data is logically organized in a row-and-column format, similar to a spreadsheet.
+
+---
+
+Row / Tuple
+===========
+- Each row represents a unique record
+- 1 row → 1 record
+
+---
+
+Columns
+=======
+- Each column represents a field/property/attribute in the record.
+- 1 column → 1 property
+
+---
+
+Simply Put
+==========
+Database → Schemas → Tables → Collection of rows and columns → Collection of records
+
+---
+
+Example:
+
+Schema → `school`
+
+Table1 → `students`
+
+```
+Columns → id (PK), name
+
+   id   name  
+  ----  ------
+   1    Mohit  
+   2    Raj
+```
+
+Table2 → `mobile_numbers`
+
+```
+// Links mobile_no to students  
+// Depends on the PK of students  
+
+Columns → id (PK), mobile_no, student_id (FK)
+
+   id   mobile_no   student_id  
+  ----  ----------  -----------
+   1    9988776655     1  
+   2    8877669911     1  
+   3    7711990912     2  
+   4    8877887788     3  ← not allowed (foreign key violation)
+```
+
+- The above tables represent 2 entities — `student` and `mobile number`
+
+- Fields: `id`, `name` in `students`; `id`, `mobile_no`, `student_id` in `mobile_numbers`
+
+- Each row = 1 record
+
+- `id` in both tables = Primary Key
+
+- `student_id` = Foreign Key
+
+---
+
+PostgreSQL Client/Server Model
+==============================
+PostgreSQL Server
+=================
+
+1. PostgreSQL Server manages the physical memory space and system where the data is stored (persisted).
+
+2. Simply put, it is the software that handles actual data operations.
+
+3. For usage, it must be running as a service (PostgreSQL Service).
+
+4. We can configure it to start automatically with the system boot.
+
+5. Every software runs on an IP and port, so does PostgreSQL Server
+
+   => IP: The digital address of the host machine
+   => Port: The endpoint where PostgreSQL runs
+
+6. If PostgreSQL Server is on our own PC, it can be accessed with IP: `127.0.0.1` (localhost)
+
+7. PostgreSQL by default runs on Port: 5432
+
+Refer Image: `03_client_server.png`
+
+---
+
+PostgreSQL Client
+=================
+=> The data stored by PostgreSQL Server cannot be accessed directly.
+
+=> To interact with it, we need client software or applications.
+
+Refer Image: `03_client_server.png`
+
+Following are some PostgreSQL clients:
+
+1. pgAdmin
+2. psql (PostgreSQL Shell)
+3. DBeaver - Universal client
+4. DataGrip
+5. Postico (Mac)
+6. Any software application
+   => If we connect a Java application with PostgreSQL Server, it will be known as a Java Client.
+   => If with Python, it will be Python Client
+
+---
+
+Most used PostgreSQL clients: 
+
+🧩 pgAdmin (GUI for PostgreSQL)
+
+1. Official browser-based GUI tool for managing PostgreSQL databases.
+2. Supports visual database design, query execution, role/permission management, and backups.
+3. Best suited for beginners and visual learners who prefer point-and-click over writing SQL manually.
+
+---
+
+💻 psql (PostgreSQL Shell)
+
+1. Command-line tool for interacting with PostgreSQL using SQL and meta-commands.
+2. Ideal for script automation, quick queries, and power users.
+3. Offers features like auto-completion, query history, and administrative tasks (e.g., creating users, databases).
+
+---
+
+🧰 DBeaver (Universal DB Tool)
+
+1. Cross-platform and supports many databases (PostgreSQL, MySQL, Oracle, etc.) in one interface.
+2. Offers powerful features like ER diagrams, data export/import, and SQL editing with auto-complete.
+3. Great for developers or DB admins working with multiple database systems.
+
+---
+
+PostgreSQL Connectors
+=====================
+=> To connect one software with another, we need drivers.
+
+=> To connect our applications written in different programming languages, we need to install appropriate drivers on the client side.
+
+=> These drivers are called Connectors.
+
+=> PostgreSQL provides connectors for languages like Java, Python, PHP, etc.
+
+=> Official clients come embedded with drivers
+Ex: MySQL Workbench comes embedded with MySQL Drivers
+Ex: PgAdmin comes embedded with PostgreSQL Drivers
+
+=> As DBeaver is not specific to any RDBMS, to connect with PostgreSQL we need to download respective drivers.
+
+=> For our Java Applications, with have to download PostgreSQL JDBC Driver (`postgresql-<version>.jar`).
+
+---
+SQL DDL
+=======
+Setup new Database
+==================
+
+✅ Step-by-Step Guide to Set Up PostgreSQL in DBeaver
+
+---
+
+🔹 Step 1: Ensure PostgreSQL is Running
+
+On Windows:
+
+=> Open Start Menu → Services
+=> Find service like: `postgresql-x64-15` (or `14`, `16`, depending on your version)
+=> Make sure Status = Running
+=> If not, right-click → Start
+
+---
+
+🔹 Step 2: Open DBeaver and Add New PostgreSQL Connection
+
+1. Open DBeaver
+2. Go to menu: `Database > New Database Connection`
+3. Select PostgreSQL (use search if needed)
+4. Click Next
+
+---
+
+🔹 Step 3: Enter Connection Details
+
+| Field        | Value            |
+| ------------ | ---------------- |
+| Host         | `localhost`      |
+| Port         | `5432` (default) |
+| Database     | `postgres`       |
+| Username     | `postgres`       |
+| Password     | (your password)  |
+
+=> ✅ Click Test Connection
+=> If driver is missing, it will prompt you to Download Driver Files
+=> Click Download, wait for a few seconds
+
+> If all good → Click Finish
+
+---
+
+🔹 Step 4: Expand PostgreSQL in DBeaver Left Panel
+
+Once connected:
+
+=> You'll see postgres under Databases
+=> Expand it → `Schemas > public > Tables`
+=> That’s the default setup.
+
+---
+
+✅ 1. Create Your Own Database (e.g., `school`)
+
+1. Right-click on postgres (the database)
+2. Choose SQL Editor > New SQL Script
+3. Paste and run:
+
+```sql
+CREATE DATABASE company;
+```
+
+---
+
+🔹 Step 6: Connect to the `company` Database
+
+You need to connect separately to `company`:
+
+1. Go to Menu -> `Database > New Database Connection`
+2. Choose PostgreSQL
+3. In the setup screen, this time change Database field to:
+
+```
+company
+```
+
+4. Keep rest same (`localhost`, `5432`, `postgres`, password)
+5. Test Connection → Finish
+
+---
+
+✅ 2. Create Schema
+
+```sql
+CREATE SCHEMA training;
+```
+
+---
+
+✅ 3. Create Table inside schema
+
+```sql
+CREATE TABLE training.student (
+  _id SERIAL PRIMARY KEY,
+  name VARCHAR(45),
+  email VARCHAR(45) UNIQUE,
+  course VARCHAR(45) NOT NULL,
+  course_fees VARCHAR(45) NOT NULL,
+  enrollment_date DATE NOT NULL,
+  completion_date DATE NOT NULL
+);
+```
+
+> 🔸 `SERIAL` in PostgreSQL auto-generates incremented values.
+
+---
+
+✅ 4. Rename Table
+
+```sql
+ALTER TABLE training.student RENAME TO students;
+```
+
+---
+
+✅ 5. Alter Columns
+
+```sql
+ALTER TABLE training.students
+RENAME COLUMN _id TO student_id;
+
+ALTER TABLE training.students
+RENAME COLUMN name TO student_name;
+
+ALTER TABLE training.students
+RENAME COLUMN email TO student_email;
+
+ALTER TABLE training.students
+RENAME COLUMN course TO student_course;
+
+ALTER TABLE training.students
+ALTER COLUMN course_fees TYPE NUMERIC(8, 2)
+USING course_fees::NUMERIC(8, 2);
+
+ALTER TABLE training.students
+RENAME COLUMN enrollment_date TO course_enrollment_date;
+
+ALTER TABLE training.students
+DROP COLUMN completion_date;
+```
+
+---
+
+✅ 6. Show Table DDL
+
+In DBeaver (GUI): ✅ Right-click on table → Generate SQL → DDL
+
+Or:
+
+Expand the schema and locate your table.
+
+Right-click the table (students under training schema).
+
+Choose:
+Generate SQL → DDL
+OR	
+View Diagram → ER Diagram → Export SQL.
+
+This gives you full CREATE TABLE statement.
+```
+
+---
+
+✅ 7. Insert Statements
+
+#➤ Insert with Column Names
+
+```sql
+INSERT INTO training.students 
+(student_id, student_name, student_email, student_course, course_fees, course_enrollment_date) 
+VALUES (101, 'Harsh', 'harsh@gmail.com', 'Core Java', 5000, '2023-05-29');
+```
+
+#➤ Insert without Column Names
+
+```sql
+INSERT INTO training.students 
+VALUES (102, 'Madhavi', 'madhavi@yahoo.com', 'Core Python', 18000, '2023-06-01');
+```
+
+#➤ Insert Multiple Records
+
+```sql
+INSERT INTO training.students 
+(student_id, student_name, student_email, student_course, course_fees, course_enrollment_date) 
+VALUES 
+(103, 'Yash', 'yash@hotmail.com', 'Advance Java', 12000, '2022-12-31'),
+(104, 'Mithun', 'mithun@hotmail.com', 'Core Java', 5000, '2023-06-30'),
+(105, 'Raj', 'raj@gmail.com', 'Advance Java', 8000, '2022-12-31'),
+(106, 'Shekhar', 'shekhar@yahoo.com', 'Core Python', 5000, '2023-01-01'), 
+(107, 'Sapna', 'sapna@gmail.com', 'Advanced PHP', 10000, '2023-06-07');
+```
+
+---
+
+✅ 8. Update Queries
+
+#➤ Update Single Record
+
+```sql
+UPDATE training.students 
+SET student_course = 'Advance Java', course_fees = 8000 
+WHERE student_id = 101;
+```
+
+#➤ Update Multiple Rows
+
+```sql
+UPDATE training.students 
+SET course_fees = 10000 
+WHERE student_course = 'Advance Java';
+```
+
+---
+
+✅ 9. Delete Record
+
+```sql
+DELETE FROM training.students 
+WHERE student_email = 'yash@hotmail.com';
+```
+
+---
+
+✅ 10. Bonus: Basic SELECT Filters
+
+```sql
+-- Simple select
+SELECT * FROM training.students;
+
+-- WHERE clause
+SELECT * FROM training.students WHERE course_fees > 8000;
+
+-- AND / OR
+SELECT * FROM training.students 
+WHERE course_fees > 8000 AND student_course = 'Advance Java';
+
+-- IN
+SELECT * FROM training.students 
+WHERE student_course IN ('Core Java', 'Core Python');
+
+-- LIKE
+SELECT * FROM training.students 
+WHERE student_email LIKE '%@gmail.com';
+
+-- BETWEEN
+SELECT * FROM training.students 
+WHERE course_enrollment_date BETWEEN '2023-01-01' AND '2023-06-30';
+```
+---
+
+# 📋 Cloning in PostgreSQL
+
+## ✅ Definition:
+
+Cloning means creating a new table based on an existing one.
+This may include the structure, the data, or both.
+
+---
+
+## 📂 Types of Cloning
+
+1. Full Cloning
+
+* Copies both the structure and data from the source table.
+* Used when you want a working copy of the table with existing data.
+
+#🔸 Syntax:
+
+```sql
+CREATE TABLE new_table AS SELECT * FROM existing_table;
+```
+
+#🔸 Example:
+
+```sql
+CREATE TABLE training.course_1 AS SELECT * FROM training.students;
+```
+
+#🔸 With Conditions (Filter rows while cloning):
+
+```sql
+CREATE TABLE training.course_2 AS 
+SELECT * FROM training.students 
+WHERE course_fees >= 8000;
+```
+
+---
+
+2. Cloning with Custom Columns
+
+* Used when you want some columns from old table and some new ones.
+
+#🔸 Step-by-step Example:
+
+```sql
+-- Step 1: Create new table manually with extra column
+CREATE TABLE training.course_3 (
+    id SERIAL PRIMARY KEY,
+    name VARCHAR(30),
+    course VARCHAR(20)
+);
+
+-- Step 2: Insert selected data from old table
+INSERT INTO training.course_3 (name, course)
+SELECT student_name, student_course
+FROM training.students
+WHERE course_fees <= 8000;
+```
+
+---
+
+3. Shallow Cloning (Structure Only)
+
+* Copies only the table structure, not the data.
+* Useful when you want to reuse schema/columns, but not the rows.
+
+#🔸 Syntax:
+
+```sql
+CREATE TABLE new_table (LIKE existing_table INCLUDING ALL);
+```
+
+> `INCLUDING ALL` ensures copying of:
+>
+> * Columns
+> * Data types
+> * Default values
+> * Constraints
+> * Indexes
+
+#🔸 Example:
+
+```sql
+CREATE TABLE training.course_4 (LIKE training.students INCLUDING ALL);
+```
+
+---
+Removals
+========
+# 🔹 1. TRUNCATE – *Instantly delete all rows from a table*
+
+➤ Use Case:
+
+Let’s say you want to empty the data in `course_1` (maybe to reload it later), but keep the structure.
+
+✅ Query:
+
+```sql
+TRUNCATE TABLE training.course_1;
+```
+
+🔍 Explanation:
+
+* Empties `course_1` instantly.
+* Much faster than DELETE.
+* Cannot use `WHERE` clause.
+* Resets `SERIAL` or `IDENTITY` values (if present).
+
+---
+
+# 🔹 2. DELETE – *Remove rows selectively*
+
+➤ Use Case:
+
+Suppose you want to remove all rows where `student_course = 'Python'` from `course_2`.
+
+✅ Query:
+
+```sql
+DELETE FROM training.course_2 WHERE student_id > 100;
+```
+
+🔍 Explanation:
+
+* Removes only matching rows.
+* Supports conditions using `WHERE`.
+* Retains structure and other rows.
+
+✅ Remove all rows:
+
+```sql
+DELETE FROM course_2;
+```
+
+---
+
+# 🔹 3. DROP – *Delete entire table structure*
+
+➤ Use Case:
+
+You don’t need `course_3` and `course_4` anymore — remove them entirely.
+
+✅ Query:
+
+```sql
+DROP TABLE training.course_1;
+```
+
+🔍 Explanation:
+
+* Deletes the table itself.
+* All data, structure, and indexes are gone.
+* Cannot be recovered unless you have a backup.
+* Use `CASCADE` if there are dependencies:
+
+```sql
+DROP TABLE course_3 CASCADE;
+```
+
+DROP multiple tables
+
+```sql
+DROP TABLE training.course_2, training.course_3, training.course_4;
+```
+
+DROP Schema
+===========
+
+DROP SCHEMA schema_name CASCADE;
+
+```sql
+DROP SCHEMA training CASCADE;
+```
+
+Notes:
+Without CASCADE, you might get an error if the schema contains any objects.
+CASCADE will permanently delete all tables, views, sequences, functions, etc., in that schema.
+
+---
+Drop Database
+=============
+
+## ✅ Steps to Drop `company` Database in DBeaver
+
+🔹 Step 1: Ensure You Are Not Connected to `company`
+
+* In the **Database Navigator**, locate the `company` database.
+* If it shows a **green dot** (active connection), **right-click on `company` ➝ `Disconnect`.
+
+---
+
+🔹 Step 2: Make Sure You're Connected to Another Database
+
+* If you're not connected to any other database, click on the `postgres` database (default one).
+* If not connected, right-click `postgres` ➝ `Connect`.
+
+---
+
+🔹 Step 3: Terminate Any Sessions (Optional but Safe)
+
+> If multiple users/connections are using `company`, you need to terminate them manually.
+
+1. Open a **SQL Editor** tab connected to `postgres`.
+2. Run:
+
+   ```sql
+   SELECT pg_terminate_backend(pid)
+   FROM pg_stat_activity
+   WHERE datname = 'company' AND pid <> pg_backend_pid();
+   ```
+
+---
+
+🔹 Step 4: Drop the Database
+
+* Right-click on the `company` database ➝ choose **Delete**.
+* A dialog will appear. Confirm that:
+
+  * You're deleting the **database**, not just disconnecting.
+  * The SQL shown is `DROP DATABASE company;`
+* Click **Yes / OK** to execute.
+
+---
+
+## 🧹 Result
+
+The  `company` database will be permanently deleted from the PostgreSQL server.
+
+---
+Relationships
+=============
+
+## 🔧 DATABASE DESIGN: `ecommerce_db`
+
+✅ Step 1: Create the database
+
+```sql
+CREATE DATABASE ecommerce_db;
+```
+
+---
+
+## 🧱 SCHEMA 1: `sales`
+
+📘 Description:
+
+Handles customers, orders, and payments — things that are customer-facing.
+
+📦 Tables:
+
+1. customers
+2. orders
+3. payments
+
+Relationships:
+
+* One customer can place many orders
+* Each order can have one or many payments (like split payments)
+
+```sql
+CREATE SCHEMA sales;
+
+CREATE TABLE sales.customers (
+    customer_id SERIAL PRIMARY KEY,
+    full_name VARCHAR(100) NOT NULL,
+    email VARCHAR(100) UNIQUE NOT NULL,
+    phone CHAR(10) unique not null
+);
+
+CREATE TABLE sales.orders (
+    order_id SERIAL PRIMARY KEY,
+    customer_id INT REFERENCES sales.customers(customer_id),
+    order_date DATE DEFAULT CURRENT_DATE,
+    total_amount NUMERIC(10, 2)
+);
+
+CREATE TABLE sales.payments (
+    payment_id SERIAL PRIMARY KEY,
+    order_id INT REFERENCES sales.orders(order_id),
+    payment_method VARCHAR(50),
+    payment_date DATE DEFAULT CURRENT_DATE,
+    amount_paid NUMERIC(10, 2)
+);
+```
+
+---
+
+## 🧱 SCHEMA 2: `inventory`
+
+📘 Description:
+
+Handles product details, stock, and categories — business operations.
+
+📦 Tables:
+
+1. products
+2. categories
+3. stock
+
+Relationships:
+
+* Each product belongs to a category
+* Each product has a stock entry
+
+```sql
+CREATE SCHEMA inventory;
+
+CREATE TABLE inventory.categories (
+    category_id SERIAL PRIMARY KEY,
+    category_name VARCHAR(100) UNIQUE NOT NULL
+);
+
+CREATE TABLE inventory.products (
+    product_id SERIAL PRIMARY KEY,
+    product_name VARCHAR(100) NOT NULL,
+    category_id INT REFERENCES inventory.categories(category_id),
+    price DECIMAL(10, 2) NOT NULL
+);
+
+CREATE TABLE inventory.stock (
+    stock_id SERIAL PRIMARY KEY,
+    product_id INT REFERENCES inventory.products(product_id),
+    quantity_available INT
+);
+```
+
+---
+
+## 🔗 CROSS-SCHEMA RELATIONSHIP
+
+Let’s connect sales.orders to inventory.products to track what items were ordered.
+
+📦 New Table: `sales.order_items`
+
+(Located in `sales` schema, referencing `inventory.products`)
+
+```sql
+CREATE TABLE sales.order_items (
+    order_item_id SERIAL PRIMARY KEY,
+    order_id INT REFERENCES sales.orders(order_id),
+    product_id INT REFERENCES inventory.products(product_id),
+    quantity INT NOT NULL,
+    price_each DECIMAL(10, 2)
+);
+```
+
+---
+
+## 📌 Entity-Relationship Summary
+
+| Entity       | Belongs To Schema | Relationships                               |
+| ------------ | ----------------- | ------------------------------------------- |
+| customers    | `sales`           | 1:N with orders                            |
+| orders       | `sales`           | 1:N with payments, 1:N with order_items  |
+| payments     | `sales`           | N:1 with orders                             |
+| order_items | `sales`           | N:1 with orders, N:1 with products          |
+| products     | `inventory`       | N:1 with categories, 1:N with order_items |
+| stock        | `inventory`       | 1:1 with products                           |
+| categories   | `inventory`       | 1:N with products                          |
+
+---
+
+## 🧰 Step 1: Insert Sample Data
+
+---
+
+🔹 `sales.customers`
+
+```sql
+INSERT INTO sales.customers (full_name, email, phone) VALUES
+('Ravi Kumar', 'ravi.kumar@gmail.com', '9876543210'),
+('Anjali Mehta', 'anjali.mehta@gmail.com', '9123456789'),
+('Suresh Patil', 'suresh.patil@yahoo.com', '9001234567'),
+('Meena Iyer', 'meena.iyer@gmail.com', '9870012345'),
+('Rahul Verma', 'rahul.verma@rediffmail.com', '9811223344'),
+('Divya Nair', 'divya.nair@yahoo.com', '9933445566');
+
+```
+
+---
+
+🔹 `sales.orders`
+
+```sql
+INSERT INTO sales.orders (customer_id, order_date, total_amount) VALUES
+(1, '2025-07-25', 5999.00),
+(2, '2025-07-26', 3499.00),
+(1, '2025-07-28', 949.00),
+(3, '2025-07-29', 1049.00),
+(5, '2025-07-30', 1749.00),
+(6, '2025-07-31', 2749.00)
+)
+
+
+```
+
+---
+
+🔹 `sales.payments`
+
+```sql
+INSERT INTO sales.payments (order_id, payment_method, payment_date, amount_paid) VALUES
+(1, 'UPI', '2025-07-25', 5999.00),
+(2, 'Credit Card', '2025-07-26', 3499.00),
+(3, 'Cash on Delivery', '2025-07-29', 949.00),
+(4, 'Credit Card', '2025-07-25', 5999.00),
+(5, 'UPI', '2025-07-26', 3499.00),
+(6, 'Cash on Delivery', '2025-07-29', 1908.00);
+```
+Short Practice---- Starts
+
+Problem Statement:
+------------------
+Task 1: Create a new table: `payment_method` with fields : `payment_method_id`, `payment_method`
+
+Task 2: Insert data in table `payment_method` for 4 types of payment methods => COD, UPI, CCP, DCP
+
+Task 3: Alter table `payments` 
+	=> Rename column `payment_method` to new name: `payment_method_id`
+	=> Change type from VARCHAR(50) to INT
+		=> Before changing the type, we have to delete `varchar` data
+		=> If NOT NULL constraint is there, we have to change it to NULL
+		=> Remove all data -> UPDATE all `payment_method_id` to null
+		=> Change type
+	=> Add constraint => Foreign Key
+		=> INSERT values first, because they are null (fk should be present in other table)
+		=> Make sure the value is in in referenced table 
+		=> Add constraint FK 
+			=> should be changed to payment_method_id referencing table payment_method => column payment_method_id
+
+Task 4: Remove total_payment from orders table
+
+Time Saving Option => DROP table sales.payments, recreate
+
+Solution
+--------
+CREATE TABLE sales.payment_methods (
+	payment_method_id SERIAL PRIMARY KEY,
+	payment_method CHAR(3) UNIQUE NOT NULL
+);
+
+INSERT INTO sales.payment_methods (payment_method) VALUES ('COD'), ('UPI'), ('CCP'), ('DCP');
+
+ALTER TABLE sales.payments
+RENAME COLUMN payment_method TO payment_method_id;
+
+UPDATE sales.payments SET payment_method_id = null;
+
+ALTER TABLE sales.payments
+ALTER COLUMN payment_method_id type INT
+USING payment_method_id::integer;
+
+update sales.payments set payment_method_id = 1;
+
+ALTER TABLE sales.payments
+add constraint fk_payment_method
+foreign key (payment_method_id) 
+references sales.payment_methods (payment_method_id)
+on update cascade
+on delete restrict;
+
+Short Practice---- Completes
+---
+
+🔹 `inventory.categories`
+
+```sql
+INSERT INTO inventory.categories (category_name) VALUES
+('Electronics'),
+('Home Appliances'),
+('Stationery');
+```
+
+---
+
+🔹 `inventory.products`
+
+```sql
+-- Electronics
+INSERT INTO inventory.products (product_name, category_id, price) VALUES
+('Bluetooth Speaker', 1, 1999.00),
+('Wireless Mouse', 1, 799.00),
+('Smartphone Charger', 1, 1299.00),
+
+-- Home Appliances
+('Mixer Grinder', 2, 3499.00),
+('Electric Kettle', 2, 1899.00),
+('Air Purifier', 2, 6499.00),
+
+-- Stationery
+('Notebook Pack of 5', 3, 949.00),
+('Gel Pens - Set of 10', 3, 199.00),
+('Stapler with Pins', 3, 149.00);
+
+```
+
+---
+
+🔹 `inventory.stock`
+
+```sql
+INSERT INTO inventory.stock (product_id, quantity_available) VALUES
+(1, 50),   -- Bluetooth Speaker
+(2, 30),   -- Wireless Mouse
+(3, 100),  -- Smartphone Charger
+(4, 25),   -- Mixer Grinder
+(5, 40),   -- Electric Kettle
+(6, 15),   -- Air Purifier
+(7, 120),  -- Notebook Pack of 5
+(8, 200),  -- Gel Pens - Set of 10
+(9, 60);   -- Stapler with Pins
+
+```
+
+---
+
+🔹 `sales.order_items`
+
+```sql
+INSERT INTO sales.order_items (order_id, product_id, quantity, price_each) VALUES
+(1, 1, 2, 1999.00),   -- Ravi bought 2 Bluetooth Speakers
+(2, 2, 1, 3499.00),   -- Anjali bought 1 Mixer Grinder
+(3, 3, 1, 949.00);    -- Ravi bought Notebooks
+```
+
+---
+
+## 📊 Step 2: Join Queries for Practice
+
+---
+
+🔸 1. Get all customers and their orders
+
+```sql
+SELECT c.full_name, o.order_id, o.order_date, o.total_amount
+FROM sales.customers c
+JOIN sales.orders o ON c.customer_id = o.customer_id;
+```
+
+---
+
+🔸 2. Get order details with payment mode
+
+```sql
+SELECT o.order_id, c.full_name, p.payment_method, p.amount_paid
+FROM sales.orders o
+JOIN sales.customers c ON o.customer_id = c.customer_id
+JOIN sales.payments p ON o.order_id = p.order_id;
+```
+
+---
+
+🔸 3. Cross-schema join: orders + order_items + products
+
+```sql
+SELECT o.order_id, c.full_name, pr.product_name, oi.quantity, oi.price_each
+FROM sales.orders o
+JOIN sales.customers c ON o.customer_id = c.customer_id
+JOIN sales.order_items oi ON o.order_id = oi.order_id
+JOIN inventory.products pr ON oi.product_id = pr.product_id;
+```
+
+---
+
+🔸 4. Product stock with category
+
+```sql
+SELECT p.product_name, cat.category_name, s.quantity_available
+FROM inventory.products p
+JOIN inventory.categories cat ON p.category_id = cat.category_id
+JOIN inventory.stock s ON p.product_id = s.product_id;
+```
+
+---
+
+🔸 5. Show full order breakdown (Customer → Order → Product → Category)
+
+```sql
+SELECT c.full_name, o.order_date, p.product_name, cat.category_name, oi.quantity, oi.price_each
+FROM sales.customers c
+JOIN sales.orders o ON c.customer_id = o.customer_id
+JOIN sales.order_items oi ON o.order_id = oi.order_id
+JOIN inventory.products p ON oi.product_id = p.product_id
+JOIN inventory.categories cat ON p.category_id = cat.category_id;
+```
+
+---
+
+## ✅ What You Can Teach Using This Setup
+
+| Topic                   | Example Query                        |
+| ----------------------- | ------------------------------------ |
+| One-to-Many             | Customers → Orders                   |
+| Many-to-One             | Payments → Orders                    |
+| Many-to-Many (via link) | Orders ↔ Products (via order_items) |
+| Cross-schema Joins      | Orders → Products                    |
+| Normalization           | Products and Categories              |
+| Inner Join vs Left Join | Customers with / without orders      |
+| Foreign Key Design      | All FK constraints in joins          |
+
+---
+
+## ✅ SQL Join Practice Questions – With Indianized Data
+
+---
+
+🔸1. List all customers who have placed an order.
+
+```sql
+SELECT DISTINCT c.full_name
+FROM sales.customers c
+JOIN sales.orders o ON c.customer_id = o.customer_id;
+```
+
+📝 Expected Output:
+
+```
+Ravi Kumar
+Anjali Mehta
+```
+
+---
+
+🔸2. Find all orders made by 'Ravi Kumar' with total amount and order date.
+
+```sql
+SELECT o.order_id, o.order_date, o.total_amount
+FROM sales.orders o
+JOIN sales.customers c ON o.customer_id = c.customer_id
+WHERE c.full_name = 'Ravi Kumar';
+```
+
+---
+
+🔸3. Show order details along with product names and quantity.
+
+```sql
+SELECT o.order_id, c.full_name, p.product_name, oi.quantity
+FROM sales.orders o
+JOIN sales.customers c ON o.customer_id = c.customer_id
+JOIN sales.order_items oi ON o.order_id = oi.order_id
+JOIN inventory.products p ON oi.product_id = p.product_id;
+```
+
+---
+
+🔸4. Show all payments made, with customer name and payment method.
+
+```sql
+SELECT c.full_name, o.order_id, p.payment_method, p.amount_paid
+FROM sales.customers c
+JOIN sales.orders o ON c.customer_id = o.customer_id
+JOIN sales.payments p ON o.order_id = p.order_id;
+```
+
+---
+
+🔸5. Find all products purchased by 'Anjali Mehta'.
+
+```sql
+SELECT DISTINCT pr.product_name
+FROM sales.customers c
+JOIN sales.orders o ON c.customer_id = o.customer_id
+JOIN sales.order_items oi ON o.order_id = oi.order_id
+JOIN inventory.products pr ON oi.product_id = pr.product_id
+WHERE c.full_name = 'Anjali Mehta';
+```
+
+---
+
+🔸6. List all products along with category and available quantity in stock.
+
+```sql
+SELECT p.product_name, cat.category_name, s.quantity_available
+FROM inventory.products p
+JOIN inventory.categories cat ON p.category_id = cat.category_id
+JOIN inventory.stock s ON p.product_id = s.product_id;
+```
+
+---
+
+🔸7. List customers and their total purchase amount.
+
+```sql
+SELECT c.full_name, SUM(o.total_amount) AS total_spent
+FROM sales.customers c
+JOIN sales.orders o ON c.customer_id = o.customer_id
+GROUP BY c.full_name;
+```
+
+---
+
+🔸8. Show all orders and payment status (including unpaid orders).
+
+```sql
+SELECT o.order_id, c.full_name, o.total_amount, p.payment_method
+FROM sales.orders o
+JOIN sales.customers c ON o.customer_id = c.customer_id
+LEFT JOIN sales.payments p ON o.order_id = p.order_id;
+```
+
+---
+
+🔸9. List products that have never been ordered.
+
+```sql
+SELECT p.product_name
+FROM inventory.products p
+LEFT JOIN sales.order_items oi ON p.product_id = oi.product_id
+WHERE oi.product_id IS NULL;
+```
+
+---
+
+🔸10. Find the most sold product (by total quantity).
+
+```sql
+SELECT p.product_name, SUM(oi.quantity) AS total_sold
+FROM sales.order_items oi
+JOIN inventory.products p ON oi.product_id = p.product_id
+GROUP BY p.product_name
+ORDER BY total_sold DESC
+LIMIT 1;
+```
+
+---

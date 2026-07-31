@@ -1,0 +1,603 @@
+Database Objects
+================
+Topics
+======
+=> Database Objects
+	What are Database Objects?
+	Common Database Objects in MySQL
+=> Tables
+=> Indexes
+=> Temporary Table
+=> Views
+=> Stored Procedures
+
+---
+
+Database Objects
+================
+
+## What are Database Objects?
+
+Database objects are structural components of MySQL used to store data, improve performance, enforce logic, and automate behavior.
+
+## Common Database Objects in MySQL
+
+### 1. Tables
+
+* Store actual data in rows and columns
+* Core object of MySQL
+
+---
+
+### 2. Indexes
+
+* Improve query performance
+* Created on table columns
+* Do not store business data
+
+---
+
+### 3. Stored Procedures
+
+* Named blocks of SQL code
+* Can contain logic, conditions, and loops
+* Improve reusability and performance
+
+---
+
+### 4. Functions
+
+* Similar to stored procedures
+* Always return a value
+* Can be used inside SQL statements
+
+---
+
+### 5. Views
+
+* Virtual tables based on SQL queries
+* Do not store data themselves
+
+---
+
+### 6. Triggers
+
+* Automatically executed on data events
+* Fired on `INSERT`, `UPDATE`, or `DELETE`
+
+---
+
+### 7. Temporary Tables
+
+* Session-based tables
+* Automatically dropped at the end of the session
+
+---
+
+### 8. Events
+
+* Used to schedule tasks inside MySQL
+* Run at a specific time or interval
+* Similar to a database-level scheduler
+
+---
+
+## Explicitly Not in MySQL
+
+* ❌ Sequences (MySQL uses `AUTO_INCREMENT`)
+* ❌ Synonyms
+
+---
+
+## Trainer-Grade Summary
+
+> In MySQL, database objects include tables, indexes, procedures, functions, views, triggers, temporary tables, and events-each serving a specific role in data storage, performance, automation, or logic.
+
+---
+
+## **Table**
+
+* A **table** is the basic database object used to **store data**.
+* Data is stored in the form of **rows (records)** and **columns (attributes)**.
+* Each table represents a **single entity** (e.g., employees, orders).
+* Columns define **data type and rules**, rows store actual data.
+* All other database objects (indexes, views, triggers, etc.) are built **on top of tables**.
+
+👉 **In short:**
+A table is the **foundation of a database** where all data resides.
+
+**Query
+
+CREATE SCHEMA db_objects;
+
+USE db_objects;
+
+CREATE TABLE employees (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(50) NOT NULL,
+    email VARCHAR(100) UNIQUE,
+    department VARCHAR(50),
+    designation VARCHAR(50),
+    joining_date DATE,
+    basic_salary DECIMAL(10,2)
+);
+
+INSERT INTO employees 
+(name, email, department, designation, joining_date, basic_salary)
+VALUES
+('Amit Sharma', 'amit.sharma@gmail.com', 'IT', 'Software Engineer', '2019-06-15', 60000),
+
+('Neha Verma', 'neha.verma@gmail.com', 'HR', 'HR Executive', '2021-03-10', 45000),
+
+('Rahul Mehta', 'rahul.mehta@gmail.com', 'Finance', 'Accountant', '2018-01-20', 55000),
+
+('Priya Singh', 'priya.singh@gmail.com', 'IT', 'Senior Developer', '2016-09-05', 85000),
+
+('Ankit Patel', 'ankit.patel@gmail.com', 'Sales', 'Sales Executive', '2022-07-01', 40000),
+
+('Sneha Kulkarni', 'sneha.k@gmail.com', 'Marketing', 'Marketing Analyst', '2020-11-18', 50000),
+
+('Vikas Rao', 'vikas.rao@gmail.com', 'Operations', 'Operations Manager', '2015-04-12', 90000),
+
+('Pooja Nair', 'pooja.nair@gmail.com', 'IT', 'QA Engineer', '2021-08-25', 48000),
+
+('Suresh Iyer', 'suresh.iyer@gmail.com', 'Support', 'Support Lead', '2017-02-14', 52000),
+
+('Kavita Joshi', 'kavita.joshi@gmail.com', 'Admin', 'Office Administrator', '2019-12-02', 42000);
+
+SELECT * FROM employees;
+
+---
+
+Indexes
+=======
+- An index in a database is used to improve the speed of data retrieval.
+- It works like a book's index, allowing the database to find specific rows more quickly without scanning the entire table.
+- Indexes help optimize query performance, especially for large datasets, and are particularly useful for speeding up SELECT statements with WHERE clauses, JOINs, and sorting (ORDER BY)
+- The primary key in a MySQL table is automatically indexed. 
+- When we define a column (or a set of columns) as the primary key, or unique MySQL automatically creates a unique index on that column. 
+
+Index Operations
+================
+We can create, update, drop and display an index with SQL.
+
+Exercise:
+
+-- Display indexes in a table
+
+**Query
+
+SHOW INDEX FROM Employees;
+
+Important points:
+- A PRIMARY KEY is automatically indexed by MySQL.
+- A UNIQUE constraint also creates an index internally.
+- So, id & email are already indexed.
+
+-- Create index manually
+
+1. Create index on a single column
+
+**Query
+
+CREATE INDEX idx_name ON employees(name);
+
+2. Create composite index
+
+**Query
+
+CREATE INDEX idx_dept_designation
+ON employees(department, designation);
+
+-- Display index
+
+**Query
+
+SHOW INDEX FROM Employees;
+
+-- Search based on name idex
+
+**Query
+
+SELECT * FROM employees WHERE name = 'Amit Sharma';
+
+-- Search based on department and designation
+
+**Query
+
+SELECT * FROM employees WHERE department = 'IT' 
+AND designation = 'Software Engineer';
+
+3. Modifying an index
+
+MySQL doesn't suppport modifying index. Instead we can recreate an index with a new name and delete the old on.
+
+4. Delete an index
+
+**Query
+
+DROP INDEX idx_name ON employees;
+DROP INDEX idx_dept_designation ON employees;
+
+5. Display indexes in a table
+SHOW INDEX FROM Employees;
+
+** Important Notes
+- Dropping an index does not delete table data.
+- PRIMARY KEY index cannot be dropped using DROP INDEX.
+- To remove a primary key, we use:
+- ALTER TABLE employees DROP PRIMARY KEY;
+
+👉 Key takeaway:
+Indexes are removed using DROP INDEX, except primary keys which require ALTER TABLE.
+
+---
+
+Temporary Table
+===============
+Imagine you are working on a big puzzle, and you need a separate space to keep some puzzle pieces while you are working on them. In MySQL, a temporary table is like that separate space.
+
+- A temporary table in MySQL is a special type of table that exists only for a short time, like a temporary workspace. 
+
+- We can create a fresh temporary table, or we can clone it from an existing one.
+
+- Temporary tables won't be visible in workbench, or with show tables query
+
+- However we can use SELECT to see the data
+
+- They could be dropped with
+	- DROP command
+	- Reconneting with server
+
+1. Fresh temporary table
+
+**Query:
+
+CREATE TEMPORARY TABLE temp_employees (
+    id INT,
+    name VARCHAR(50)
+);
+
+-- Insert data
+
+**Query (DML):
+
+INSERT INTO temp_employees 
+VALUES (1, 'Jay'), (2, 'Raj'), (3, 'Yash');
+
+-- View data
+
+**Query (DQL):
+
+SELECT * FROM temp_employees;
+
+-- Drop table
+
+**Query (DDL)
+
+DROP TEMPORARY TABLE temp_employees; 
+
+---
+
+2. Clone a table from another table
+
+**Query (DDL):
+
+CREATE TEMPORARY TABLE temp_it_employees AS
+SELECT *
+FROM employees
+WHERE department = 'IT';
+
+As a result
+- Table will be created
+- It will contain data from students table
+
+-- Display data
+
+**Query (DQL): 
+
+SHOW tables;
+
+** Temporary tables won't be displayed
+
+**Query (DQL):
+
+SELECT * FROM temp_students;
+
+** Data will be displayed`
+
+-- Insert more data
+
+**Query (DML):
+
+INSERT INTO temp_it_employees 
+(name, email, department, designation, joining_date, basic_salary)
+VALUES ('Akanksha', 'akanksha@yahoo.com', 'CS', 'Lead','2020-12-12', 40000);
+SELECT * FROM temp_students;
+
+---
+
+Drop temporary table
+--------------------
+Either drop the temporary table manually or it will be automatically dropped at the end of session
+
+Way 1 : Go to Menu -> Query -> Reconnect to server
+
+OR
+
+Way 2: **Query (DDL): 
+	
+	DROP TEMPORARY TABLE temp_students; 
+
+-----X-----X-----X-----
+Views
+=====
+A view is a virtual table based on the result of a query. 
+It doesn't store data physically but presents data from one or more tables.
+
+Uses
+----
+Views are used to:
+- Simplify complex queries.
+- Abstract complex joins or aggregations.
+
+Types of Views
+--------------
+There are 2 types of views:
+
+1. Simple View: Based on a single table without joins.
+2. Complex View: Based on multiple tables with joins or aggregations.
+
+Create Views
+------------
+**Query (DDL):
+
+CREATE VIEW it_senior_employees_view AS
+SELECT 
+    id,
+    name,
+    email,
+    department,
+    designation,
+    basic_salary,
+    YEAR(CURDATE()) - YEAR(joining_date) AS experience_years
+FROM employees
+WHERE department = 'IT'
+  AND basic_salary >= 60000;
+
+See view
+--------
+**Query (DQL):
+
+SHOW FULL TABLES WHERE Table_Type = 'VIEW';
+
+See data in view
+----------------
+**Query (DQL):
+
+SELECT * FROM it_senior_employees_view;
+
+Benefit of the View: If we see the above 2 queries - in order to get the data we had to do write a complex query, but now we just have to do: SELECT * FROM it_senior_employees_view;
+
+That is the use of a View => simplify complex queries.
+
+We can hide long SELECT, JOIN, or WHERE logic behind a short name.
+-----X-----X----
+Updating data in a View
+-----------------------
+**Query (DML):
+
+UPDATE it_senior_employees_view
+SET basic_salary = basic_salary + 5000
+WHERE id = 4;
+SELECT * FROM it_senior_employees_view;
+
+** This will not only change the view, but also the original students table
+
+Updating the structure of a View
+--------------------------------
+**Query:
+
+CREATE OR REPLACE VIEW it_senior_employees_view AS
+SELECT id, name, email, department, designation, basic_salary
+FROM employees
+WHERE department = 'IT'
+  AND basic_salary >= 65000;
+
+Renaming a View
+---------------
+No, MySQL does not support renaming a view directly using a RENAME statement.
+
+Alternative Approach: To rename a view, we need to:
+- Create a new view with the desired name using CREATE OR REPLACE VIEW.
+- Drop the old view using DROP VIEW.
+
+Drop view
+---------
+**Query:
+
+DROP VIEW it_senior_employees_view;
+
+-----X-----X-----X-----
+Views vs. Temporary Tables
+==========================
+1. Definition:
+   - View: Virtual table based on a SELECT query.
+   - Temporary Table: Physical table that stores data temporarily.
+
+2. Persistence:
+   - View: Persistent until dropped. Exists during change of sessions.
+   - Temporary Table: Exists only for the duration of the session or transaction.
+
+3. Data Storage:
+   - View: Does not store data; generates results dynamically.
+   - Temporary Table: Stores data physically.
+
+4. Usage:
+   - View: Simplifies complex queries, abstracts data.
+   - Temporary Table: Holds intermediate results, temporary data processing.
+-----X-----X-----
+Stored Procedures
+=================
+Stored procedures in MySQL are sets of SQL statements that are stored in the database and can be executed as a single unit. 
+
+They are used to encapsulate and execute repetitive or complex database tasks with a simple call, making database operations more efficient and maintainable.
+
+There are 3 types of parameters in a Stored Procedure:
+1. IN parameters -> to pass the data
+2. OUT parameters -> to return the data
+3. INOUT parameters -> to pass as well as to return the data
+
+Note: If the type (IN, OUT, or INOUT) is not explicitly specified, the default type is IN.
+
+Syntax:
+
+DELIMITER //
+
+CREATE PROCEDURE procedure_name (IN param1 datatype, OUT param2 datatype, INOUT param3 datatype...)
+BEGIN
+    -- SQL statements go here
+    -- You can use SELECT, INSERT, UPDATE, DELETE, etc.
+    
+    -- Example:
+    SELECT column_name INTO param2 FROM table_name WHERE condition;
+	
+END//
+
+DELIMITER ;
+
+Practice 
+========
+
+-- Using Schema db_objects
+
+**Query 1: Stored procedure with IN paremeter
+--------
+DELIMITER //
+
+CREATE PROCEDURE get_employees_by_department (
+    IN dept_name VARCHAR(50)
+)
+BEGIN
+    SELECT *
+    FROM employees
+    WHERE department = dept_name;
+END//
+
+DELIMITER ;
+
+How to call?
+------------
+CALL get_employees_by_department('IT');
+
+-----X-----X-----X-----
+**Query 2: Stored procedure with OUT paremeter
+----------
+
+DELIMITER $$
+
+CREATE PROCEDURE get_it_employee_count (
+    OUT emp_count INT
+)
+BEGIN
+    SELECT COUNT(*)
+    INTO emp_count
+    FROM employees
+    WHERE department = 'IT';
+END$$
+
+DELIMITER ;
+
+How to call?
+------------
+CALL get_it_employee_count(@total);
+SELECT @total;
+
+-----X-----X-----X-----
+Query 3: Stored procedure with INOUT paremeter
+--------
+DELIMITER ^^
+
+CREATE PROCEDURE get_matching_salary (
+    INOUT sal DECIMAL(10,2)
+)
+BEGIN
+    SELECT MAX(basic_salary)
+    INTO sal
+    FROM employees
+    WHERE basic_salary <= sal;
+END^^
+
+DELIMITER ;
+
+How to call?
+------------
+-- Step 1: Declare and set an initial value for the salary
+SET @salary = 70000;
+
+-- Step 2: Call the stored procedure
+CALL get_matching_salary(@salary);
+
+-- Step 3: Collect output
+SELECT @salary;
+
+-----X-----X-----X-----
+Query 4: Having all the 3 types of parameters in 1
+
+DELIMITER //
+
+CREATE PROCEDURE employee_summary_by_department (
+    IN dept_name VARCHAR(50),
+    INOUT min_salary DECIMAL(10,2),
+    OUT emp_count INT
+)
+BEGIN
+    -- Count employees in the given department with salary >= min_salary
+    SELECT COUNT(*)
+    INTO emp_count
+    FROM employees
+    WHERE department = dept_name
+      AND basic_salary >= min_salary;
+
+    -- Update min_salary to the maximum salary in that department
+    SELECT MAX(basic_salary)
+    INTO min_salary
+    FROM employees
+    WHERE department = dept_name;
+END//
+
+DELIMITER ;
+
+
+-- Step 1: Declare variables for the INOUT and OUT parameters
+SET @dept = 'IT';  -- Initial value for dept_name
+SET @salary = 50000; -- Initial value for dept_name
+
+-- Step 2: Call the stored procedure
+CALL employee_summary_by_department(@dept, @salary, @total);
+
+-- Step 3: Retrieve the results
+SELECT @salary AS max_salary, @total AS employee_count;
+
+Drop Stored procedures
+-----------------------
+
+-- Drop a Single Stored Procedure
+
+**Query
+
+DROP PROCEDURE get_employees_by_department;
+
+-- Safer version
+
+**Query
+
+DROP PROCEDURE IF EXISTS get_employees_by_department;
+
+-- DROP multiple
+
+DROP PROCEDURE IF EXISTS `employee_summary_by_department`;
+DROP PROCEDURE IF EXISTS `get_it_employee_count`;
+DROP PROCEDURE IF EXISTS `get_matching_salary`;
+
+-----X-----X-----X-----

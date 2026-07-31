@@ -1,0 +1,511 @@
+Joins
+=====
+
+Example Setup:
+--------------
+
+CREATE DATABASE ecommerce;
+
+use ecommerce;
+
+CREATE TABLE users (
+    user_id INT AUTO_INCREMENT PRIMARY KEY,
+    user_name VARCHAR(100),
+    user_email VARCHAR(100) UNIQUE,
+    user_phone VARCHAR(15),
+    delivery_address VARCHAR(255)
+);
+
+CREATE TABLE orders (
+    order_id INT PRIMARY KEY,
+    user_id INT,
+    order_date DATE,
+    FOREIGN KEY (user_id) REFERENCES users(user_id)
+);
+
+CREATE TABLE products (
+    product_id INT PRIMARY KEY,
+    product_name VARCHAR(100),
+    price DECIMAL(10,2)
+);
+
+CREATE TABLE order_items (
+    order_id INT,
+    product_id INT,
+    qty INT,
+    PRIMARY KEY (order_id, product_id),
+    FOREIGN KEY (order_id) REFERENCES orders(order_id),
+    FOREIGN KEY (product_id) REFERENCES products(product_id)
+);
+
+INSERT INTO users (user_name, user_email, user_phone, delivery_address) VALUES
+('Rahul Sharma', 'rahul.sharma@gmail.com', '9876543210', '101, MG Road, Indore, MP'),
+('Aditi Verma', 'aditi.verma@yahoo.com', '9123456780', '22, Nehru Nagar, Bhopal, MP'),
+('Rohan Patil', 'rohan.patil@gmail.com', '9988776655', '14, FC Road, Pune, MH'),
+('Kavya Iyer', 'kavya.iyer@outlook.com', '9090909090', '55, Anna Nagar, Chennai, TN'),
+('Arjun Singh', 'arjun.singh@gmail.com', '9000011111', '18, Hazratganj, Lucknow, UP'),
+('Neha Gupta', 'neha.gupta@gmail.com', '9822334455', '88, Civil Lines, Kanpur, UP'),
+('Vikas Yadav', 'vikas.yadav@gmail.com', '9811122233', '40, Sector 18, Noida, UP'),
+('Yash Mukati', 'yash.mukati@yahoo.com', '9897969594', '19, LIG, Jabalpur, MP'),
+('Vikas Yadav', 'vikas.yadav@gmail.com', '9987766345', '21, Sector 18, Gwalior, MP');
+
+
+INSERT INTO orders VALUES
+(101, 1, '2025-01-10'),
+(102, 2, '2025-01-11'),
+(103, 3, '2025-01-12'),
+(104, 4, '2025-01-12'),
+(105, 5, '2025-01-14'),
+(106, 6, '2025-01-15'),
+(107, 7, '2025-01-16');
+
+INSERT INTO products VALUES
+(201, 'Boat Airdopes 141', 999.00),
+(305, 'Dell Wireless Mouse', 699.00),
+(402, 'Campus Running Shoes', 1299.00),
+(509, 'Prestige Kettle', 799.00),
+(611, 'Samsung Galaxy M34 Cover', 299.00),
+(788, 'Milton Water Bottle 1L', 499.00);
+
+INSERT INTO order_items VALUES
+(101, 201, 1),
+(101, 305, 1),
+(102, 402, 2),
+(103, 201, 1),
+(103, 509, 1),
+(104, 611, 1),
+(105, 402, 1),
+(105, 305, 1),
+(106, 788, 1),
+(107, 402, 1);
+
+---
+
+What is a JOIN?
+
+> A JOIN is used to retrieve data from multiple related tables using a common column (usually PK–FK).
+
+After normalization, data is split into:
+
+* `users`
+* `orders`
+* `products`
+* `order_items`
+
+👉 Joins help us reconstruct meaningful information from these tables.
+
+Refer fig: 05_sql_joins.png
+
+---
+
+Relationships in Our Schema
+
+* `users.user_id` ↔ `orders.user_id`
+* `orders.order_id` ↔ `order_items.order_id`
+* `products.product_id` ↔ `order_items.product_id`
+
+---
+
+# 1. INNER JOIN
+
+Definition
+
+Returns only matching records from both tables.
+
+---
+
+Syntax
+
+```sql
+SELECT columns
+FROM table1
+INNER JOIN table2
+ON condition;
+```
+
+---
+
+Example: Users who placed orders
+
+```sql
+SELECT u.user_name, o.order_id, o.order_date
+FROM users u
+INNER JOIN orders o
+ON u.user_id = o.user_id;
+```
+
+👉 Only users with orders are shown.
+
+---
+
+Example: Orders with product details
+
+```sql
+SELECT o.order_id, p.product_name, oi.qty
+FROM orders o
+INNER JOIN order_items oi ON o.order_id = oi.order_id
+INNER JOIN products p ON oi.product_id = p.product_id;
+```
+
+---
+
+# 2. LEFT JOIN (LEFT OUTER JOIN)
+
+Definition
+
+Returns all records from the left table, and matching records from the right table.
+If no match → `NULL`.
+
+---
+
+Syntax
+
+```sql
+SELECT columns
+FROM table1
+LEFT JOIN table2
+ON condition;
+```
+
+---
+
+Example: All users (even if no orders)
+
+```sql
+SELECT u.user_name, o.order_id
+FROM users u
+LEFT JOIN orders o
+ON u.user_id = o.user_id;
+```
+
+👉 Users without orders will still appear.
+
+---
+
+Use Case
+
+* Find users who never placed an order
+* Audit missing relationships
+
+---
+
+# 3. RIGHT JOIN (RIGHT OUTER JOIN)
+
+Definition
+
+Returns all records from the right table, and matching records from the left table.
+
+---
+
+Syntax
+
+```sql
+SELECT columns
+FROM table1
+RIGHT JOIN table2
+ON condition;
+```
+
+---
+
+Example: All orders with user info
+
+```sql
+SELECT u.user_name, o.order_id
+FROM users u
+RIGHT JOIN orders o
+ON u.user_id = o.user_id;
+```
+
+👉 Practically same as LEFT JOIN with table order reversed.
+
+---
+
+🔎 Note
+
+> RIGHT JOIN is rarely used in real projects.
+> Here we want all the orders that exist without users
+> As the data in orders table is only possible with users, it makes no sense
+> We can get data only if some orders are made by non-registerd users
+
+---
+
+# 4. FULL JOIN (Conceptual in MySQL)
+
+Definition
+
+Returns all matching and non-matching records from both tables.
+
+⚠️ MySQL does NOT support FULL JOIN directly
+
+---
+
+FULL JOIN using UNION
+
+```sql
+SELECT u.user_name, o.order_id
+FROM users u
+LEFT JOIN orders o
+ON u.user_id = o.user_id
+
+UNION
+
+SELECT u.user_name, o.order_id
+FROM users u
+RIGHT JOIN orders o
+ON u.user_id = o.user_id;
+```
+
+---
+
+# 5. SELF JOIN
+
+Definition
+
+A table joined with itself.
+
+👉 Used when rows in the same table relate to each other.
+
+---
+
+Syntax
+
+```sql
+SELECT a.col, b.col
+FROM table a
+JOIN table b
+ON condition;
+```
+
+---
+
+Example (Conceptual)
+
+If `users` had a `referred_by` column:
+
+```sql
+SELECT u1.user_name AS user,
+       u2.user_name AS referred_by
+FROM users u1
+LEFT JOIN users u2
+ON u1.referred_by = u2.user_id;
+```
+
+---
+
+# 6. CROSS JOIN
+
+Definition
+
+Returns Cartesian product (every row × every row).
+
+---
+
+Syntax
+
+```sql
+SELECT *
+FROM table1
+CROSS JOIN table2;
+```
+
+---
+
+Example
+
+```sql
+SELECT u.user_name, p.product_name
+FROM users u
+CROSS JOIN products p;
+```
+
+👉 Produces users × products combinations
+⚠️ Rarely used in real systems.
+
+---
+
+# Important Join Rules (Must Remember)
+
+* Always join using PK–FK
+* Use table aliases (`u`, `o`, `p`)
+* Avoid joining on non-key columns
+* Understand result size before executing
+
+---
+
+# Normalization + Joins (Key Insight)
+
+> Normalization removes redundancy; joins restore meaning.
+
+They are complementary, not opposite.
+
+---
+
+Trainer-Grade Closing Lines
+
+* INNER JOIN → matching data
+* LEFT JOIN → include missing data
+* RIGHT JOIN → reverse of LEFT
+* FULL JOIN → everything (via UNION)
+* SELF JOIN → same table relationship
+* CROSS JOIN → combinations
+
+---
+Practice questions
+==================
+
+1. List all users along with their order IDs
+
+Concept: `INNER JOIN`
+
+```sql
+SELECT u.user_name, o.order_id
+FROM users u
+INNER JOIN orders o
+ON u.user_id = o.user_id;
+```
+
+---
+
+2. List all users, including those who have not placed any orders
+
+Concept: `LEFT JOIN`
+
+```sql
+SELECT u.user_name, o.order_id
+FROM users u
+LEFT JOIN orders o
+ON u.user_id = o.user_id;
+```
+
+---
+
+3. Find users who have NOT placed any orders
+
+Concept: `LEFT JOIN + NULL check`
+
+```sql
+SELECT u.user_name
+FROM users u
+LEFT JOIN orders o
+ON u.user_id = o.user_id
+WHERE o.order_id IS NULL;
+```
+
+---
+
+4. Display order ID, product name, and quantity for all orders
+
+Concept: Multi-table `INNER JOIN`
+
+```sql
+SELECT o.order_id, p.product_name, oi.qty
+FROM orders o
+INNER JOIN order_items oi ON o.order_id = oi.order_id
+INNER JOIN products p ON oi.product_id = p.product_id;
+```
+
+---
+
+5. Display user name, order ID, and order date
+
+Concept: Join parent → child
+
+```sql
+SELECT u.user_name, o.order_id, o.order_date
+FROM users u
+INNER JOIN orders o
+ON u.user_id = o.user_id;
+```
+
+---
+
+6. Find total quantity of each product sold
+
+Concept: Join + aggregation
+
+```sql
+SELECT p.product_name, SUM(oi.qty) AS total_qty_sold
+FROM products p
+INNER JOIN order_items oi
+ON p.product_id = oi.product_id
+GROUP BY p.product_name;
+```
+
+---
+
+7. Find total number of orders placed by each user
+
+Concept: `LEFT JOIN + COUNT`
+
+```sql
+SELECT u.user_name, COUNT(o.order_id) AS total_orders
+FROM users u
+LEFT JOIN orders o
+ON u.user_id = o.user_id
+GROUP BY u.user_name;
+```
+
+---
+
+8. Display order ID and total amount of each order
+
+Concept: Join + calculation
+
+```sql
+SELECT o.order_id,
+       SUM(p.price * oi.qty) AS order_total
+FROM orders o
+INNER JOIN order_items oi ON o.order_id = oi.order_id
+INNER JOIN products p ON oi.product_id = p.product_id
+GROUP BY o.order_id;
+```
+
+---
+
+9. Find users who ordered “Campus Running Shoes”
+
+Concept: Multi-table filtering
+
+```sql
+SELECT DISTINCT u.user_name
+FROM users u
+INNER JOIN orders o ON u.user_id = o.user_id
+INNER JOIN order_items oi ON o.order_id = oi.order_id
+INNER JOIN products p ON oi.product_id = p.product_id
+WHERE p.product_name = 'Campus Running Shoes';
+```
+
+---
+
+🔟 Display users and the products they have ordered
+
+Concept: Full relationship traversal
+
+```sql
+SELECT u.user_name, p.product_name
+FROM users u
+INNER JOIN orders o ON u.user_id = o.user_id
+INNER JOIN order_items oi ON o.order_id = oi.order_id
+INNER JOIN products p ON oi.product_id = p.product_id;
+```
+
+---
+
+🧠 Practice Summary
+
+| Skill                  | Covered |
+| ---------------------- | ------- |
+| INNER JOIN             | ✅       |
+| LEFT JOIN              | ✅       |
+| Multi-table joins      | ✅       |
+| Aggregation with joins | ✅       |
+| Real-world queries     | ✅       |
+
+---
+
+Trainer-Grade Closing Line
+
+> If you can confidently write these 10 queries, your JOIN fundamentals are solid.
+
+---X---X---X---

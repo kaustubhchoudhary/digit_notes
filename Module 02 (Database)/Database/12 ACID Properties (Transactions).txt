@@ -1,0 +1,234 @@
+
+# ACID Properties (Transactions)
+
+## What are ACID Properties?
+
+> ACID properties define the guarantees that a database provides to ensure reliable and consistent transaction processing.
+
+ACID stands for:
+
+* [A]tomicity
+* [C]onsistency
+* [I]solation
+* [D]urability
+
+These properties apply to transactions, not individual queries.
+
+---
+
+## Why ACID Matters
+
+Without ACID:
+
+* Data can become inconsistent
+* Partial updates can occur
+* Concurrent users can corrupt data
+* System crashes can cause data loss
+
+👉 ACID ensures trust in the database.
+
+---
+
+# 1️⃣ Atomicity
+
+### Definition
+
+> A transaction is atomic: it either completes fully or not at all.
+
+There is no partial success.
+
+---
+
+### Example (Conceptual)
+
+Order placement involves:
+
+1. Insert order
+2. Insert order items
+3. Reduce product stock
+
+If any one step fails → everything must roll back.
+
+---
+
+### Example (SQL)
+
+```sql
+START TRANSACTION;
+
+INSERT INTO orders VALUES (201, 1, CURDATE());
+INSERT INTO order_items VALUES (201, 201, 1);
+
+-- Suppose this fails
+UPDATE products SET stock = stock - 1 WHERE product_id = 201;
+
+ROLLBACK;
+```
+
+👉 Result:
+
+* No order
+* No order items
+* No partial data
+
+---
+
+### One-liner
+
+> Atomicity ensures “all or nothing” execution.
+
+---
+
+# 2️⃣ Consistency
+
+### Definition
+
+> A transaction must bring the database from one valid state to another valid state.
+
+All:
+
+* Constraints
+* Keys
+* Rules
+  must remain satisfied.
+
+---
+
+### Example (Conceptual)
+
+* `order_items.order_id` must exist in `orders`
+* Stock cannot go negative
+* Unique email must remain unique
+
+---
+
+### Example
+
+```sql
+INSERT INTO orders VALUES (202, 999, CURDATE());
+```
+
+❌ Fails because `user_id = 999` does not exist.
+
+👉 Database rejects the transaction.
+
+---
+
+### One-liner
+
+> Consistency ensures data integrity rules are never violated.
+
+---
+
+# 3️⃣ Isolation
+
+### Definition
+
+> Each transaction executes as if it is the only transaction in the system.
+
+Concurrent transactions should not interfere with each other.
+
+---
+
+### Example (Conceptual)
+
+Two users try to buy the last product at the same time.
+
+Isolation ensures:
+
+* Only one transaction succeeds
+* The other waits or fails
+
+---
+
+### Example
+
+```sql
+START TRANSACTION;
+SELECT stock FROM products WHERE product_id = 201;
+-- stock = 1
+UPDATE products SET stock = stock - 1 WHERE product_id = 201;
+COMMIT;
+```
+
+Another transaction trying the same:
+
+* Must wait
+* Or see updated stock
+
+---
+
+### Isolation Levels (Awareness)
+
+* READ UNCOMMITTED
+* READ COMMITTED
+* REPEATABLE READ (MySQL default)
+* SERIALIZABLE
+
+---
+
+### One-liner
+
+> Isolation prevents concurrent transactions from corrupting each other’s data.
+
+---
+
+# 4️⃣ Durability
+
+### Definition
+
+> Once a transaction is committed, its changes persist permanently—even after crashes.
+
+---
+
+### Example (Conceptual)
+
+* Order is placed
+* `COMMIT` executed
+* System crashes immediately
+
+👉 Order still exists after restart.
+
+---
+
+### Example
+
+```sql
+COMMIT;
+```
+
+After commit:
+
+* Data is written to disk / logs
+* Cannot be lost
+
+---
+
+### One-liner
+
+> Durability guarantees that committed data is never lost.
+
+---
+
+## ACID Summary Table
+
+| Property    | Ensures              |
+| ----------- | -------------------- |
+| Atomicity   | All or nothing       |
+| Consistency | Valid database state |
+| Isolation   | Safe concurrency     |
+| Durability  | Permanent data       |
+
+---
+
+## ACID in One Real-Life Line
+
+> ACID ensures that transactions are reliable, safe under concurrency, and crash-proof.
+
+---
+
+## 🏁 Final Course-Closing Line
+
+> ACID properties are what transform a database from a data store into a trustworthy system of record.
+
+---

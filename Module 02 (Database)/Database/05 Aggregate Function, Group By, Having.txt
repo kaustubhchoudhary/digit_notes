@@ -1,0 +1,142 @@
+Topics
+======
+Aggregate Functions
+Group by
+Having
+
+---
+
+Aggregate Functions 
+===================
+Aggregate functions return the result of a query as 1 final answer. For ex: the total no of records, the total sum, min/max, avg value of all
+
+There are 5 aggregate functions:
+COUNT(), MIN(), MAX(), AVG(), SUM()
+
+**Query: Get total no of employees
+- SELECT COUNT(*) AS total_employees FROM employees
+
+**Query: Count the no of employees from QA and Engineering
+- SELECT COUNT(*) FROM employees WHERE department = 'QA' OR department = 'Engineering';
+
+**Query: Get minimum salary
+- SELECT MIN(salary) min_salary FROM employees;
+
+**Query: Get latest joining date
+- SELECT MAX(joining_date) as latest_joing_date FROM employees;
+
+**Query: Calculate total salary of all employees
+- SELECT SUM(salary) as total_salary FROM employees;
+
+**Query: Calculate average salary of all employees
+- SELECT AVG(salary) avg_salary FROM employees;
+
+Round off the above answers: Use Round()
+
+- SELECT ROUND(AVG(salary), 2) avg_salary FROM employees;
+
+GROUP BY
+--------
+- The GROUP BY clause is used to group rows that have the same values in specified columns into aggregated data. 
+- It is often used with aggregate functions like COUNT(), SUM(), AVG(), MAX(), and MIN() to produce summarized results.
+
+Purpose:
+ - Group rows based on one or more columns.
+ - Aggregate data for each group.
+
+Example: Suppose we want to find out the number of employees in each department
+
+SELECT department, COUNT(*) AS total_employees
+FROM employees
+GROUP BY department;
+
+Having
+------
+- The HAVING clause is used to filter groups created by GROUP BY based on a condition. 
+- Unlike the WHERE clause, which filters rows before grouping, HAVING filters groups after the aggregation has been performed.
+
+Example: Suppose we want to find departments with an average salary greater than 25,000.
+
+SELECT department, ROUND(AVG(salary), 2) AS average_salary
+FROM employees
+GROUP BY department
+HAVING average_salary > 23000;
+
+---
+
+Here are **short, sharp, high-impact pointers** on **GROUP BY** and **HAVING** — perfect for **revision, interviews, and daily SQL thinking**.
+
+---
+
+## 🔹 GROUP BY – Key Pointers
+
+* `GROUP BY` is used to **aggregate rows into groups**
+* It is required when using **aggregate functions** (`COUNT`, `SUM`, `AVG`, `MIN`, `MAX`)
+* Each group produces **one output row**
+* Columns in `SELECT` must be either:
+
+  * Aggregated, or
+  * Present in `GROUP BY`
+* `GROUP BY` works **after WHERE** but **before HAVING**
+* Grouping defines **the level of analysis** (per user, per order, per product)
+* Grouping by **primary key** is usually sufficient
+* `GROUP BY` reduces rows, not columns
+
+---
+
+## 🔹 HAVING – Key Pointers
+
+* `HAVING` filters **groups**, not rows
+* It is used **only with GROUP BY**
+* Aggregate functions **can be used in HAVING**
+* `WHERE` cannot filter aggregate results
+* `HAVING` is evaluated **after grouping**
+* Use `HAVING` for conditions like:
+
+  * “more than 1”
+  * “greater than average”
+  * “exactly N”
+* `HAVING` without `GROUP BY` is rarely useful (but allowed)
+
+---
+
+## 🔹 WHERE vs HAVING (Must Remember)
+
+| WHERE                 | HAVING              |
+| --------------------- | ------------------- |
+| Filters rows          | Filters groups      |
+| Cannot use aggregates | Can use aggregates  |
+| Runs before GROUP BY  | Runs after GROUP BY |
+
+---
+
+## 🔹 Common Mistakes to Avoid
+
+* ❌ Using `WHERE` with `COUNT`, `SUM`, etc.
+* ❌ Forgetting to group non-aggregated columns
+* ❌ Confusing `COUNT(*)` with `SUM(qty)`
+* ❌ Grouping by foreign keys instead of entity keys
+* ❌ Using HAVING when WHERE is sufficient
+
+---
+
+## 🔹 Mental Checklist (Before Writing Query)
+
+Ask yourself:
+
+1. Am I calculating something? → `GROUP BY`
+2. Am I filtering raw rows? → `WHERE`
+3. Am I filtering calculated results? → `HAVING`
+4. What is my **grouping level**?
+
+---
+
+## 🔹 Interview-Ready One-Liners
+
+* **GROUP BY** → *“Aggregates rows into meaningful groups.”*
+* **HAVING** → *“Filters aggregated results.”*
+* **WHERE filters rows, HAVING filters groups.”*
+
+These pointers capture **90% of real-world GROUP BY usage**.
+
+---

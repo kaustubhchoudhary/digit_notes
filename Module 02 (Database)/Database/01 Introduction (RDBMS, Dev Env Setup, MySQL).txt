@@ -1,0 +1,275 @@
+Introduction
+============
+Topics
+======
+=> Setting up the database
+=> Parts of an Application
+=> Database
+	 - Types of databases
+	 - Storage Approaches
+=> RDBMS
+	 - Schema
+	 - Database
+	 - Table
+	 - Row/tuple
+	 - Columns
+=> MySQL Overview
+=> MySQL Client/Server Model
+	 - MySQL Server
+	 - MySQL Client
+	 - MySQL Connectors
+
+---
+
+Setting up the database
+=======================
+Download and Install
+- MySQL Server 8.0.39
+- MySQL Workbench 8.0.39
+- MySQL Shell 8.0.39
+
+Make sure MySQL DB Server is up and running
+
+---
+
+Parts of an Application
+=======================
+Every software appl. contains 3 components.
+
+1. Frontend
+2. Backend - Server Side Code
+3. Backend - Database 
+
+Refer image : 01_application_layers.png
+
+---
+
+Database
+========
+- A database is a structured collection of data.
+- In a database, data is stored permanently (data is persisted)
+
+Refer fig: 02_data_persistence.png
+
+---
+
+Types of databases
+------------------
+Below are the types of databases:
+
+1. Relational Databases (RDBMS)  
+
+2. NoSQL Databases
+
+   - Key-Value Databases  
+
+   - Document-Oriented Databases  
+
+   - Graph Databases  
+
+3. Object-Oriented Databases
+
+4. Hierarchical Databases  
+
+5. Network Databases  
+
+---
+
+Storage Approaches
+------------------
+These are some different types of storages:
+  
+1. On-Disk Storage (Traditional databases stored on HDDs/SSDs)  
+
+2. In-Memory Storage (Data stored primarily in RAM, e.g., H2, Redis)  
+
+3. Cloud Storage (Hosted on cloud platforms, e.g., AWS RDS, Firebase)  
+
+4. Hybrid Storage (Combination of in-memory and disk storage)  
+
+5. Distributed Storage (Data spread across multiple nodes, e.g., Cassandra)
+
+---
+
+RDBMS
+=====
+- RDBMS stands for Relational Database Management System.
+
+- In an RDBMS, data is organized into entities (tables) and the relationships between those entities are clearly defined.
+
+- Data is stored in a structured, tabular format consisting of rows and columns.
+
+- Relationships between tables are established using keys (primary keys and foreign keys).
+
+Schema
+------
+- A database schema is the skeleton structure that represents the logical view of the entire database.
+- A schema tells us what exists in the database and how everything is connected, not the actual data.
+
+Database
+--------
+- Database is the physical structure of data
+
+Table
+=====
+- Tables contain all the data in a database.
+- In tables, data is logically organized in a row-and-column format, similar to a spreadsheet.
+
+---
+
+Row / Tuple
+===========
+- Each row represents a unique record
+- 1 row → 1 record
+
+---
+
+Columns
+=======
+- Each column represents a field/property/attribute in the record.
+- 1 column → 1 property
+
+---
+
+Simply Put
+==========
+Database → Schemas → Tables → Collection of rows and columns → Collection of records
+
+---
+
+Example:
+
+Schema → `school`
+
+Table1 → `students`
+
+```
+Columns → id (PK), name
+
+   id   name  
+  ----  ------
+   1    Mohit  
+   2    Raj
+```
+
+Table2 → `mobile_numbers`
+
+```
+// Links mobile_no to students  
+// Depends on the PK of students  
+
+Columns → id (PK), mobile_no, student_id (FK)
+
+   id   mobile_no   student_id  
+  ----  ----------  -----------
+   1    9988776655     1  
+   2    8877669911     1  
+   3    7711990912     2  
+   4    8877887788     3  ← not allowed (foreign key violation)
+```
+
+- The above tables represent 2 entities - `student` and `mobile number`
+
+- Fields: `id`, `name` in `students`; `id`, `mobile_no`, `student_id` in `mobile_numbers`
+
+- Each row = 1 record
+
+- `id` in both tables = Primary Key
+
+- `student_id` = Foreign Key
+
+---
+
+MySQL Overview
+==============
+- MySQL is an open-source RDBMS software
+
+- Its name is a combination of "My", the name of co-founder Michael Widenius's daughter My, and "SQL", the acronym for Structured Query Language
+
+- The latest version is 9.2.0
+
+- MySQL ranks as the second-most-popular database, behind Oracle Database.
+
+- Many companies such as Facebook, Twitter, Netflix, Uber, Airbnb, Shopify, and Booking.com use MySQL
+
+---
+
+MySQL Client/Server Model
+=========================
+MySQL Server
+------------
+1. MySQL Server is used to connect and manage the physical memory space and system where actually the data is stored (persisted)
+
+2. Simply put, it is the software that works with the underlying data
+
+3. If we want to use it, it must be running as a service (MySQL Service)
+
+4. We can choose to start MySQL Service as the System is switched on (boots)
+
+5. Every software runs on an IP and port, so does MySQL Server
+    IP: is the unique digital address of any computer
+	Port: is the place where a software runs
+
+6. If MySQL Server is on our own PC, it can be accessed via IP: 127.0.0.1, i.e. localhost
+
+7. MySQL Server by default runs on Port: 3306
+
+Refer Image : 03_client_server.png
+
+---
+
+MySQL Client
+------------
+- The data is physically stored on disk and can be accessed only via MySQL Server.
+
+- Even MySQL Server cannot be accessed directly.
+
+- To do this we need client softwares and programs.
+
+- These clients send SQL queries to the server and receive results in return.
+
+Refer Image: 03_client_server.png
+
+Following are some clients:
+1. MySQL Workbench
+2. MySQL Shell
+3. SQL Yog
+4. PHP My Admin
+5. DBeaver - Universal client
+6. Any software application
+	- If we connect our Java application with MySQL Server, it will be known as Java Client.
+
+---
+
+MySQL Connectors
+----------------
+* To connect one software application with another, we require drivers.
+
+* To connect MySQL clients or applications written in different programming languages with the MySQL Server, we must install these drivers on the client side.
+
+* These drivers act as a communication bridge between the application and the database.
+
+* MySQL Workbench and MySQL Shell are official tools, so the required drivers come pre-installed.
+
+* For custom software applications (Java, Python, etc.), we need to manually install the drivers.
+
+* These drivers are officially called MySQL Connectors.
+
+* The official MySQL repository provides connectors for multiple languages such as:
+
+  * Java
+  * Python
+  * .NET
+  * C / C++
+  * Node.js, etc.
+
+### JDBC Specific
+
+* For Java applications, we download the MySQL Connector/J.
+
+* This connector is provided as a `.jar` file and is required for JDBC-based communication with MySQL Server.
+
+👉 In short:
+Connectors = Drivers = Bridge between application and MySQL Server
+
+---

@@ -1,0 +1,205 @@
+Data Types
+==========
+🔢 Integer Types
+
+1. SMALLINT (2 bytes)
+
+   * Stores small whole numbers (range: -32,768 to 32,767).
+   * Useful when the value will definitely be small (e.g., age, rating out of 10).
+   * Saves space compared to larger types.
+
+2. INTEGER / INT (4 bytes)
+
+   * Most commonly used integer type.
+   * Suitable for general-purpose counting, IDs, and calculations.
+   * Range is sufficient for most applications (-2 billion to +2 billion).
+
+3. BIGINT (8 bytes)
+
+   * Stores very large whole numbers.
+   * Best used for transaction IDs, total downloads, or anything expected to grow large over time.
+   * Slower than INT but necessary for large ranges.
+
+---
+
+🔁 Auto-Incrementing Types
+
+4. SERIAL
+
+   * Automatically creates a unique `INT` column backed by a sequence.
+   * Ideal for primary keys when values auto-increment (like user\_id, order\_id).
+   * Saves effort of manually managing sequences.
+
+5. BIGSERIAL
+
+   * Same as `SERIAL` but uses `BIGINT` under the hood.
+   * Use when you're expecting billions of rows (very large-scale systems).
+
+---
+
+🔤 String Types
+
+6. TEXT
+
+   * Most flexible string type; stores any length of text.
+   * Good for comments, descriptions, or user input where size can vary.
+   * Preferred in PostgreSQL due to performance and no need for max length.
+
+7. VARCHAR(n)
+
+   * Variable-length string with a maximum of `n` characters.
+   * Use when you want to enforce a limit (e.g., username VARCHAR(20)).
+   * Helps apply business validation rules directly in schema.
+
+8. CHAR(n)
+
+   * Fixed-length string. Pads with spaces if input is shorter than `n`.
+   * Rarely used — best only when all values are exact same length (e.g., fixed codes).
+
+---
+
+💰 Monetary & Decimal Types
+
+9. NUMERIC(p, s) or DECIMAL(p, s)
+
+   * Used for precise decimal values (e.g., `NUMERIC(10,2)` for 2 decimal places).
+   * Ideal for monetary and financial data like salaries, taxes, product prices.
+   * Avoids rounding errors common with floating-point numbers.
+
+10. MONEY
+
+* Stores currency values with formatting.
+* Simple to use for quick financial display.
+* Not recommended for complex financial calculations (can behave differently across locales).
+
+---
+
+⚠️ Avoid Using (for money)
+
+* FLOAT / REAL / DOUBLE PRECISION
+
+  * These are approximate numeric types.
+  * Not suitable for money due to rounding issues.
+  * Use only where approximation is acceptable (e.g., scientific calculations).
+
+---
+
+📅 1. DATE
+
+* Stores only the date (year, month, day) — no time component.
+* Format: `'YYYY-MM-DD'` (e.g., `'2025-07-31'`).
+* Use when you only care about the calendar date — like date of birth, joining date, or holiday dates.
+* Time is automatically considered as `00:00:00` if used in operations.
+
+---
+
+⏰ 2. TIME \[WITHOUT TIME ZONE]
+
+* Stores only the time of day (hour, minute, second) — no date.
+* Format: `'HH:MI:SS'` (e.g., `'13:45:00'`).
+* Use when time matters but the date does not — like opening/closing hours, duration, etc.
+* No timezone info is stored.
+
+---
+
+🌐 3. TIME WITH TIME ZONE (a.k.a. `TIMETZ`)
+
+* Stores time along with time zone.
+* Useful for time-based events across different regions, like scheduling meetings.
+* PostgreSQL handles conversions if time zones are involved.
+
+---
+
+🕒 4. TIMESTAMP \[WITHOUT TIME ZONE]
+
+* Stores both date and time in one field, but no time zone.
+* Format: `'YYYY-MM-DD HH:MI:SS'` (e.g., `'2025-07-31 14:30:00'`).
+* Commonly used for created\_at, updated\_at, booking time, etc.
+* Use when time zone is not relevant to your app.
+
+---
+
+🌍 5. TIMESTAMP WITH TIME ZONE (a.k.a. `TIMESTAMPTZ`)
+
+* Stores full date + time + time zone info.
+* Automatically converts to the time zone of the session or client.
+* Ideal for global apps (e.g., flight systems, messaging apps with international users).
+* Internally stored in UTC, displayed in your session's time zone.
+
+---
+
+⏱️ 6. INTERVAL
+
+* Represents a span or duration of time — not a specific point.
+* Example: `'2 days 3 hours 15 minutes'` or `'5 months'`.
+* Use for representing delays, validity periods, differences between timestamps (e.g., project duration, subscription period).
+
+---
+
+✅ Best Practices:
+
+* Use `TIMESTAMP` when both date and time are important.
+* Use `TIMESTAMPTZ` when dealing with multiple time zones or international data.
+* Avoid mixing `DATE` and `TIME` when working with datetime arithmetic — prefer `TIMESTAMP`.
+* Use `INTERVAL` for time differences, delays, durations.
+
+---
+
+📅 1. DATE
+
+* Stores only the date (year, month, day) — no time component.
+* Format: `'YYYY-MM-DD'` (e.g., `'2025-07-31'`).
+* Use when you only care about the calendar date — like date of birth, joining date, or holiday dates.
+* Time is automatically considered as `00:00:00` if used in operations.
+
+---
+
+⏰ 2. TIME \[WITHOUT TIME ZONE]
+
+* Stores only the time of day (hour, minute, second) — no date.
+* Format: `'HH:MI:SS'` (e.g., `'13:45:00'`).
+* Use when time matters but the date does not — like opening/closing hours, duration, etc.
+* No timezone info is stored.
+
+---
+
+🌐 3. TIME WITH TIME ZONE (a.k.a. `TIMETZ`)
+
+* Stores time along with time zone.
+* Useful for time-based events across different regions, like scheduling meetings.
+* PostgreSQL handles conversions if time zones are involved.
+
+---
+
+🕒 4. TIMESTAMP \[WITHOUT TIME ZONE]
+
+* Stores both date and time in one field, but no time zone.
+* Format: `'YYYY-MM-DD HH:MI:SS'` (e.g., `'2025-07-31 14:30:00'`).
+* Commonly used for created\_at, updated\_at, booking time, etc.
+* Use when time zone is not relevant to your app.
+
+---
+
+🌍 5. TIMESTAMP WITH TIME ZONE (a.k.a. `TIMESTAMPTZ`)
+
+* Stores full date + time + time zone info.
+* Automatically converts to the time zone of the session or client.
+* Ideal for global apps (e.g., flight systems, messaging apps with international users).
+* Internally stored in UTC, displayed in your session's time zone.
+
+---
+
+⏱️ 6. INTERVAL
+
+* Represents a span or duration of time — not a specific point.
+* Example: `'2 days 3 hours 15 minutes'` or `'5 months'`.
+* Use for representing delays, validity periods, differences between timestamps (e.g., project duration, subscription period).
+
+---
+
+✅ Best Practices:
+
+* Use `TIMESTAMP` when both date and time are important.
+* Use `TIMESTAMPTZ` when dealing with multiple time zones or international data.
+* Avoid mixing `DATE` and `TIME` when working with datetime arithmetic — prefer `TIMESTAMP`.
+* Use `INTERVAL` for time differences, delays, durations.
