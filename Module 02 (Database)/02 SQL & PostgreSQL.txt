@@ -652,6 +652,11 @@ WHERE course_fees > 8000 AND student_course = 'Advance Java';
 SELECT * FROM training.students 
 WHERE student_course IN ('Core Java', 'Core Python');
 
+Same as
+
+SELECT * FROM training.students 
+WHERE student_course = 'Core Java' OR student_course = 'Core Python';
+
 -- LIKE
 SELECT * FROM training.students 
 WHERE student_email LIKE '%@gmail.com';
@@ -677,6 +682,10 @@ This may include the structure, the data, or both.
 
 * Copies both the structure and data from the source table.
 * Used when you want a working copy of the table with existing data.
+
+--
+* Was the structure truly copied in course_1?
+--
 
 #🔸 Syntax:
 
@@ -708,6 +717,7 @@ WHERE course_fees >= 8000;
 
 ```sql
 -- Step 1: Create new table manually with extra column
+
 CREATE TABLE training.course_3 (
     id SERIAL PRIMARY KEY,
     name VARCHAR(30),
@@ -735,7 +745,7 @@ CREATE TABLE new_table (LIKE existing_table INCLUDING ALL);
 ```
 
 > `INCLUDING ALL` ensures copying of:
->
+
 > * Columns
 > * Data types
 > * Default values
@@ -749,8 +759,10 @@ CREATE TABLE training.course_4 (LIKE training.students INCLUDING ALL);
 ```
 
 ---
+
 Removals
 ========
+
 # 🔹 1. TRUNCATE – *Instantly delete all rows from a table*
 
 ➤ Use Case:
@@ -760,7 +772,7 @@ Let’s say you want to empty the data in `course_1` (maybe to reload it later),
 ✅ Query:
 
 ```sql
-TRUNCATE TABLE training.course_1;
+TRUNCATE TABLE training.course_1 RESTART IDENTITY;
 ```
 
 🔍 Explanation:
@@ -841,6 +853,7 @@ Without CASCADE, you might get an error if the schema contains any objects.
 CASCADE will permanently delete all tables, views, sequences, functions, etc., in that schema.
 
 ---
+
 Drop Database
 =============
 
@@ -889,502 +902,5 @@ Drop Database
 ## 🧹 Result
 
 The  `company` database will be permanently deleted from the PostgreSQL server.
-
----
-Relationships
-=============
-
-## 🔧 DATABASE DESIGN: `ecommerce_db`
-
-✅ Step 1: Create the database
-
-```sql
-CREATE DATABASE ecommerce_db;
-```
-
----
-
-## 🧱 SCHEMA 1: `sales`
-
-📘 Description:
-
-Handles customers, orders, and payments — things that are customer-facing.
-
-📦 Tables:
-
-1. customers
-2. orders
-3. payments
-
-Relationships:
-
-* One customer can place many orders
-* Each order can have one or many payments (like split payments)
-
-```sql
-CREATE SCHEMA sales;
-
-CREATE TABLE sales.customers (
-    customer_id SERIAL PRIMARY KEY,
-    full_name VARCHAR(100) NOT NULL,
-    email VARCHAR(100) UNIQUE NOT NULL,
-    phone CHAR(10) unique not null
-);
-
-CREATE TABLE sales.orders (
-    order_id SERIAL PRIMARY KEY,
-    customer_id INT REFERENCES sales.customers(customer_id),
-    order_date DATE DEFAULT CURRENT_DATE,
-    total_amount NUMERIC(10, 2)
-);
-
-CREATE TABLE sales.payments (
-    payment_id SERIAL PRIMARY KEY,
-    order_id INT REFERENCES sales.orders(order_id),
-    payment_method VARCHAR(50),
-    payment_date DATE DEFAULT CURRENT_DATE,
-    amount_paid NUMERIC(10, 2)
-);
-```
-
----
-
-## 🧱 SCHEMA 2: `inventory`
-
-📘 Description:
-
-Handles product details, stock, and categories — business operations.
-
-📦 Tables:
-
-1. products
-2. categories
-3. stock
-
-Relationships:
-
-* Each product belongs to a category
-* Each product has a stock entry
-
-```sql
-CREATE SCHEMA inventory;
-
-CREATE TABLE inventory.categories (
-    category_id SERIAL PRIMARY KEY,
-    category_name VARCHAR(100) UNIQUE NOT NULL
-);
-
-CREATE TABLE inventory.products (
-    product_id SERIAL PRIMARY KEY,
-    product_name VARCHAR(100) NOT NULL,
-    category_id INT REFERENCES inventory.categories(category_id),
-    price DECIMAL(10, 2) NOT NULL
-);
-
-CREATE TABLE inventory.stock (
-    stock_id SERIAL PRIMARY KEY,
-    product_id INT REFERENCES inventory.products(product_id),
-    quantity_available INT
-);
-```
-
----
-
-## 🔗 CROSS-SCHEMA RELATIONSHIP
-
-Let’s connect sales.orders to inventory.products to track what items were ordered.
-
-📦 New Table: `sales.order_items`
-
-(Located in `sales` schema, referencing `inventory.products`)
-
-```sql
-CREATE TABLE sales.order_items (
-    order_item_id SERIAL PRIMARY KEY,
-    order_id INT REFERENCES sales.orders(order_id),
-    product_id INT REFERENCES inventory.products(product_id),
-    quantity INT NOT NULL,
-    price_each DECIMAL(10, 2)
-);
-```
-
----
-
-## 📌 Entity-Relationship Summary
-
-| Entity       | Belongs To Schema | Relationships                               |
-| ------------ | ----------------- | ------------------------------------------- |
-| customers    | `sales`           | 1:N with orders                            |
-| orders       | `sales`           | 1:N with payments, 1:N with order_items  |
-| payments     | `sales`           | N:1 with orders                             |
-| order_items | `sales`           | N:1 with orders, N:1 with products          |
-| products     | `inventory`       | N:1 with categories, 1:N with order_items |
-| stock        | `inventory`       | 1:1 with products                           |
-| categories   | `inventory`       | 1:N with products                          |
-
----
-
-## 🧰 Step 1: Insert Sample Data
-
----
-
-🔹 `sales.customers`
-
-```sql
-INSERT INTO sales.customers (full_name, email, phone) VALUES
-('Ravi Kumar', 'ravi.kumar@gmail.com', '9876543210'),
-('Anjali Mehta', 'anjali.mehta@gmail.com', '9123456789'),
-('Suresh Patil', 'suresh.patil@yahoo.com', '9001234567'),
-('Meena Iyer', 'meena.iyer@gmail.com', '9870012345'),
-('Rahul Verma', 'rahul.verma@rediffmail.com', '9811223344'),
-('Divya Nair', 'divya.nair@yahoo.com', '9933445566');
-
-```
-
----
-
-🔹 `sales.orders`
-
-```sql
-INSERT INTO sales.orders (customer_id, order_date, total_amount) VALUES
-(1, '2025-07-25', 5999.00),
-(2, '2025-07-26', 3499.00),
-(1, '2025-07-28', 949.00),
-(3, '2025-07-29', 1049.00),
-(5, '2025-07-30', 1749.00),
-(6, '2025-07-31', 2749.00)
-)
-
-
-```
-
----
-
-🔹 `sales.payments`
-
-```sql
-INSERT INTO sales.payments (order_id, payment_method, payment_date, amount_paid) VALUES
-(1, 'UPI', '2025-07-25', 5999.00),
-(2, 'Credit Card', '2025-07-26', 3499.00),
-(3, 'Cash on Delivery', '2025-07-29', 949.00),
-(4, 'Credit Card', '2025-07-25', 5999.00),
-(5, 'UPI', '2025-07-26', 3499.00),
-(6, 'Cash on Delivery', '2025-07-29', 1908.00);
-```
-Short Practice---- Starts
-
-Problem Statement:
-------------------
-Task 1: Create a new table: `payment_method` with fields : `payment_method_id`, `payment_method`
-
-Task 2: Insert data in table `payment_method` for 4 types of payment methods => COD, UPI, CCP, DCP
-
-Task 3: Alter table `payments` 
-	=> Rename column `payment_method` to new name: `payment_method_id`
-	=> Change type from VARCHAR(50) to INT
-		=> Before changing the type, we have to delete `varchar` data
-		=> If NOT NULL constraint is there, we have to change it to NULL
-		=> Remove all data -> UPDATE all `payment_method_id` to null
-		=> Change type
-	=> Add constraint => Foreign Key
-		=> INSERT values first, because they are null (fk should be present in other table)
-		=> Make sure the value is in in referenced table 
-		=> Add constraint FK 
-			=> should be changed to payment_method_id referencing table payment_method => column payment_method_id
-
-Task 4: Remove total_payment from orders table
-
-Time Saving Option => DROP table sales.payments, recreate
-
-Solution
---------
-CREATE TABLE sales.payment_methods (
-	payment_method_id SERIAL PRIMARY KEY,
-	payment_method CHAR(3) UNIQUE NOT NULL
-);
-
-INSERT INTO sales.payment_methods (payment_method) VALUES ('COD'), ('UPI'), ('CCP'), ('DCP');
-
-ALTER TABLE sales.payments
-RENAME COLUMN payment_method TO payment_method_id;
-
-UPDATE sales.payments SET payment_method_id = null;
-
-ALTER TABLE sales.payments
-ALTER COLUMN payment_method_id type INT
-USING payment_method_id::integer;
-
-update sales.payments set payment_method_id = 1;
-
-ALTER TABLE sales.payments
-add constraint fk_payment_method
-foreign key (payment_method_id) 
-references sales.payment_methods (payment_method_id)
-on update cascade
-on delete restrict;
-
-Short Practice---- Completes
----
-
-🔹 `inventory.categories`
-
-```sql
-INSERT INTO inventory.categories (category_name) VALUES
-('Electronics'),
-('Home Appliances'),
-('Stationery');
-```
-
----
-
-🔹 `inventory.products`
-
-```sql
--- Electronics
-INSERT INTO inventory.products (product_name, category_id, price) VALUES
-('Bluetooth Speaker', 1, 1999.00),
-('Wireless Mouse', 1, 799.00),
-('Smartphone Charger', 1, 1299.00),
-
--- Home Appliances
-('Mixer Grinder', 2, 3499.00),
-('Electric Kettle', 2, 1899.00),
-('Air Purifier', 2, 6499.00),
-
--- Stationery
-('Notebook Pack of 5', 3, 949.00),
-('Gel Pens - Set of 10', 3, 199.00),
-('Stapler with Pins', 3, 149.00);
-
-```
-
----
-
-🔹 `inventory.stock`
-
-```sql
-INSERT INTO inventory.stock (product_id, quantity_available) VALUES
-(1, 50),   -- Bluetooth Speaker
-(2, 30),   -- Wireless Mouse
-(3, 100),  -- Smartphone Charger
-(4, 25),   -- Mixer Grinder
-(5, 40),   -- Electric Kettle
-(6, 15),   -- Air Purifier
-(7, 120),  -- Notebook Pack of 5
-(8, 200),  -- Gel Pens - Set of 10
-(9, 60);   -- Stapler with Pins
-
-```
-
----
-
-🔹 `sales.order_items`
-
-```sql
-INSERT INTO sales.order_items (order_id, product_id, quantity, price_each) VALUES
-(1, 1, 2, 1999.00),   -- Ravi bought 2 Bluetooth Speakers
-(2, 2, 1, 3499.00),   -- Anjali bought 1 Mixer Grinder
-(3, 3, 1, 949.00);    -- Ravi bought Notebooks
-```
-
----
-
-## 📊 Step 2: Join Queries for Practice
-
----
-
-🔸 1. Get all customers and their orders
-
-```sql
-SELECT c.full_name, o.order_id, o.order_date, o.total_amount
-FROM sales.customers c
-JOIN sales.orders o ON c.customer_id = o.customer_id;
-```
-
----
-
-🔸 2. Get order details with payment mode
-
-```sql
-SELECT o.order_id, c.full_name, p.payment_method, p.amount_paid
-FROM sales.orders o
-JOIN sales.customers c ON o.customer_id = c.customer_id
-JOIN sales.payments p ON o.order_id = p.order_id;
-```
-
----
-
-🔸 3. Cross-schema join: orders + order_items + products
-
-```sql
-SELECT o.order_id, c.full_name, pr.product_name, oi.quantity, oi.price_each
-FROM sales.orders o
-JOIN sales.customers c ON o.customer_id = c.customer_id
-JOIN sales.order_items oi ON o.order_id = oi.order_id
-JOIN inventory.products pr ON oi.product_id = pr.product_id;
-```
-
----
-
-🔸 4. Product stock with category
-
-```sql
-SELECT p.product_name, cat.category_name, s.quantity_available
-FROM inventory.products p
-JOIN inventory.categories cat ON p.category_id = cat.category_id
-JOIN inventory.stock s ON p.product_id = s.product_id;
-```
-
----
-
-🔸 5. Show full order breakdown (Customer → Order → Product → Category)
-
-```sql
-SELECT c.full_name, o.order_date, p.product_name, cat.category_name, oi.quantity, oi.price_each
-FROM sales.customers c
-JOIN sales.orders o ON c.customer_id = o.customer_id
-JOIN sales.order_items oi ON o.order_id = oi.order_id
-JOIN inventory.products p ON oi.product_id = p.product_id
-JOIN inventory.categories cat ON p.category_id = cat.category_id;
-```
-
----
-
-## ✅ What You Can Teach Using This Setup
-
-| Topic                   | Example Query                        |
-| ----------------------- | ------------------------------------ |
-| One-to-Many             | Customers → Orders                   |
-| Many-to-One             | Payments → Orders                    |
-| Many-to-Many (via link) | Orders ↔ Products (via order_items) |
-| Cross-schema Joins      | Orders → Products                    |
-| Normalization           | Products and Categories              |
-| Inner Join vs Left Join | Customers with / without orders      |
-| Foreign Key Design      | All FK constraints in joins          |
-
----
-
-## ✅ SQL Join Practice Questions – With Indianized Data
-
----
-
-🔸1. List all customers who have placed an order.
-
-```sql
-SELECT DISTINCT c.full_name
-FROM sales.customers c
-JOIN sales.orders o ON c.customer_id = o.customer_id;
-```
-
-📝 Expected Output:
-
-```
-Ravi Kumar
-Anjali Mehta
-```
-
----
-
-🔸2. Find all orders made by 'Ravi Kumar' with total amount and order date.
-
-```sql
-SELECT o.order_id, o.order_date, o.total_amount
-FROM sales.orders o
-JOIN sales.customers c ON o.customer_id = c.customer_id
-WHERE c.full_name = 'Ravi Kumar';
-```
-
----
-
-🔸3. Show order details along with product names and quantity.
-
-```sql
-SELECT o.order_id, c.full_name, p.product_name, oi.quantity
-FROM sales.orders o
-JOIN sales.customers c ON o.customer_id = c.customer_id
-JOIN sales.order_items oi ON o.order_id = oi.order_id
-JOIN inventory.products p ON oi.product_id = p.product_id;
-```
-
----
-
-🔸4. Show all payments made, with customer name and payment method.
-
-```sql
-SELECT c.full_name, o.order_id, p.payment_method, p.amount_paid
-FROM sales.customers c
-JOIN sales.orders o ON c.customer_id = o.customer_id
-JOIN sales.payments p ON o.order_id = p.order_id;
-```
-
----
-
-🔸5. Find all products purchased by 'Anjali Mehta'.
-
-```sql
-SELECT DISTINCT pr.product_name
-FROM sales.customers c
-JOIN sales.orders o ON c.customer_id = o.customer_id
-JOIN sales.order_items oi ON o.order_id = oi.order_id
-JOIN inventory.products pr ON oi.product_id = pr.product_id
-WHERE c.full_name = 'Anjali Mehta';
-```
-
----
-
-🔸6. List all products along with category and available quantity in stock.
-
-```sql
-SELECT p.product_name, cat.category_name, s.quantity_available
-FROM inventory.products p
-JOIN inventory.categories cat ON p.category_id = cat.category_id
-JOIN inventory.stock s ON p.product_id = s.product_id;
-```
-
----
-
-🔸7. List customers and their total purchase amount.
-
-```sql
-SELECT c.full_name, SUM(o.total_amount) AS total_spent
-FROM sales.customers c
-JOIN sales.orders o ON c.customer_id = o.customer_id
-GROUP BY c.full_name;
-```
-
----
-
-🔸8. Show all orders and payment status (including unpaid orders).
-
-```sql
-SELECT o.order_id, c.full_name, o.total_amount, p.payment_method
-FROM sales.orders o
-JOIN sales.customers c ON o.customer_id = c.customer_id
-LEFT JOIN sales.payments p ON o.order_id = p.order_id;
-```
-
----
-
-🔸9. List products that have never been ordered.
-
-```sql
-SELECT p.product_name
-FROM inventory.products p
-LEFT JOIN sales.order_items oi ON p.product_id = oi.product_id
-WHERE oi.product_id IS NULL;
-```
-
----
-
-🔸10. Find the most sold product (by total quantity).
-
-```sql
-SELECT p.product_name, SUM(oi.quantity) AS total_sold
-FROM sales.order_items oi
-JOIN inventory.products p ON oi.product_id = p.product_id
-GROUP BY p.product_name
-ORDER BY total_sold DESC
-LIMIT 1;
-```
 
 ---

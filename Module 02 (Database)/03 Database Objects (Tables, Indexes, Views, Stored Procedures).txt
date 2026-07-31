@@ -1,0 +1,785 @@
+Database Objects
+================
+Topics
+======
+=> Database Objects
+	What are Database Objects?
+	Common Database Objects in PostgreSQL
+=> Tables
+=> Indexes
+=> Temporary Table
+=> Views
+=> Stored Procedures
+
+---
+
+Database Objects
+================
+
+## What are Database Objects?
+
+Database objects are structural components of PostgreSQL used to store data, organize data, improve performance, enforce business rules, and automate database operations.
+
+## Common Database Objects in PostgreSQL
+
+### 1. Tables
+
+* Store actual data in rows and columns.
+* Core object of PostgreSQL.
+
+---
+
+### 2. Indexes
+
+* Improve query performance.
+* Created on one or more table columns.
+* Do not store business data separately.
+
+---
+
+### 3. Stored Procedures
+
+* Named blocks of SQL code.
+* Can accept input and output parameters.
+* Can contain conditions, loops, and transaction control (`COMMIT`, `ROLLBACK`).
+* Invoked using the `CALL` statement.
+
+---
+
+### 4. Functions
+
+* Named blocks of SQL or PL/pgSQL code.
+* Always return a value.
+* Can accept parameters.
+* Can be used inside SQL statements such as `SELECT`.
+
+---
+
+### 5. Views
+
+* Virtual tables based on SQL queries.
+* Do not store data themselves.
+* Simplify complex queries and improve security.
+
+---
+
+### 6. Triggers
+
+* Automatically executed when a database event occurs.
+* Fired on `INSERT`, `UPDATE`, `DELETE`, or `TRUNCATE`.
+* Executed before or after the event.
+
+---
+
+### 7. Temporary Tables
+
+* Exist only for the current database session.
+* Automatically dropped when the session ends.
+* Used to store temporary data during processing.
+
+---
+
+### 8. Sequences
+
+* Generate unique numeric values.
+* Commonly used for auto-incrementing primary keys.
+* Used internally by `SERIAL` and can also be used explicitly.
+
+---
+
+### 9. Materialized Views
+
+* Store the result of a query physically.
+* Improve performance for complex and frequently executed queries.
+* Must be refreshed to reflect the latest data.
+
+---
+
+## In PostgreSQL
+
+* PostgreSQL supports Sequences and does not support AUTO_INCREMENT.
+* ✅ Sequences (used with `SERIAL` or `GENERATED AS IDENTITY` columns)
+
+---
+
+## Summary
+
+> In PostgreSQL, database objects include tables, views, indexes, sequences, functions, stored procedures, triggers, temporary tables, schemas, constraints, and extensions. Each object serves a specific purpose in data storage, organization, performance, or business logic.
+
+---
+
+## Table
+
+* A **table** is the basic database object used to **store data**.
+* Data is stored in the form of **rows (records)** and **columns (attributes)**.
+* Each table represents a **single entity** (e.g., employees, orders).
+* Columns define the **data type and constraints**, while rows store the actual data.
+* Most database objects, such as indexes, views, and triggers, are created on top of tables.
+
+👉 **In short:**
+A table is the **foundation of a database** where all data resides.
+
+### Query
+
+```sql
+CREATE SCHEMA db_objects;
+
+CREATE TABLE db_objects.employees (
+    id INT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    name VARCHAR(50) NOT NULL,
+    email VARCHAR(100) UNIQUE,
+    department VARCHAR(50),
+    designation VARCHAR(50),
+    joining_date DATE,
+    basic_salary DECIMAL(10,2)
+);
+
+INSERT INTO db_objects.employees
+(name, email, department, designation, joining_date, basic_salary)
+VALUES
+('Amit Sharma', 'amit.sharma@gmail.com', 'IT', 'Software Engineer', '2019-06-15', 60000),
+
+('Neha Verma', 'neha.verma@gmail.com', 'HR', 'HR Executive', '2021-03-10', 45000),
+
+('Rahul Mehta', 'rahul.mehta@gmail.com', 'Finance', 'Accountant', '2018-01-20', 55000),
+
+('Priya Singh', 'priya.singh@gmail.com', 'IT', 'Senior Developer', '2016-09-05', 85000),
+
+('Ankit Patel', 'ankit.patel@gmail.com', 'Sales', 'Sales Executive', '2022-07-01', 40000),
+
+('Sneha Kulkarni', 'sneha.k@gmail.com', 'Marketing', 'Marketing Analyst', '2020-11-18', 50000),
+
+('Vikas Rao', 'vikas.rao@gmail.com', 'Operations', 'Operations Manager', '2015-04-12', 90000),
+
+('Pooja Nair', 'pooja.nair@gmail.com', 'IT', 'QA Engineer', '2021-08-25', 48000),
+
+('Suresh Iyer', 'suresh.iyer@gmail.com', 'Support', 'Support Lead', '2017-02-14', 52000),
+
+('Kavita Joshi', 'kavita.joshi@gmail.com', 'Admin', 'Office Administrator', '2019-12-02', 42000);
+
+SELECT * FROM db_objects.employees;
+```
+
+---
+
+Indexes
+=======
+
+- An **index** is a database object used to improve the speed of data retrieval.
+- It works like a book's index, allowing PostgreSQL to locate rows quickly without scanning the entire table.
+- Indexes improve the performance of `SELECT` queries, especially those using `WHERE`, `JOIN`, `ORDER BY`, and `GROUP BY` clauses.
+- The **PRIMARY KEY** of a PostgreSQL table is automatically indexed.
+- A **UNIQUE** constraint also automatically creates a unique index.
+
+Index Operations
+================
+
+We can create, view, and drop indexes using SQL.
+
+
+**Important Points**
+
+- A **PRIMARY KEY** is automatically indexed by PostgreSQL.
+- A **UNIQUE** constraint also creates a unique index internally.
+- Therefore, `id` and `email` are already indexed.
+
+---
+
+### 1. Display indexes
+
+```sql
+SELECT indexname, indexdef
+FROM pg_indexes
+WHERE schemaname = 'db_objects'
+  AND tablename = 'employees';
+```
+
+
+### 2. See query performance without index
+
+```sql
+EXPLAIN ANALYZE
+SELECT *
+FROM db_objects.employees
+WHERE name = 'Amit Sharma';
+```sql
+
+### 3. Create an index on a single column
+
+```sql
+CREATE INDEX idx_name
+ON db_objects.employees(name);
+```
+
+See Query performance again
+
+EXPLAIN ANALYZE
+SELECT *
+FROM db_objects.employees
+WHERE name = 'Amit Sharma';
+
+---
+
+### 3. Create a composite index
+
+Query Performance:
+
+```sql
+SELECT *
+FROM db_objects.employees
+WHERE department = 'IT'
+  AND designation = 'Software Engineer';
+```
+
+```sql
+CREATE INDEX idx_dept_designation
+ON db_objects.employees(department, designation);
+```
+
+See Query Performance
+
+---
+
+### Search using the name index
+
+```sql
+SELECT *
+FROM db_objects.employees
+WHERE name = 'Amit Sharma';
+```
+
+---
+
+### Search using the composite index
+
+```sql
+SELECT *
+FROM db_objects.employees
+WHERE department = 'IT'
+  AND designation = 'Software Engineer';
+```
+
+---
+
+### 3. Modify an index
+
+PostgreSQL does **not** support modifying an existing index.
+
+To change an index, drop the existing index and create a new one.
+
+---
+
+### 4. Delete an index
+
+```sql
+DROP INDEX db_objects.idx_name;
+
+DROP INDEX db_objects.idx_dept_designation;
+```
+
+---
+
+### 5. Display indexes
+
+```sql
+SELECT indexname, indexdef
+FROM pg_indexes
+WHERE schemaname = 'db_objects'
+  AND tablename = 'employees';
+```
+
+---
+
+## Important Notes
+
+- Dropping an index does **not** delete table data.
+- The index created for a **PRIMARY KEY** cannot be dropped directly using `DROP INDEX`.
+- To remove the primary key (and its associated index), use:
+
+```sql
+ALTER TABLE db_objects.employees
+DROP CONSTRAINT employees_pkey;
+```
+
+> **Note:** `employees_pkey` is the default name of the primary key constraint. You can find the actual constraint name using `\d employees` in `psql` or by inspecting the table properties in DBeaver.
+
+👉 **Key Takeaway**
+
+Indexes are removed using `DROP INDEX`, except indexes created by constraints (such as **PRIMARY KEY** and **UNIQUE**), which must be removed by dropping the corresponding constraint.
+````
+
+---
+
+Temporary Tables
+================
+
+- A **temporary table** is a special type of table that exists only for the current database session.
+- It is commonly used to store intermediate or temporary data while processing queries.
+- We can create a new temporary table or create one from an existing table.
+- Temporary tables are visible **only to the session that created them**.
+- They are automatically dropped when the session ends.
+- They can also be dropped manually using the `DROP TABLE` command.
+
+---
+
+## 1. Create a fresh temporary table
+
+### Query
+
+```sql
+CREATE TEMPORARY TABLE temp_employees (
+    id INT,
+    name VARCHAR(50)
+);
+```
+
+### Insert data
+
+```sql
+INSERT INTO temp_employees
+VALUES
+(1, 'Jay'),
+(2, 'Raj'),
+(3, 'Yash');
+```
+
+### View data
+
+```sql
+SELECT * FROM temp_employees;
+```
+
+### Drop table
+
+```sql
+DROP TABLE temp_employees;
+```
+
+---
+
+## 2. Create a temporary table from an existing table
+
+### Query
+
+```sql
+CREATE TEMPORARY TABLE temp_it_employees AS
+SELECT *
+FROM db_objects.employees
+WHERE department = 'IT';
+```
+
+### Result
+
+- A temporary table is created.
+- It contains all IT employees.
+
+### View data
+
+```sql
+SELECT * FROM temp_it_employees;
+```
+
+### Insert more data
+
+```sql
+INSERT INTO temp_it_employees
+(id, name, email, department, designation, joining_date, basic_salary)
+VALUES
+(11, 'Akanksha', 'akanksha@yahoo.com', 'IT', 'Lead', '2020-12-12', 40000);
+```
+
+### Display data
+
+```sql
+SELECT * FROM temp_it_employees;
+```
+
+---
+
+## Drop a Temporary Table
+
+A temporary table can be removed in two ways.
+
+### Way 1
+
+Close the current database session (or reconnect to the database).
+
+PostgreSQL automatically drops all temporary tables created in that session.
+
+### Way 2
+
+```sql
+DROP TABLE temp_it_employees;
+``` 
+
+-----X-----X-----X-----
+
+Views
+=====
+
+A **view** is a virtual table based on the result of a SQL query.
+
+It does not store data physically and presents data from one or more tables.
+
+Uses
+----
+
+Views are used to:
+
+- Simplify complex queries.
+- Hide complex joins or calculations.
+- Restrict access to specific rows or columns.
+- Provide a consistent interface to the underlying data.
+
+Types of Views
+--------------
+
+There are two common types of views:
+
+1. **Simple View** – Based on a single table without joins or aggregations.
+2. **Complex View** – Based on multiple tables, joins, aggregations, or expressions.
+
+---
+
+## Create a View
+
+```sql
+CREATE VIEW db_objects.it_senior_employees_view AS
+SELECT
+    id,
+    name,
+    email,
+    department,
+    designation,
+    basic_salary,
+    EXTRACT(YEAR FROM AGE(CURRENT_DATE, joining_date)) AS experience_years
+FROM db_objects.employees
+WHERE department = 'IT'
+  AND basic_salary >= 60000;
+```
+
+---
+
+## Display Views
+
+```sql
+SELECT table_name
+FROM information_schema.views
+WHERE table_schema = 'db_objects';
+```
+
+---
+
+## View Data
+
+```sql
+SELECT *
+FROM db_objects.it_senior_employees_view;
+```
+
+### Benefit of a View
+
+Without a view, we must write the complete query every time.
+
+With a view, we simply write:
+
+```sql
+SELECT *
+FROM db_objects.it_senior_employees_view;
+```
+
+Views help simplify complex queries by hiding lengthy `SELECT`, `JOIN`, and `WHERE` clauses behind a meaningful name.
+
+---
+
+## Updating Data Through a View
+
+```sql
+UPDATE db_objects.it_senior_employees_view
+SET basic_salary = basic_salary + 5000
+WHERE id = 4;
+
+SELECT *
+FROM db_objects.it_senior_employees_view;
+```
+
+> Changes made through an updatable view are reflected in the underlying table.
+
+---
+
+## Updating the Definition of a View
+
+```sql
+CREATE OR REPLACE VIEW db_objects.it_senior_employees_view AS
+SELECT
+    id,
+    name,
+    email,
+    department,
+    designation,
+    basic_salary
+FROM db_objects.employees
+WHERE department = 'IT'
+  AND basic_salary >= 65000;
+```
+
+---
+
+## Renaming a View
+
+PostgreSQL supports renaming a view directly.
+
+```sql
+ALTER VIEW db_objects.it_senior_employees_view
+RENAME TO db_objects.senior_it_employees_view;
+```
+
+---
+
+## Drop a View
+
+```sql
+DROP VIEW db_objects.it_senior_employees_view;
+```
+
+-----X-----X-----X-----
+Views vs. Temporary Tables
+==========================
+
+1. Definition
+   - View: A virtual table based on the result of a `SELECT` query.
+   - Temporary Table: A physical table that stores data temporarily.
+
+2. Data Storage
+   - View: Does not store data.
+   - Temporary Table: Stores data physically.
+
+3. Persistence
+   - View: Exists until explicitly dropped.
+   - Temporary Table: Exists only for the current database session and is automatically dropped when the session ends.
+
+4. Data Source
+   - View: Retrieves data from one or more existing tables.
+   - Temporary Table: Data can inserted manually or copied from existing tables.
+
+5. Visibility
+   - View: Visible to users who have permission to access the view.
+   - Temporary Table: Visible only to the session that created it.
+
+6. Usage
+   - View: Simplifies complex queries and hides implementation details.
+   - Temporary Table: Stores intermediate results and temporary data during processing.
+   
+-----X-----X-----
+Stored Procedures
+=================
+
+A **stored procedure** is a named block of SQL or PL/pgSQL statements stored in the database.
+
+Stored procedures are executed using the `CALL` statement and are used to perform repetitive or complex database operations.
+
+Advantages
+----------
+
+- Reuse SQL logic.
+- Reduce duplicate code.
+- Improve maintainability.
+- Execute multiple SQL statements together.
+
+Parameter Types
+---------------
+
+There are three types of parameters in a stored procedure:
+
+1. **IN** parameters → Used to pass data into the procedure.
+2. **OUT** parameters → Used to return data from the procedure.
+3. **INOUT** parameters → Used to pass data into the procedure and return the modified value.
+
+> **Note:** If the parameter type (`IN`, `OUT`, or `INOUT`) is not specified, PostgreSQL treats it as an **IN** parameter.
+
+Syntax
+------
+
+```sql
+CREATE OR REPLACE PROCEDURE procedure_name(
+    IN param1 datatype,
+    OUT param2 datatype,
+    INOUT param3 datatype
+)
+LANGUAGE plpgsql
+AS $$
+BEGIN
+
+    -- SQL statements
+
+END;
+$$;
+```
+
+Practice
+========
+
+-- Using Schema `db_objects`
+
+### Query 1: Stored Procedure with IN Parameter
+
+```sql
+CREATE OR REPLACE PROCEDURE db_objects.get_employees_by_department(
+    IN dept_name VARCHAR(50)
+)
+LANGUAGE plpgsql
+AS $$
+BEGIN
+
+    SELECT *
+    FROM db_objects.employees
+    WHERE department = dept_name;
+
+END;
+$$;
+```
+
+How to call?
+------------
+
+```sql
+CALL db_objects.get_employees_by_department('IT');
+```
+
+-----X-----X-----X-----
+
+### Query 2: Stored Procedure with OUT Parameter
+
+```sql
+CREATE OR REPLACE PROCEDURE db_objects.get_it_employee_count(
+    OUT emp_count INT
+)
+LANGUAGE plpgsql
+AS $$
+BEGIN
+
+    SELECT COUNT(*)
+    INTO emp_count
+    FROM db_objects.employees
+    WHERE department = 'IT';
+
+END;
+$$;
+```
+
+How to call?
+------------
+
+```sql
+CALL db_objects.get_it_employee_count(NULL);
+```
+
+-----X-----X-----X-----
+
+### Query 3: Stored Procedure with INOUT Parameter
+
+```sql
+CREATE OR REPLACE PROCEDURE db_objects.get_matching_salary(
+    INOUT sal DECIMAL(10,2)
+)
+LANGUAGE plpgsql
+AS $$
+BEGIN
+
+    SELECT MAX(basic_salary)
+    INTO sal
+    FROM db_objects.employees
+    WHERE basic_salary <= sal;
+
+END;
+$$;
+```
+
+How to call?
+------------
+
+```sql
+CALL db_objects.get_matching_salary(70000);
+```
+
+-----X-----X-----X-----
+
+### Query 4: Stored Procedure with IN, OUT and INOUT Parameters
+
+```sql
+CREATE OR REPLACE PROCEDURE db_objects.employee_summary_by_department(
+    IN dept_name VARCHAR(50),
+    INOUT min_salary DECIMAL(10,2),
+    OUT emp_count INT
+)
+LANGUAGE plpgsql
+AS $$
+BEGIN
+
+    SELECT COUNT(*)
+    INTO emp_count
+    FROM db_objects.employees
+    WHERE department = dept_name
+      AND basic_salary >= min_salary;
+
+    SELECT MAX(basic_salary)
+    INTO min_salary
+    FROM db_objects.employees
+    WHERE department = dept_name;
+
+END;
+$$;
+```
+
+How to call?
+------------
+
+```sql
+CALL db_objects.employee_summary_by_department('IT', 50000, NULL);
+```
+
+-----X-----X-----X-----
+Drop Stored Procedures
+----------------------
+
+### Drop a Single Stored Procedure
+
+```sql
+DROP PROCEDURE db_objects.employee_summary_by_department;
+```
+
+### Safer Version
+
+```sql
+DROP PROCEDURE IF EXISTS db_objects.employee_summary_by_department;
+```
+
+### Drop Multiple Procedures
+
+```sql
+DROP PROCEDURE IF EXISTS db_objects.employee_summary_by_department;
+
+DROP PROCEDURE IF EXISTS db_objects.get_it_employee_count;
+
+DROP PROCEDURE IF EXISTS db_objects.get_matching_salary;
+
+DROP PROCEDURE IF EXISTS db_objects.get_employees_by_department;
+```
+
+-----X-----X-----X-----
+
+Stored Procedure vs Function
+============================
+
+| Stored Procedure                       | Function                                             |
+| -------------------------------------- | ---------------------------------------------------- |
+| Performs an action (business logic).   | Computes and returns a value.                        |
+| Called using CALL.                     | Called inside SQL statements or using SELECT.      |
+| May or may not return values           | Must return a value (or a table).                    |
+  (using OUT/INOUT).                
+| Cannot be used directly inside a       | Can be used inside SELECT, WHERE, ORDER BY, etc. |
+  SELECT statement.
+| Can perform database operations like   | Can also perform database operations in PostgreSQL, but 
+  INSERT, UPDATE, DELETE.                  they're primarily intended for returning results and  
+                                           are commonly used in queries. |
+----
