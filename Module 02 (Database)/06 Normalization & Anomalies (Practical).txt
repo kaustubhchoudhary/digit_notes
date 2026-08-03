@@ -1,0 +1,1355 @@
+Normalization
+=============
+
+Example: We will use an e-commerce database to understand Normalization and Anomalies.
+
+In this example, we will create a new PostgreSQL database, connect to it using DBeaver, create a schema, and then create the required tables.
+
+---
+
+Step 1: Create a Database
+
+Open DBeaver and connect to your PostgreSQL server.
+
+Right-click **Databases** → **Create New Database**
+
+Database Name:
+```
+
+```text
+normal_demo
+```
+
+---
+
+```text
+Step 2: Connect to the Database
+
+Once the database is created, expand the database list and double-click **normal_demo** (or open a new SQL Editor for it).
+
+All the remaining queries in this chapter should be executed in the **normal_demo** database.
+
+---
+
+Step 3: Create a Schema
+
+**Query:
+```
+
+```sql
+CREATE SCHEMA ecommerce;
+```
+
+---
+
+Raw (Unnormalized) Table
+========================
+
+CREATE TABLE ecommerce.nf0_ecom (
+    order_id INT,
+    user_name VARCHAR(100),
+    user_email VARCHAR(100),
+    user_phone VARCHAR(15),
+    product_ids VARCHAR(255),       -- NOT atomic
+    product_names VARCHAR(255),     -- NOT atomic
+    quantities VARCHAR(255),        -- NOT atomic
+    prices VARCHAR(255),            -- NOT atomic
+    order_date DATE,
+    delivery_address VARCHAR(255)
+);
+
+INSERT INTO ecommerce.nf0_ecom VALUES
+(101, 'Rahul Sharma', 'rahul.sharma@gmail.com', '9876543210',
+ '201,305',
+ 'Boat Airdopes 141,Dell Wireless Mouse',
+ '1,1',
+ '999,699',
+ '2025-01-10', '101, MG Road, Indore, MP'),
+
+(102, 'Aditi Verma', 'aditi.verma@yahoo.com', '9123456780',
+ '402',
+ 'Campus Running Shoes',
+ '2',
+ '1299',
+ '2025-01-11', '22, Nehru Nagar, Bhopal, MP'),
+
+(103, 'Rohan Patil', 'rohan.patil@gmail.com', '9988776655',
+ '201,509',
+ 'Boat Airdopes 141,Prestige Kettle',
+ '1,1',
+ '999,799',
+ '2025-01-12', '14, FC Road, Pune, MH'),
+
+(104, 'Kavya Iyer', 'kavya.iyer@outlook.com', '9090909090',
+ '611',
+ 'Samsung Galaxy M34 Cover',
+ '1',
+ '299',
+ '2025-01-12', '55, Anna Nagar, Chennai, TN'),
+
+(105, 'Arjun Singh', 'arjun.singh@gmail.com', '9000011111',
+ '402,305',
+ 'Campus Running Shoes,Dell Wireless Mouse',
+ '1,1',
+ '1299,699',
+ '2025-01-14', '18, Hazratganj, Lucknow, UP');
+
+---
+
+🤯 Why This Table Is Worse Than the Worst
+
+This table has 4 huge violations of 1NF:
+
+❌ 1. Multi-valued columns
+
+product_ids = "201,305"
+quantities = "1,1"
+
+These are arrays hidden as strings.
+
+❌ 2. Repeating groups
+
+product_1, product_2, product_3 are crammed into one row.
+
+❌ 3. No way to enforce referential integrity
+
+You cannot enforce product_id → product table mapping.
+
+❌ 4. Hard to query
+
+You cannot easily ask:
+
+"Which users ordered product 305?"
+
+You’d have to split strings → horrible performance.
+
+🧨 NOW YOU HAVE A TRUE NON-1NF TABLE
+
+This is the exact structure from which we normally start the normalization journey:
+
+➤ Convert this table → 1NF (expand rows)
+➤ Then convert 1NF → 2NF (remove partial dependencies)
+➤ Then convert 2NF → 3NF (remove transitive dependencies)
+
+---
+
+1. First Normal Form (1NF)
+
+Rule:
+
+* Each column should contain atomic (indivisible) values
+* No repeating groups or multi-valued attributes
+
+Conceptually:
+
+> One cell → one value
+
+CREATE TABLE ecommerce.nf1_ecom (
+    order_id INT,
+    user_name VARCHAR(100),
+    user_email VARCHAR(100),
+    user_phone VARCHAR(15),
+    product_id INT,
+    product_name VARCHAR(100),
+    qty INT,
+    price DECIMAL(10,2),
+    order_date DATE,
+    delivery_address VARCHAR(255)
+);
+
+INSERT INTO ecommerce.nf1_ecom
+(order_id, user_name, user_email, user_phone, product_id, product_name, qty, price, order_date, delivery_address)
+VALUES
+(101, 'Rahul Sharma', 'rahul.sharma@gmail.com', '9876543210', 201, 'Boat Airdopes 141', 1, 999.00, '2025-01-10', '101, MG Road, Indore, MP'),
+
+(101, 'Rahul Sharma', 'rahul.sharma@gmail.com', '9876543210', 305, 'Dell Wireless Mouse', 1, 699.00, '2025-01-10', '101, MG Road, Indore, MP'),
+
+(102, 'Aditi Verma', 'aditi.verma@yahoo.com', '9123456780', 402, 'Campus Running Shoes', 2, 1299.00, '2025-01-11', '22, Nehru Nagar, Bhopal, MP'),
+
+(103, 'Rohan Patil', 'rohan.patil@gmail.com', '9988776655', 201, 'Boat Airdopes 141', 1, 999.00, '2025-01-12', '14, FC Road, Pune, MH'),
+
+(103, 'Rohan Patil', 'rohan.patil@gmail.com', '9988776655', 509, 'Prestige Kettle', 1, 799.00, '2025-01-12', '14, FC Road, Pune, MH'),
+
+(104, 'Kavya Iyer', 'kavya.iyer@outlook.com', '9090909090', 611, 'Samsung Galaxy M34 Cover', 1, 299.00, '2025-01-12', '55, Anna Nagar, Chennai, TN'),
+
+(105, 'Arjun Singh', 'arjun.singh@gmail.com', '9000011111', 402, 'Campus Running Shoes', 1, 1299.00, '2025-01-14', '18, Hazratganj, Lucknow, UP'),
+
+(105, 'Arjun Singh', 'arjun.singh@gmail.com', '9000011111', 305, 'Dell Wireless Mouse', 1, 699.00, '2025-01-14', '18, Hazratganj, Lucknow, UP'),
+
+(106, 'Neha Gupta', 'neha.gupta@gmail.com', '9822334455', 788, 'Milton Water Bottle 1L', 1, 499.00, '2025-01-15', '88, Civil Lines, Kanpur, UP'),
+
+(107, 'Vikas Yadav', 'vikas.yadav@gmail.com', '9811122233', 402, 'Campus Running Shoes', 1, 1299.00, '2025-01-16', '40, Sector 18, Noida, UP');
+
+---
+
+🎯 CONFIRMATION
+
+➡️ This table is now an NF1 table.
+
+It meets all NF1 requirements:
+Requirement	Satisfied?	Why
+Atomic values	        ✔	No multi-valued cells
+No repeating groups	    ✔	Each product gets a separate row
+Tabular structure	    ✔	Rows & columns well-formed
+No arrays / CSV lists	✔	product_id, qty are atomic
+
+---
+
+Before we dive into further normal forms, lets delve into anomalies and some important terms.
+
+---
+
+Anomalies
+=========
+
+# 🔥 1. INSERTION ANOMALY (Problem while inserting new data)
+
+Insertion anomaly means:
+
+> We cannot insert some data unless other unrelated data also exists.
+
+### Example from our wrong table:
+
+### ❌ Case 1 — We want to add a *new product* to the system
+
+Suppose a new product arrives:
+
+```
+product_id = 900
+product_name = "OnePlus Bullets Wireless Z2"
+price = 1999
+```
+
+But…
+In the wrong table, we CANNOT insert this product unless:
+
+* A user places an order
+* We provide fake order_id
+* We fill user_name, user_email, delivery_address, phone etc.
+
+So to store a product, we are forced to store unwanted fields like:
+
+```
+order_id?
+user_name?
+user_email?
+delivery_address?
+```
+
+Which makes no logical sense.
+
+👉 This happens because product data is *dependent* on order data.
+
+---
+
+### ❌ Case 2 — We want to add a *new user* account
+
+Suppose a new user registers:
+
+```
+Name: Manish Jain  
+Email: manish.jain@gmail.com  
+Phone: 9876500000
+```
+
+But no order has been placed yet.
+In this bad table, we *cannot* insert a standalone user.
+
+We would have to create a fake order row.
+
+---
+
+# ⚠️ Why this is bad
+
+* We cannot add meaningful data unless unrelated data exists.
+* This blocks simple operations like onboarding new users or adding products.
+
+---
+
+# 🔥 2. DELETION ANOMALY (Losing important data unintentionally)
+
+Deletion anomaly means:
+
+> Deleting one fact accidentally deletes another important fact.
+
+### Using our data:
+
+Neha Gupta placed order #106 with a product:
+
+```
+(788, Milton Water Bottle)
+```
+
+### ❌ If she returns it → we delete the row:
+
+```sql
+DELETE FROM nf1_ecom WHERE order_id = 106;
+```
+
+### What gets deleted?
+
+1. Her order → expected
+2. Her *ordered product* → expected
+3. Her *user information* → NOT EXPECTED
+
+   * Name
+   * Email
+   * Phone
+   * Delivery address
+
+4. Product `Milton Water Bottle` deleted - Not Expected
+
+Suddenly Neha Gupta & Milton Bottle appears nowhere in the system.
+
+---
+
+### ❌ Another example
+
+If we delete Rohan Patil’s order (103):
+
+```
+(201, Boat Airdopes)
+(509, Prestige Kettle)
+```
+
+Both rows go away → and Rohan’s identity plus `Prestige Kettle` also vanishes from the database.
+
+👉 We should not lose a user or a product simply because their order is deleted.
+
+---
+
+# ⚠️ Why deletion anomaly is dangerous
+
+* Critical information disappears unintentionally.
+* User records vanish when old orders are deleted.
+* Product data can vanish if no one bought that product recently.
+
+---
+
+# 🔥 3. UPDATE ANOMALY (Problem while updating repeated information)
+
+Update anomaly means:
+
+> A value repeated in many rows must be updated everywhere, or the data becomes inconsistent.
+
+Using our table:
+
+---
+
+## ❌ Case 1 — User changes their address
+
+Rahul Sharma’s address appears multiple times:
+
+```
+101, MG Road, Indore, MP
+```
+
+If Rahul shifts to:
+
+```
+201, Race Course Road, Indore
+```
+
+Then we must update all rows where Rahul appears:
+
+```sql
+UPDATE ecom_raw_orders
+SET delivery_address = '201, Race Course Road, Indore'
+WHERE user_email = 'rahul.sharma@gmail.com';
+```
+
+If even one row is missed, our data becomes contradictory.
+
+---
+
+## ❌ Case 2 — Product price changes
+
+“Boat Airdopes 141” appears in many rows:
+
+* Rahul's order (101)
+* Rohan's order (103)
+
+If the price becomes:
+
+```
+₹1199 instead of ₹999
+```
+
+We must update it EVERYWHERE.
+
+If one row still says 999 → inconsistent product pricing.
+
+---
+
+## ❌ Case 3 — Phone number change
+
+If “Aditi Verma” changes her phone number, we must update every row for order 102.
+
+---
+
+# ⚠️ Why update anomaly matters
+
+* Difficult to maintain consistency.
+* Prone to human error.
+* A single missed row leads to corrupted business data.
+
+---
+
+# 🧠 SUMMARY TABLE OF ANOMALIES
+
+| Anomaly       | Meaning                     | Example in our dataset                                 |
+| ------------- | ----------------------------| ------------------------------------------------------ |
+| Insertion     | Cannot add data unless      | Cannot add a new product without fake order            |
+                | unrelated fields exist 
+| Deletion      | Deleting one fact deletes   | Deleting order deletes user data                       
+                  another             
+| Update        | Must update repeated fields | Changing address/price/phone must update multiple rows | 
+                | everywhere        
+
+---
+
+# 🚀 Next Step: NF2 (Second Normal Form)
+
+---
+
+# ⭐ What is 2NF (Second Normal Form)?
+
+A table is in 2NF when:
+
+1. It is already in 1NF
+2. There are NO partial dependencies
+
+Before moving to acheiving 2nd NF, we should understand Partial Dependency.
+
+---
+
+# 🔷 Partial Dependency
+
+### Definition
+
+A partial dependency occurs when:
+
+> A non-key attribute depends on part of a composite primary key, not the whole key.
+
+This only occurs when the primary key is composite (made of 2 or more columns).
+
+---
+
+## ⭐ Practical Example Using Our WRONG TABLE
+
+In the unnormalized e-commerce table, if we temporarily *treat* the composite key as:
+
+```
+(order_id, product_id)
+```
+
+Because for each order, multiple products may appear.
+
+Now check this:
+
+### 🔸 user_name depends only on `order_id`
+
+It does *not* depend on `product_id`.
+
+### 🔸 product_name depends only on `product_id`
+
+It does *not* depend on `order_id`.
+
+These are classical partial dependencies.
+
+## 🔸 Columns that depend on both (order_id + product_id)
+
+```
+qty  → depends on the order line (one product within one order)
+```
+
+This is a valid dependency.
+
+---
+
+## ✔ Why this is a problem?
+
+Because attributes that depend only on part of the key should be in separate tables.
+
+### Visual:
+
+| Composite Key         | Column       | Depends on      | Problem Type       |
+| --------------------- | ------------ | --------------- | ------------------ |
+| order_id + product_id | user_name    | order_id only   | Partial dependency |
+| order_id + product_id | user_email   | order_id only   | Partial dependency |
+| order_id + product_id | product_name | product_id only | Partial dependency |
+
+---
+
+# 🚫 Conclusion: nf1_ecom violates 2NF
+
+Because several non-key attributes depend on only part of the composite primary key.
+
+---
+
+# ⭐ Goal of 2NF
+
+→ Remove partial dependencies
+→ Each non-key column must depend on the *whole* primary key
+→ Break into new tables that each depend only on ONE key
+
+---
+
+# ✔ How to Achieve 2NF (General Rule)
+
+## ➤ Step 1: Take attributes depending only on order_id
+
+Place them in orders table
+
+* nf2_orders
+
+```
+order_id (PK)
+user_name
+user_email
+user_phone
+order_date
+delivery_address
+```
+
+```sql
+CREATE TABLE ecommerce.nf2_orders (
+    order_id INT PRIMARY KEY,
+    user_name VARCHAR(100),
+    user_email VARCHAR(100),
+    user_phone VARCHAR(15),
+    order_date DATE,
+    delivery_address VARCHAR(255)
+);
+```
+
+```sql
+INSERT INTO ecommerce.nf2_orders VALUES
+(101, 'Rahul Sharma', 'rahul.sharma@gmail.com', '9876543210', '2025-01-10', '101, MG Road, Indore, MP'),
+(102, 'Aditi Verma', 'aditi.verma@yahoo.com', '9123456780', '2025-01-11', '22, Nehru Nagar, Bhopal, MP'),
+(103, 'Rohan Patil', 'rohan.patil@gmail.com', '9988776655', '2025-01-12', '14, FC Road, Pune, MH'),
+(104, 'Kavya Iyer', 'kavya.iyer@outlook.com', '9090909090', '2025-01-12', '55, Anna Nagar, Chennai, TN'),
+(105, 'Arjun Singh', 'arjun.singh@gmail.com', '9000011111', '2025-01-14', '18, Hazratganj, Lucknow, UP'),
+(106, 'Neha Gupta', 'neha.gupta@gmail.com', '9822334455', '2025-01-15', '88, Civil Lines, Kanpur, UP'),
+(107, 'Vikas Yadav', 'vikas.yadav@gmail.com', '9811122233', '2025-01-16', '40, Sector 18, Noida, UP');
+```
+
+## ➤ Step 2: Take attributes depending only on product_id
+
+Place them in products table
+
+* nf2_products
+
+```
+product_id (PK)
+product_name
+price
+```
+
+```sql
+CREATE TABLE ecommerce.nf2_products (
+    product_id INT PRIMARY KEY,
+    product_name VARCHAR(100),
+    price DECIMAL(10,2)
+);
+```
+
+```sql
+INSERT INTO ecommerce.nf2_products VALUES
+(201, 'Boat Airdopes 141', 999.00),
+(305, 'Dell Wireless Mouse', 699.00),
+(402, 'Campus Running Shoes', 1299.00),
+(509, 'Prestige Kettle', 799.00),
+(611, 'Samsung Galaxy M34 Cover', 299.00),
+(788, 'Milton Water Bottle 1L', 499.00);
+```
+
+## ➤ Step 3: Keep attributes depending on (order_id, product_id)
+
+Place them in order_items table
+
+* nf2_order_items
+
+```
+order_id (FK)
+product_id (FK)
+qty
+PRIMARY KEY (order_id, product_id)
+```
+
+```sql
+CREATE TABLE ecommerce.nf2_order_items (
+    order_id INT,
+    product_id INT,
+    qty INT,
+    PRIMARY KEY (order_id, product_id),
+    FOREIGN KEY (order_id) REFERENCES ecommerce.nf2_orders(order_id),
+    FOREIGN KEY (product_id) REFERENCES ecommerce.nf2_products(product_id)
+);
+
+(One row per order-product combination)
+
+```sql
+INSERT INTO nf2_order_items VALUES
+(101, 201, 1),
+(101, 305, 1),
+(102, 402, 2),
+(103, 201, 1),
+(103, 509, 1),
+(104, 611, 1),
+(105, 402, 1),
+(105, 305, 1),
+(106, 788, 1),
+(107, 402, 1);
+```
+---
+
+# 🎉 NF2 is complete!
+
+### ✔ All partial dependencies removed
+
+### ✔ Orders stored separately
+
+### ✔ Products stored separately
+
+### ✔ Order items linked with composite key
+
+### ✔ Redundancy reduced
+
+### ✔ Structural clarity improved
+
+---
+
+# 🚀 Next Step: NF3 (Third Normal Form)
+
+---
+
+# ⭐ What is NF3?
+
+A table is in 3NF if:
+
+1. It is already in 2NF
+2. No non-key attribute depends on another non-key attribute
+   (i.e., no *transitive dependency*)
+
+Before moving forward let us understand what is Transitive Dependency
+
+---
+
+# 🔷 Transitive Dependency
+
+### Definition
+
+A transitive dependency exists when:
+
+> A non-key column depends on another non-key column, not directly on the primary key.
+
+Formula:
+
+```
+A → B → C
+```
+
+Where:
+
+* A = primary key
+* B = non-key attribute
+* C = another non-key attribute
+* C depends on B, not on A directly
+
+---
+
+## ⭐ Practical Example Using Our Data
+
+Take delivery_address:
+
+```
+"101, MG Road, Indore, MP"
+```
+
+Inside this address:
+
+* pin_code → city
+* city → state
+
+If the address was broken into parts:
+
+| Column | Depends On |
+| ------ | ---------- |
+| city   | pin_code   |
+| state  | city       |
+
+But both city and state are non-key attributes.
+
+So:
+
+```
+order_id → pin_code → city → state
+```
+
+This creates a transitive dependency.
+
+Another simple example:
+
+If we had:
+
+```
+user_email → user_domain
+```
+
+Then:
+
+```
+order_id → user_email → user_domain
+```
+
+This is also a transitive dependency.
+
+---
+
+# ✔ Why is this a problem?
+
+Because non-key attributes should not depend on each other.
+
+They must depend only on the primary key.
+
+Transitive dependencies violate 3NF.
+
+---
+
+In NF3, we remove transitive dependencies, such as:
+
+* user_name, user_email, user_phone → should actually depend on *user* entity
+* address → may be further decomposed
+* orders should reference `user_id`, not contain user details inside
+
+---
+
+# 🔍 Transitive Dependencies in NF2
+
+### In nf2_orders, these three fields logically belong to a "User":
+
+* user_name
+* user_email
+* user_phone
+
+They all depend on user_email, not directly on order_id.
+
+So:
+
+```
+order_id → user_email → user_name, user_phone
+```
+
+➡ Transitive dependency
+➡ Must separate Users from Orders
+
+---
+
+# ⭐ NF3 Table Structure
+
+We create:
+
+1. nf3_users
+2. nf3_orders (order refers to user_id, not user details)
+3. nf3_products
+4. nf3_order_items
+
+(Products and order_items are already in 3NF — no transitive dependencies there.)
+
+---
+
+# ✅ 1.  CREATE NF3 TABLES
+
+---
+
+## 🔷 nf3_users
+
+```sql
+CREATE TABLE ecommerce.nf3_users (
+    user_id INT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+	user_name VARCHAR(100),
+    user_email VARCHAR(100) UNIQUE,
+    user_phone VARCHAR(15)
+);
+```
+
+---
+
+## 🔷 nf3_orders
+
+(Reference user instead of storing user info repeatedly)
+
+```sql
+CREATE TABLE ecommerce.nf3_orders (
+    order_id INT PRIMARY KEY,
+    user_id INT,
+    order_date DATE,
+    delivery_address VARCHAR(255),
+    FOREIGN KEY (user_id) REFERENCES ecommerce.nf3_users(user_id)
+);
+```
+
+---
+
+## 🔷 nf3_products
+
+(Same as NF2, already normalized)
+
+```sql
+CREATE TABLE ecommerce.nf3_products (
+    product_id INT PRIMARY KEY,
+    product_name VARCHAR(100),
+    price DECIMAL(10,2)
+);
+```
+
+---
+
+## 🔷 nf3_order_items
+
+(Same as NF2, already normalized)
+
+```sql
+CREATE TABLE ecommerce.nf3_order_items (
+    order_id INT,
+    product_id INT,
+    qty INT,
+    PRIMARY KEY (order_id, product_id),
+    FOREIGN KEY (order_id) REFERENCES ecommerce.nf3_orders(order_id),
+    FOREIGN KEY (product_id) REFERENCES ecommerce.nf3_products(product_id)
+);
+```
+
+---
+
+# ✅ 2.  INSERT DATA INTO NF3 TABLES
+
+---
+
+# 🔷 Insert Users into nf3_users
+
+(Unique users extracted from NF2)
+
+We must insert them first, because orders reference user_id.
+
+```sql
+INSERT INTO ecommerce.nf3_users (user_name, user_email, user_phone) VALUES
+('Rahul Sharma', 'rahul.sharma@gmail.com', '9876543210'),
+('Aditi Verma', 'aditi.verma@yahoo.com', '9123456780'),
+('Rohan Patil', 'rohan.patil@gmail.com', '9988776655'),
+('Kavya Iyer', 'kavya.iyer@outlook.com', '9090909090'),
+('Arjun Singh', 'arjun.singh@gmail.com', '9000011111'),
+('Neha Gupta', 'neha.gupta@gmail.com', '9822334455'),
+('Vikas Yadav', 'vikas.yadav@gmail.com', '9811122233');
+```
+
+These users will get auto-generated IDs:
+
+| user_id | user_name    |
+| ------- | ------------ |
+| 1       | Rahul Sharma |
+| 2       | Aditi Verma  |
+| 3       | Rohan Patil  |
+| 4       | Kavya Iyer   |
+| 5       | Arjun Singh  |
+| 6       | Neha Gupta   |
+| 7       | Vikas Yadav  |
+
+---
+
+# 🔷 Insert Orders into nf3_orders
+
+(Use the new user_id values)
+
+```sql
+INSERT INTO ecommerce.nf3_orders VALUES
+(101, 1, '2025-01-10', '101, MG Road, Indore, MP'),
+(102, 2, '2025-01-11', '22, Nehru Nagar, Bhopal, MP'),
+(103, 3, '2025-01-12', '14, FC Road, Pune, MH'),
+(104, 4, '2025-01-12', '55, Anna Nagar, Chennai, TN'),
+(105, 5, '2025-01-14', '18, Hazratganj, Lucknow, UP'),
+(106, 6, '2025-01-15', '88, Civil Lines, Kanpur, UP'),
+(107, 7, '2025-01-16', '40, Sector 18, Noida, UP');
+```
+
+---
+
+# 🔷 Insert Products into nf3_products
+
+(Same as nf2)
+
+```sql
+INSERT INTO ecommerce.nf3_products VALUES
+(201, 'Boat Airdopes 141', 999.00),
+(305, 'Dell Wireless Mouse', 699.00),
+(402, 'Campus Running Shoes', 1299.00),
+(509, 'Prestige Kettle', 799.00),
+(611, 'Samsung Galaxy M34 Cover', 299.00),
+(788, 'Milton Water Bottle 1L', 499.00);
+```
+
+---
+
+# 🔷 Insert Order Items into nf3_order_items
+
+(Same as nf2)
+
+```sql
+INSERT INTO nf3_order_items VALUES
+(101, 201, 1),
+(101, 305, 1),
+(102, 402, 2),
+(103, 201, 1),
+(103, 509, 1),
+(104, 611, 1),
+(105, 402, 1),
+(105, 305, 1),
+(106, 788, 1),
+(107, 402, 1);
+```
+
+---
+
+# 🎉 NF3 Achieved!
+
+### ✔ All tables are now free from:
+
+* Partial dependencies
+* Transitive dependencies
+* Redundant user details
+* Repeated product details
+
+### ✔ Structure is fully normalized and matches real-world e-commerce schema.
+
+---
+
+# 🚀 Next Step: BCNF (Boyce–Codd Normal Form)
+
+Why BCNF exists:
+
+* 3NF can still allow subtle anomalies
+* BCNF is a stricter version of 3NF
+
+---
+
+# BCNF Review on Given Schema
+
+* You have already achieved 3NF.
+* Now we analyze what is still wrong according to BCNF.
+
+---
+
+## Reminder: What BCNF Requires
+
+> For every functional dependency, the determinant must be a candidate key
+
+In simple words:
+
+👉 Only keys should determine other attributes
+👉 No non-key column should decide anything
+
+---
+
+## Tables That Are ALREADY OK in BCNF
+
+### ✅ `nf3_users`
+
+```text
+user_id → user_name, user_email, user_phone
+```
+
+* `user_id` is the primary key
+* All dependencies originate from a key
+
+✔ BCNF compliant
+
+---
+
+### ✅ `nf3_products`
+
+```text
+product_id → product_name, price
+```
+
+* Determinant is a key
+* No hidden dependency
+
+✔ BCNF compliant
+
+---
+
+### ✅ `nf3_order_items`
+
+```text
+(order_id, product_id) → qty
+```
+
+* Composite key fully determines `qty`
+
+✔ BCNF compliant
+
+---
+
+## ❌ Problem Table: `nf3_orders`
+
+### Current structure
+
+```text
+order_id (PK)
+user_id
+order_date
+delivery_address
+```
+
+---
+
+## Hidden Functional Dependency (BCNF Violation)
+
+From real-world meaning:
+
+```text
+user_id → delivery_address
+```
+
+Because:
+
+* A user usually has one delivery address
+* Multiple orders by the same user repeat the same address
+
+But in the table:
+
+```text
+order_id → delivery_address
+```
+
+This creates a problem.
+
+---
+
+## Why This Violates BCNF
+
+* `user_id` is NOT a candidate key in `nf3_orders`
+* Yet it determines `delivery_address`
+
+👉 Non-key determining a non-key attribute = BCNF violation
+
+---
+
+## Problems Caused (Even Though 3NF is satisfied)
+
+### 🔴 Update Anomaly
+
+If a user changes address:
+
+* You must update multiple order rows
+
+### 🔴 Redundancy
+
+* Same address repeated across many orders
+
+### 🔴 Logical mismatch
+
+* Address belongs to user, not to order
+
+---
+
+## Why 3NF Allowed This but BCNF Does Not
+
+* 3NF allows this because `delivery_address` is not dependent on another non-key
+* BCNF is stricter: it disallows any non-key determinant
+
+---
+
+## ✅ Correct BCNF Fix
+
+### Option 1 (Best & Cleanest): Move Address to Users
+
+```text
+users
+-----
+user_id (PK)
+user_name
+user_email
+user_phone
+delivery_address
+```
+
+```text
+orders
+------
+order_id (PK)
+user_id (FK)
+order_date
+```
+
+✔ Now:
+
+* `user_id → delivery_address` happens in users
+* Determinant is a key
+* BCNF satisfied
+
+---
+
+## Final BCNF Verdict
+
+| Table             | BCNF Status       |
+| ----------------- | ----------------- |
+| `nf3_users`       | ✅                 |
+| `nf3_products`    | ✅                 |
+| `nf3_order_items` | ✅                 |
+| `nf3_orders`      | ❌ (violates BCNF) |
+
+---
+
+## Closing Line
+
+> 3NF removes transitive dependency, but BCNF removes incorrect ownership of data by enforcing that only keys determine attributes.
+
+---
+
+# Fourth Normal Form (4NF)
+
+## What is 4NF? (Conceptual)
+
+> A table is in Fourth Normal Form (4NF) if it is in BCNF and contains no multi-valued dependencies.
+
+In simple words:
+
+👉 One table should not store multiple independent facts about the same entity.
+
+---
+
+## What is a Multi-Valued Dependency (MVD)?
+
+A multi-valued dependency exists when:
+
+* One key determines multiple independent sets of attributes
+* These attributes are not dependent on each other
+* But are stored together, causing duplication
+
+Symbolically:
+
+```
+A →→ B
+A →→ C
+```
+
+(where B and C are independent)
+
+---
+
+## Let’s Apply 4NF to Your Example
+
+### Current Tables (After BCNF Fix)
+
+We have:
+
+* `users`
+* `orders`
+* `products`
+* `order_items`
+
+Now we ask the 4NF question:
+
+> Is there any table where one key controls multiple independent lists?
+
+---
+
+## ✅ Tables Already in 4NF
+
+### `nf3_users`
+
+```text
+user_id → user_name, email, phone
+```
+
+* Single fact per user
+* No independent multi-valued attributes
+
+✔ 4NF compliant
+
+---
+
+### `nf3_products`
+
+```text
+product_id → product_name, price
+```
+
+✔ 4NF compliant
+
+---
+
+### `nf3_orders`
+
+```text
+order_id → user_id, order_date
+```
+
+✔ 4NF compliant
+
+---
+
+### `nf3_order_items`
+
+```text
+(order_id, product_id) → qty
+```
+
+✔ 4NF compliant
+
+---
+CREATE TABLE nf4_users (
+    user_id INT AUTO_INCREMENT PRIMARY KEY,
+    user_name VARCHAR(100),
+    user_email VARCHAR(100) UNIQUE,
+    user_phone VARCHAR(15),
+    delivery_address VARCHAR(255)
+);
+
+CREATE TABLE nf4_orders (
+    order_id INT PRIMARY KEY,
+    user_id INT,
+    order_date DATE,
+    FOREIGN KEY (user_id) REFERENCES nf4_users(user_id)
+);
+
+CREATE TABLE nf4_products (
+    product_id INT PRIMARY KEY,
+    product_name VARCHAR(100),
+    price DECIMAL(10,2)
+);
+
+CREATE TABLE nf4_order_items (
+    order_id INT,
+    product_id INT,
+    qty INT,
+    PRIMARY KEY (order_id, product_id),
+    FOREIGN KEY (order_id) REFERENCES nf4_orders(order_id),
+    FOREIGN KEY (product_id) REFERENCES nf4_products(product_id)
+);
+
+INSERT INTO nf4_users (user_name, user_email, user_phone, delivery_address) VALUES
+('Rahul Sharma', 'rahul.sharma@gmail.com', '9876543210', '101, MG Road, Indore, MP'),
+('Aditi Verma', 'aditi.verma@yahoo.com', '9123456780', '22, Nehru Nagar, Bhopal, MP'),
+('Rohan Patil', 'rohan.patil@gmail.com', '9988776655', '14, FC Road, Pune, MH'),
+('Kavya Iyer', 'kavya.iyer@outlook.com', '9090909090', '55, Anna Nagar, Chennai, TN'),
+('Arjun Singh', 'arjun.singh@gmail.com', '9000011111', '18, Hazratganj, Lucknow, UP'),
+('Neha Gupta', 'neha.gupta@gmail.com', '9822334455', '88, Civil Lines, Kanpur, UP'),
+('Vikas Yadav', 'vikas.yadav@gmail.com', '9811122233', '40, Sector 18, Noida, UP');
+
+INSERT INTO nf4_orders VALUES
+(101, 1, '2025-01-10'),
+(102, 2, '2025-01-11'),
+(103, 3, '2025-01-12'),
+(104, 4, '2025-01-12'),
+(105, 5, '2025-01-14'),
+(106, 6, '2025-01-15'),
+(107, 7, '2025-01-16');
+
+INSERT INTO nf4_products VALUES
+(201, 'Boat Airdopes 141', 999.00),
+(305, 'Dell Wireless Mouse', 699.00),
+(402, 'Campus Running Shoes', 1299.00),
+(509, 'Prestige Kettle', 799.00),
+(611, 'Samsung Galaxy M34 Cover', 299.00),
+(788, 'Milton Water Bottle 1L', 499.00);
+
+INSERT INTO nf4_order_items VALUES
+(101, 201, 1),
+(101, 305, 1),
+(102, 402, 2),
+(103, 201, 1),
+(103, 509, 1),
+(104, 611, 1),
+(105, 402, 1),
+(105, 305, 1),
+(106, 788, 1),
+(107, 402, 1);
+---
+
+## ❌ What a 4NF Violation WOULD Look Like (Important)
+
+Suppose we had a table like this:
+
+```text
+user_preferences
+----------------
+user_id
+language
+payment_method
+```
+
+Meaning:
+
+* A user can prefer multiple languages
+* A user can prefer multiple payment methods
+* These two are independent sets of data
+
+This creates:
+
+```text
+user_id →→ language
+user_id →→ payment_method
+```
+
+❌ 4NF violation
+
+---
+
+## ✅ Correct 4NF Fix
+
+Split into two tables:
+
+```text
+user_languages
+--------------
+user_id
+language
+```
+
+```text
+user_payment_methods
+--------------------
+user_id
+payment_method
+```
+
+Now:
+
+* Each table represents one independent fact
+* No duplication
+* 4NF satisfied
+
+---
+
+## Key Insight (Very Important)
+
+* BCNF fixes “who determines what”
+* 4NF fixes “how many independent facts live together”
+
+---
+
+## Final Verdict on Your Design
+
+| Normal Form | Status                |
+| ----------- | --------------------- |
+| 1NF         | Done                  |
+| 2NF         | Done                  |
+| 3NF         | Done                  |
+| BCNF        | (after address fix)   |
+| 4NF         | Done                  |
+
+👉 Our final design is fully normalized up to 4NF.
+
+---
+
+## Trainer-Grade Closing Line
+
+> 4NF ensures that a table represents exactly one kind of fact and nothing else.
+
+This is a perfect conceptual stopping point for normalization.
+Anything beyond this (5NF) is usually academic only, not industry-practical.
+
+----X----X----X---

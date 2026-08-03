@@ -37,7 +37,7 @@ There are 2 types of triggers:
 Triggers can be associated with these events:
 
 * BEFORE INSERT
-* AFTER INSERT
+* AFTER INSERT 
 * BEFORE UPDATE
 * AFTER UPDATE
 * BEFORE DELETE
@@ -108,7 +108,7 @@ AS $$
 BEGIN
 
     -- Calculate bonus
-    NEW.bonus := NEW.basic_salary * 0.10;
+    NEW.bonus := NEW.basic_salary * 10;
 
     -- Calculate deduction
     NEW.deduction := NEW.basic_salary * 0.05;
