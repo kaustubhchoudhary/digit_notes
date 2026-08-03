@@ -87,14 +87,6 @@ Database objects are structural components of PostgreSQL used to store data, org
 
 ---
 
-### 9. Materialized Views
-
-* Store the result of a query physically.
-* Improve performance for complex and frequently executed queries.
-* Must be refreshed to reflect the latest data.
-
----
-
 ## In PostgreSQL
 
 * PostgreSQL supports Sequences and does not support AUTO_INCREMENT.
@@ -176,7 +168,6 @@ Index Operations
 
 We can create, view, and drop indexes using SQL.
 
-
 **Important Points**
 
 - A **PRIMARY KEY** is automatically indexed by PostgreSQL.
@@ -225,6 +216,7 @@ WHERE name = 'Amit Sharma';
 Query Performance:
 
 ```sql
+EXPLAIN ANALYZE
 SELECT *
 FROM db_objects.employees
 WHERE department = 'IT'
@@ -523,6 +515,7 @@ WHERE department = 'IT'
   AND basic_salary >= 65000;
 ```
 
+
 ---
 
 ## Renaming a View
@@ -616,6 +609,14 @@ END;
 $$;
 ```
 
+Notes:
+* IN is optional because it is the default.
+* OUT and INOUT must be specified explicitly.
+* Replace datatype with a PostgreSQL data type such as INT, VARCHAR, NUMERIC, DATE, etc.
+* If your procedure contains only IN parameters, you can omit the IN keyword:
+
+---
+
 Practice
 ========
 
@@ -624,16 +625,17 @@ Practice
 ### Query 1: Stored Procedure with IN Parameter
 
 ```sql
-CREATE OR REPLACE PROCEDURE db_objects.get_employees_by_department(
-    IN dept_name VARCHAR(50)
+CREATE OR REPLACE PROCEDURE db_objects.increase_salary(
+    IN p_department VARCHAR,
+    IN p_increment NUMERIC
 )
 LANGUAGE plpgsql
 AS $$
 BEGIN
 
-    SELECT *
-    FROM db_objects.employees
-    WHERE department = dept_name;
+    UPDATE db_objects.employees
+    SET basic_salary = basic_salary + p_increment
+    WHERE department = p_department;
 
 END;
 $$;
@@ -643,7 +645,7 @@ How to call?
 ------------
 
 ```sql
-CALL db_objects.get_employees_by_department('IT');
+CALL db_objects.increase_salary('IT', 5000);
 ```
 
 -----X-----X-----X-----
@@ -651,17 +653,18 @@ CALL db_objects.get_employees_by_department('IT');
 ### Query 2: Stored Procedure with OUT Parameter
 
 ```sql
-CREATE OR REPLACE PROCEDURE db_objects.get_it_employee_count(
-    OUT emp_count INT
+CREATE OR REPLACE PROCEDURE db_objects.get_employee_count(
+    IN p_department VARCHAR,
+    OUT p_total_employees INT
 )
 LANGUAGE plpgsql
 AS $$
 BEGIN
 
     SELECT COUNT(*)
-    INTO emp_count
+    INTO p_total_employees
     FROM db_objects.employees
-    WHERE department = 'IT';
+    WHERE department = p_department;
 
 END;
 $$;
@@ -671,7 +674,17 @@ How to call?
 ------------
 
 ```sql
-CALL db_objects.get_it_employee_count(NULL);
+DO $$
+DECLARE
+    total_employees INT;
+BEGIN
+
+    CALL db_objects.get_employee_count('IT', total_employees);
+
+    RAISE NOTICE 'Total Employees: %', total_employees;
+
+END;
+$$;
 ```
 
 -----X-----X-----X-----
@@ -679,17 +692,14 @@ CALL db_objects.get_it_employee_count(NULL);
 ### Query 3: Stored Procedure with INOUT Parameter
 
 ```sql
-CREATE OR REPLACE PROCEDURE db_objects.get_matching_salary(
-    INOUT sal DECIMAL(10,2)
+CREATE OR REPLACE PROCEDURE db_objects.increment_number(
+    INOUT p_number INT
 )
 LANGUAGE plpgsql
 AS $$
 BEGIN
 
-    SELECT MAX(basic_salary)
-    INTO sal
-    FROM db_objects.employees
-    WHERE basic_salary <= sal;
+    p_number := p_number + 1;
 
 END;
 $$;
@@ -699,7 +709,17 @@ How to call?
 ------------
 
 ```sql
-CALL db_objects.get_matching_salary(70000);
+DO $$
+DECLARE
+    num INT := 10;
+BEGIN
+
+    CALL db_objects.increment_number(num);
+
+    RAISE NOTICE 'Updated Number: %', num;
+
+END;
+$$;
 ```
 
 -----X-----X-----X-----
@@ -707,25 +727,18 @@ CALL db_objects.get_matching_salary(70000);
 ### Query 4: Stored Procedure with IN, OUT and INOUT Parameters
 
 ```sql
-CREATE OR REPLACE PROCEDURE db_objects.employee_summary_by_department(
-    IN dept_name VARCHAR(50),
-    INOUT min_salary DECIMAL(10,2),
-    OUT emp_count INT
+CREATE OR REPLACE PROCEDURE db_objects.calculate_bonus(
+    IN p_employee_id INT,
+    OUT p_bonus NUMERIC,
+    INOUT p_total_salary NUMERIC
 )
 LANGUAGE plpgsql
 AS $$
 BEGIN
 
-    SELECT COUNT(*)
-    INTO emp_count
-    FROM db_objects.employees
-    WHERE department = dept_name
-      AND basic_salary >= min_salary;
+    p_bonus := p_total_salary * 0.10;
 
-    SELECT MAX(basic_salary)
-    INTO min_salary
-    FROM db_objects.employees
-    WHERE department = dept_name;
+    p_total_salary := p_total_salary + p_bonus;
 
 END;
 $$;
@@ -735,7 +748,23 @@ How to call?
 ------------
 
 ```sql
-CALL db_objects.employee_summary_by_department('IT', 50000, NULL);
+DO $$
+DECLARE
+    bonus NUMERIC;
+    total_salary NUMERIC := 50000;
+BEGIN
+
+    CALL db_objects.calculate_bonus(
+        101,
+        bonus,
+        total_salary
+    );
+
+    RAISE NOTICE 'Bonus: %', bonus;
+    RAISE NOTICE 'Updated Salary: %', total_salary;
+
+END;
+$$;
 ```
 
 -----X-----X-----X-----
@@ -745,26 +774,26 @@ Drop Stored Procedures
 ### Drop a Single Stored Procedure
 
 ```sql
-DROP PROCEDURE db_objects.employee_summary_by_department;
+DROP PROCEDURE db_objects.increase_salary;
 ```
 
 ### Safer Version
 
 ```sql
-DROP PROCEDURE IF EXISTS db_objects.employee_summary_by_department;
+DROP PROCEDURE IF EXISTS db_objects.increase_salary;
 ```
 
 ### Drop Multiple Procedures
 
 ```sql
-DROP PROCEDURE IF EXISTS db_objects.employee_summary_by_department;
+DROP PROCEDURE IF EXISTS db_objects.get_employee_count;
 
-DROP PROCEDURE IF EXISTS db_objects.get_it_employee_count;
+DROP PROCEDURE IF EXISTS db_objects.increment_number;
 
-DROP PROCEDURE IF EXISTS db_objects.get_matching_salary;
-
-DROP PROCEDURE IF EXISTS db_objects.get_employees_by_department;
+DROP PROCEDURE IF EXISTS db_objects.calculate_bonus;
 ```
+
+> **Note:** If a procedure is overloaded (multiple procedures with the same name but different parameter types), PostgreSQL requires you to specify the parameter types while dropping it. For beginners, since each procedure has a unique name, the above syntax is sufficient.
 
 -----X-----X-----X-----
 

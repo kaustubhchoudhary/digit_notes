@@ -45,7 +45,7 @@ INSERT INTO users (user_name, user_email, user_phone, delivery_address) VALUES
 ('Kavya Iyer', 'kavya.iyer@outlook.com', '9090909090', '55, Anna Nagar, Chennai, TN'),
 ('Arjun Singh', 'arjun.singh@gmail.com', '9000011111', '18, Hazratganj, Lucknow, UP'),
 ('Neha Gupta', 'neha.gupta@gmail.com', '9822334455', '88, Civil Lines, Kanpur, UP'),
-('Vikas Yadav', 'vikas.yadav@gmail.com', '9811122233', '40, Sector 18, Noida, UP'),
+('Aakash Yadav', 'aakash.yadav@gmail.com', '9811122233', '40, Sector 18, Noida, UP'),
 ('Yash Mukati', 'yash.mukati@yahoo.com', '9897969594', '19, LIG, Jabalpur, MP'),
 ('Vikas Yadav', 'vikas.yadav@gmail.com', '9987766345', '21, Sector 18, Gwalior, MP');
 
@@ -341,16 +341,26 @@ They are complementary, not opposite.
 
 ---
 
-Trainer-Grade Closing Lines
+Closing Lines
 
-* INNER JOIN → matching data
-* LEFT JOIN → include missing data
-* RIGHT JOIN → reverse of LEFT
-* FULL JOIN → everything (via UNION)
-* SELF JOIN → same table relationship
-* CROSS JOIN → combinations
+You can present it like this:
+
+| Join            | Purpose                           | Usage Frequency |
+| --------------- | --------------------------------- | --------------- |
+| INNER JOIN      | Matching data                     | Most Used       |
+| LEFT JOIN       | Include missing data              | Very Common     |
+| RIGHT JOIN      | Reverse of LEFT JOIN              | Rare            |
+| FULL OUTER JOIN | Everything (via `UNION` in MySQL) | Very Rare       |
+| SELF JOIN       | Same table relationship           | Occasional      |
+| CROSS JOIN      | All possible combinations         | Very Rare       |
+
+
+* Master `INNER JOIN` and `LEFT JOIN` first-they account for the vast majority of SQL joins you'll write.
+* Learn `SELF JOIN` for hierarchical relationships (e.g., employees and managers).
+* Know that `RIGHT JOIN`, `FULL OUTER JOIN`, and `CROSS JOIN` exist, but they're used much less frequently.
 
 ---
+
 Practice questions
 ==================
 
@@ -492,20 +502,16 @@ INNER JOIN products p ON oi.product_id = p.product_id;
 
 ---
 
-🧠 Practice Summary
+Questions:
 
-| Skill                  | Covered |
-| ---------------------- | ------- |
-| INNER JOIN             | ✅       |
-| LEFT JOIN              | ✅       |
-| Multi-table joins      | ✅       |
-| Aggregation with joins | ✅       |
-| Real-world queries     | ✅       |
+Q 1. Display each user along with the total amount they have spent
 
----
+Q 2. Find the most expensive product ordered in each order
 
-Trainer-Grade Closing Line
+Q 3. Display all products that have never been ordered
 
-> If you can confidently write these 10 queries, your JOIN fundamentals are solid.
+Q 4. Find the number of different products ordered by each user
+
+Q 5. Display order ID, user name, product name, quantity, and total price of each product in the order
 
 ---X---X---X---

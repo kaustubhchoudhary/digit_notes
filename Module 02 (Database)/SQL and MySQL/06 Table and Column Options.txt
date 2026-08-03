@@ -63,7 +63,7 @@ Naming Conventions
 
 ---
 
-## 🧠 Trainer-Grade One-Liner
+## 🧠 One-Liner
 
 > A naming convention is successful only when it is applied consistently everywhere.
 
@@ -178,9 +178,15 @@ There are following constraints:
 
 3. UQ : If checked => Each entry must be unique
 
-4. AI : If checked => The integer field will be auto incrememnted
+4. B  : If checked => Stores or compares string data in a binary (case-sensitive) manner.
 
-5. ZF : If checked => It pads numeric values with leading zeros up to a specified display width, ensuring a consistent length for output.
+5. UN : If checked => Each entry must be positive (un-signed)
+
+6. AI : If checked => The integer field will be auto incrememnted
+
+7. G  : If checked => Column value is automatically calculated from other columns.
+
+8. ZF : If checked => It pads numeric values with leading zeros up to a specified display width, ensuring a consistent length for output.
 
 Ex:  roll_no int(5) ZF checked
 Data  00001

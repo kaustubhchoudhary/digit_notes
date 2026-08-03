@@ -1,0 +1,478 @@
+Topics
+======
+Aggregate Functions
+Group by
+Having
+
+---
+
+Database Setup
+--------------
+* Create Database
+
+```
+CREATE DATABASE company_db;
+```
+
+* Make company_db the active schema
+
+```
+USE company_db;
+```
+
+* Create Employees Table
+
+```
+CREATE TABLE employees (
+    id INT PRIMARY KEY,
+    name VARCHAR(50),
+    department VARCHAR(30),
+    salary DECIMAL(10,2),
+    joining_date DATE
+);
+```
+
+* Insert Sample Data
+
+```
+INSERT INTO employees VALUES
+(101, 'Amit',    'Engineering', 35000, '2020-01-15'),
+(102, 'Neha',    'QA',          28000, '2021-03-20'),
+(103, 'Rahul',   'Engineering', 42000, '2019-11-10'),
+(104, 'Priya',   'HR',          25000, '2022-06-05'),
+(105, 'Karan',   'QA',          30000, '2020-09-12'),
+(106, 'Sneha',   'HR',          27000, '2023-01-08'),
+(107, 'Rohit',   'Engineering', 39000, '2018-07-19'),
+(108, 'Mina',    'Sales',       32000, '2021-12-01'),
+(109, 'Ankit',   'Sales',       29000, '2022-04-18'),
+(110, 'Pooja',   'Engineering', 45000, '2017-02-25');
+```
+
+* View the data:
+
+```
+SELECT * FROM employees;
+```
+
+---
+
+Aggregate Functions 
+===================
+Aggregate functions return the result of a query as one final value by performing calculations on multiple rows.
+
+For example:
+Total number of employees, Minimum salary, Maximum salary, Average salary, Total salary
+
+MySQL provides five commonly used aggregate functions:
+COUNT(), MIN(), MAX(), AVG(), SUM()
+
+Practice
+========
+
+COUNT(): Returns the number of rows.
+
+** Query: Get total number of employees
+
+SELECT COUNT(*) AS total_employees
+FROM employees;
+
+** Query: Count employees from QA and Engineering
+
+SELECT COUNT(*) AS total_employees
+FROM employees
+WHERE department = 'QA'
+OR department = 'Engineering';
+
+** Query: Count employees whose salary is greater than 30,000
+
+SELECT COUNT(*)
+FROM employees
+WHERE salary > 30000;
+
+---
+
+MIN(): Returns the smallest value.
+
+** Query: Get minimum salary
+
+SELECT MIN(salary) AS min_salary
+FROM employees;
+
+**Query: Get earliest joining date
+
+SELECT MIN(joining_date) AS earliest_joining_date
+FROM employees;
+
+---
+
+MAX(): Returns the largest value.
+
+**Query: Get highest salary
+
+SELECT MAX(salary) AS max_salary
+FROM employees;
+
+**Query: Get latest joining date
+
+SELECT MAX(joining_date) AS latest_joining_date
+FROM employees;
+
+---
+
+SUM(): Returns the total of all values.
+
+**Query: Calculate total salary of all employees
+
+SELECT SUM(salary) AS total_salary
+FROM employees;
+
+---
+
+AVG(): Returns the average value.
+
+**Query: Calculate average salary
+
+SELECT AVG(salary) AS avg_salary
+FROM employees;
+
+**Query: Round off the answer using ROUND().
+
+SELECT ROUND(AVG(salary), 2) AS avg_salary
+FROM employees;
+
+---
+
+## Aggregate Functions Ignore NULL Values
+
+Suppose one employee's salary is NULL.
+
+```sql
+SELECT AVG(salary) FROM employees;
+```
+
+The employee with NULL salary is ignored while calculating the average.
+
+Similarly, COUNT(column), SUM(), AVG(), MIN(), MAX() ignore NULL values.
+
+---
+
+## COUNT(*) vs COUNT(column)
+
+Example:
+
+| id | salary |
+| -- | ------ |
+| 1  | 25000  |
+| 2  | NULL   |
+| 3  | 30000  |
+
+```sql
+SELECT COUNT(*) FROM employees;
+```
+
+Result: 3
+
+```sql
+SELECT COUNT(salary) FROM employees;
+```
+
+Result: 2
+
+Because one salary is NULL.
+
+---X---X---X---
+GROUP BY
+========
+
+* The `GROUP BY` clause groups rows having the same values into one group.
+* It is usually used together with aggregate functions.
+* Without `GROUP BY`, aggregate functions produce only one result for the entire table.
+* With `GROUP BY`, one result is produced for each group.
+
+---
+
+## Syntax
+
+```sql
+SELECT column_name,
+       aggregate_function(column_name)
+FROM table_name
+GROUP BY column_name;
+```
+
+---
+
+## Example 1: Number of Employees in Each Department
+
+```sql
+SELECT department,
+       COUNT(*) AS total_employees
+FROM employees
+GROUP BY department;
+```
+
+Output:
+
+| Department  | Employees |
+| ----------- | --------- |
+| Engineering | 4         |
+| QA          | 2         |
+| HR          | 2         |
+| Sales       | 2         |
+
+---
+
+## Example 2: Average Salary of Each Department
+
+```sql
+SELECT department,
+       ROUND(AVG(salary),2) AS average_salary
+FROM employees
+GROUP BY department;
+```
+
+---
+
+## Example 3: Total Salary of Each Department
+
+```sql
+SELECT department,
+       SUM(salary) AS total_salary
+FROM employees
+GROUP BY department;
+```
+
+---
+
+## Example 4: Highest Salary in Each Department
+
+```sql
+SELECT department,
+       MAX(salary) AS highest_salary
+FROM employees
+GROUP BY department;
+```
+
+---
+
+## Example 5: Earliest Joining Date of Each Department
+
+```sql
+SELECT department,
+       MIN(joining_date) AS first_employee
+FROM employees
+GROUP BY department;
+```
+
+---
+
+# HAVING
+
+`HAVING` filters groups created by `GROUP BY`.
+
+Remember:
+
+* `WHERE` filters rows.
+* `HAVING` filters groups.
+
+---
+
+## Syntax
+
+```sql
+SELECT column_name,
+       aggregate_function(column_name)
+FROM table_name
+GROUP BY column_name
+HAVING condition;
+```
+
+---
+
+## Example 1: Find the number of Employees in each Department and display only those Departments having more than 2 Employees
+
+```sql
+SELECT department,
+       COUNT(*) AS total_employees
+FROM employees
+GROUP BY department
+HAVING COUNT(*) > 2;
+```
+
+---
+
+## Example 2: Display department-wise employee count for departments having more than 2 employees
+
+```sql
+SELECT department,
+       ROUND(AVG(salary),2) AS average_salary
+FROM employees
+GROUP BY department
+HAVING AVG(salary) > 30000;
+```
+
+---
+
+## Example 3: Display department-wise employee count for departments whose total salary exceeds 1,00,000
+
+```sql
+SELECT department,
+       SUM(salary) AS total_salary
+FROM employees
+GROUP BY department
+HAVING SUM(salary) > 100000;
+```
+
+---
+
+## Example 4: Display department-wise employee count for departments having highest salary greater than 40,000
+
+```sql
+SELECT department,
+       MAX(salary) AS highest_salary
+FROM employees
+GROUP BY department
+HAVING MAX(salary) > 40000;
+```
+
+---
+
+# WHERE + GROUP BY + HAVING Together
+
+Display the average salary of departments, considering only employees who earn more than ₹25,000, where the resulting average salary is greater than ₹30,000.
+
+```sql
+SELECT department,
+       ROUND(AVG(salary),2) AS average_salary
+FROM employees
+WHERE salary > 25000
+GROUP BY department
+HAVING AVG(salary) > 30000;
+```
+
+Execution order:
+
+1. FROM
+2. WHERE
+3. GROUP BY
+4. HAVING
+5. SELECT
+6. ORDER BY
+
+---
+
+# GROUP BY – Key Pointers
+
+* `GROUP BY` is used to **aggregate rows into groups**.
+* It is commonly used with `COUNT()`, `SUM()`, `AVG()`, `MIN()`, and `MAX()`.
+* Each group produces **one output row**.
+* Every non-aggregated column in the `SELECT` clause must also appear in the `GROUP BY` clause.
+* `GROUP BY` executes **after WHERE** but **before HAVING**.
+* It defines the **level of analysis** (per department, per customer, per product, etc.).
+* `GROUP BY` reduces the number of rows, not the number of columns.
+
+---
+
+# HAVING – Key Pointers
+
+* `HAVING` filters **groups**, not individual rows.
+* It is generally used along with `GROUP BY`.
+* Aggregate functions can be used in `HAVING`.
+* `WHERE` cannot filter aggregate results.
+* `HAVING` executes after grouping.
+* Typical conditions:
+
+  * More than N records
+  * Average greater than X
+  * Total greater than X
+  * Maximum/Minimum satisfying a condition
+
+---
+
+# WHERE vs HAVING
+
+| WHERE                          | HAVING                        |
+| ------------------------------ | ----------------------------- |
+| Filters rows                   | Filters groups                |
+| Executes before GROUP BY       | Executes after GROUP BY       |
+| Cannot use aggregate functions | Can use aggregate functions   |
+| Reduces rows before grouping   | Reduces groups after grouping |
+
+---
+
+# Common Mistakes
+
+❌ Using aggregate functions inside `WHERE`
+
+```sql
+SELECT department
+FROM employees
+WHERE COUNT(*) > 2;
+```
+
+Correct:
+
+```sql
+SELECT department
+FROM employees
+GROUP BY department
+HAVING COUNT(*) > 2;
+```
+
+---
+
+❌ Forgetting `GROUP BY`
+
+```sql
+SELECT department, AVG(salary)
+FROM employees;
+```
+
+Correct:
+
+```sql
+SELECT department,
+       AVG(salary)
+FROM employees
+GROUP BY department;
+```
+
+---
+
+# Mental Checklist
+
+Before writing any query, ask yourself:
+
+1. Am I calculating something? → Use Aggregate Functions.
+2. Am I calculating per group? → Use GROUP BY.
+3. Am I filtering individual rows? → Use WHERE.
+4. Am I filtering grouped results? → Use HAVING.
+5. What is my grouping level?
+
+---
+
+# Interview-Ready One-Liners
+
+**Aggregate Function**
+
+> Performs a calculation on multiple rows and returns a single result.
+
+**GROUP BY**
+
+> Aggregates rows into meaningful groups.
+
+**HAVING**
+
+> Filters aggregated results after grouping.
+
+**WHERE**
+
+> Filters rows before grouping.
+
+**Golden Rule**
+
+> **WHERE filters rows. HAVING filters groups.**
+
+These concepts cover almost every aggregate query used in real-world SQL applications.
+
+---X---X---X---

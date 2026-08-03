@@ -1,0 +1,263 @@
+# Database Designing
+
+There are various steps while designing a database.
+
+Requirement Analysis
+--------------------
+- Understand and gather requirements from stakeholders.
+- Identify the purpose of the database, its users, and the types of data to be stored firsthand.
+
+Database Modeling
+-----------------
+Data modeling is the process of creating a high-level conceptual model, often using Entity-Relationship Diagrams (ER Diagram), to define entities, their relationships.
+
+There are different types of data models, however the most effective and scalable is ER-modeling
+
+---
+
+# Data Models
+
+## 1. What is a Data Model?
+
+A Data Model is a set of concepts used to describe:
+
+=> The structure of a database
+=> The relationships among data
+=> The constraints applied to data
+=> The operations allowed on data (retrieval and update)
+
+📌 In simple words:
+
+> A data model defines how data is organized, related, and accessed in a database system.
+
+---
+
+## 2. Why Do We Need Data Models?
+
+=> To understand data requirements clearly
+=> To design databases systematically
+=> To bridge the gap between:
+
+  * Real-world requirements
+  * Actual data storage in computers
+=> To make databases:
+
+  * Maintainable
+  * Scalable
+  * Consistent
+
+---
+
+## 3. Categories of Data Models
+
+Data models are broadly classified into three levels, based on abstraction:
+
+1. High-Level (Conceptual) Data Model
+2. Representational (Logical / Implementational) Data Model
+3. Low-Level (Physical) Data Model
+
+---
+
+## 4. High-Level (Conceptual) Data Model
+
+---
+
+### Definition
+
+=> A High-Level Data Model describes data in a way that is close to how users perceive the real world.
+=> It focuses on what data is required, not how it is stored.
+
+### Key Characteristics
+
+=> Easy to understand
+=> Technology-independent
+=> Can be understood even by non-technical users
+=> Uses:
+
+  * Entities
+  * Attributes
+  * Relationships
+
+📌 Used mainly during requirement analysis and database design phase.
+
+---
+
+### Entity–Relationship (ER) Model
+
+The ER Model is the most common high-level data model.
+
+#### Core Concepts
+
+=> Entity
+
+  * A real-world object or concept
+  * Example: `Student`, `Employee`, `Course`
+
+=> Attribute
+
+  * Properties of an entity
+  * Example: `studentId`, `name`, `dob`
+
+=> Relationship
+
+  * Association between entities
+  * Example: *Student enrolls in Course*
+
+---
+
+### Entity, Entity Type, Entity Set (Clarified)
+
+```java
+Student s1 = new Student();
+```
+
+=> Entity → `s1` (actual object / instance)
+=> Entity Type → `Student` (class / blueprint)
+=> Entity Set → Collection of entities
+  `{ s1, s2, s3, ... }`
+
+📌 ER Diagrams visually represent:
+
+=> Entities
+=> Attributes
+=> Relationships
+
+---
+
+## 5. Representational (Logical / Implementational) Data Model
+
+---
+
+### Definition
+
+=> A Representational Data Model lies between:
+
+  * High-level conceptual model
+  * Low-level physical model
+=> It shows how data is logically structured, but hides physical storage details.
+
+### Key Characteristics
+
+=> More technical than conceptual model
+=> Still independent of physical storage
+=> Directly implementable on a DBMS
+=> Used by database designers and developers
+
+---
+
+### Types of Representational Data Models
+
+#### 1. Relational Data Model (Most Important)
+
+=> Data is represented as tables (relations)
+=> Each table consists of:
+
+  * Rows (records)
+  * Columns (attributes)
+=> Relationships are implemented using:
+
+  * Primary Keys
+  * Foreign Keys
+=> Uses SQL for data operations
+
+📌 MySQL is based on the Relational Data Model
+
+---
+
+#### 2. Hierarchical Data Model
+
+=> Data is organized in a tree-like structure
+=> Each child node has only one parent
+=> One-to-many relationships
+=> Example:
+
+  * Company → Departments → Employees
+
+📌 Limitation:
+
+> Not suitable for complex relationships.
+
+---
+
+#### 3. Network Data Model
+
+=> Data is organized as a graph structure
+=> A child can have multiple parents
+=> Supports many-to-many relationships
+=> More flexible than hierarchical model
+
+📌 Limitation:
+
+> Complex structure and difficult maintenance.
+
+---
+
+## 6. Low-Level (Physical) Data Model
+
+---
+
+### Definition
+
+=> A Low-Level Data Model describes:
+
+  * How data is physically stored
+  * File structures
+  * Indexing mechanisms
+  * Storage formats
+
+### Key Characteristics
+
+=> Closest to actual disk storage
+=> Highly technical
+=> Not meant for end users
+=> Used by:
+
+  * DBMS developers
+  * Database administrators (DBAs)
+
+---
+
+### Physical Storage Example (MySQL)
+
+=> Storage Engine: InnoDB
+=> Data stored as:
+
+  * Tablespaces
+  * Data files
+  * Index files
+=> Actual location:
+
+  * Managed internally by MySQL Server
+  * Hidden from application developers
+
+📌 Developers usually do not interact directly with physical data models.
+
+---
+
+## 7. Conceptual Flow (Very Important)
+
+```
+Real World Requirements
+        ↓
+High-Level (ER Model)
+        ↓
+Representational (Relational Model)
+        ↓
+Low-Level (Physical Storage)
+```
+
+---
+
+## 8. Summary (Interview-Ready)
+
+=> A Data Model defines how data is structured, related, and accessed.
+=> There are three levels of data models:
+
+  * Conceptual (High-Level)
+  * Logical / Representational
+  * Physical (Low-Level)
+=> ER Model is a high-level data model.
+=> Relational Model is the most widely used representational model.
+=> MySQL internally uses physical data models, but developers mainly work with relational models.
+
+---

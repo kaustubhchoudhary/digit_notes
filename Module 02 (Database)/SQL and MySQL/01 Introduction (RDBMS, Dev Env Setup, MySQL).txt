@@ -8,6 +8,7 @@ Topics
 	 - Types of databases
 	 - Storage Approaches
 => RDBMS
+     - RDBMS
 	 - Schema
 	 - Database
 	 - Table
@@ -19,8 +20,7 @@ Topics
 	 - MySQL Client
 	 - MySQL Connectors
 
----
-
+XXXXXXXXXXXXXXXXXXXX
 Setting up the database
 =======================
 Download and Install
@@ -28,7 +28,10 @@ Download and Install
 - MySQL Workbench 8.0.39
 - MySQL Shell 8.0.39
 
-Make sure MySQL DB Server is up and running
+Make sure MySQL DB Server is up and running:
+- Open Task Manager
+- Open Services tab, search for: MySQL8039 service
+- If it is stopped, right click & select: Start
 
 ---
 
@@ -54,7 +57,7 @@ Refer fig: 02_data_persistence.png
 ---
 
 Types of databases
-------------------
+==================
 Below are the types of databases:
 
 1. Relational Databases (RDBMS)  
@@ -76,7 +79,7 @@ Below are the types of databases:
 ---
 
 Storage Approaches
-------------------
+==================
 These are some different types of storages:
   
 1. On-Disk Storage (Traditional databases stored on HDDs/SSDs)  
@@ -101,6 +104,13 @@ RDBMS
 
 - Relationships between tables are established using keys (primary keys and foreign keys).
 
+- Some key terms in an RDBMS are:
+  database, schema, table, records, properties, constraints, keys, relations, alias, etc.
+
+- Ex: Oracle Database, MySQL, PostgreSQL, Microsoft SQL Server, IBM Db2, MariaDB, SQLite, SAP HANA, Teradata, Firebird
+
+---
+
 Schema
 ------
 - A database schema is the skeleton structure that represents the logical view of the entire database.
@@ -115,14 +125,10 @@ Table
 - Tables contain all the data in a database.
 - In tables, data is logically organized in a row-and-column format, similar to a spreadsheet.
 
----
-
 Row / Tuple
 ===========
 - Each row represents a unique record
-- 1 row → 1 record
-
----
+- Tuple → 1 row → 1 record
 
 Columns
 =======
@@ -133,13 +139,13 @@ Columns
 
 Simply Put
 ==========
-Database → Schemas → Tables → Collection of rows and columns → Collection of records
+Database/Schema → Tables → Collection of rows and columns → Collection of records
 
 ---
 
 Example:
 
-Schema → `school`
+Database/Schema → `school`
 
 Table1 → `students`
 
@@ -155,7 +161,7 @@ Columns → id (PK), name
 Table2 → `mobile_numbers`
 
 ```
-// Links mobile_no to students  
+// Linking mobile_no to students  
 // Depends on the PK of students  
 
 Columns → id (PK), mobile_no, student_id (FK)
@@ -176,7 +182,7 @@ Columns → id (PK), mobile_no, student_id (FK)
 
 - `id` in both tables = Primary Key
 
-- `student_id` = Foreign Key
+- `student_id` in mobile table = Foreign Key
 
 ---
 
@@ -186,7 +192,7 @@ MySQL Overview
 
 - Its name is a combination of "My", the name of co-founder Michael Widenius's daughter My, and "SQL", the acronym for Structured Query Language
 
-- The latest version is 9.2.0
+- The latest version is 9.7.0
 
 - MySQL ranks as the second-most-popular database, behind Oracle Database.
 
@@ -198,13 +204,14 @@ MySQL Client/Server Model
 =========================
 MySQL Server
 ------------
-1. MySQL Server is used to connect and manage the physical memory space and system where actually the data is stored (persisted)
+1. MySQL Server is used to connect and manage the physical memory space where the data is actually stored (persisted)
 
-2. Simply put, it is the software that works with the underlying data
+2. Simply put, MySQL server does not store data itself, it simply acts as a bridge between client programs and underlying data.
 
-3. If we want to use it, it must be running as a service (MySQL Service)
+3. If we want to use it, it must be running as a service (MySQL Service). 
+We cannot directly access the data without MySQL Server up and running.
 
-4. We can choose to start MySQL Service as the System is switched on (boots)
+4. We can configure MySQL Service to start when the System is switched on (at boot time)
 
 5. Every software runs on an IP and port, so does MySQL Server
     IP: is the unique digital address of any computer

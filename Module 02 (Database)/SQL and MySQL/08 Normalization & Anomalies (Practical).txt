@@ -3,6 +3,8 @@ Normalization
 
 Example: We will use Ecommerce data to understand Normalization and Anomalies
 
+The below table is not in any Normal Form. 
+
 CREATE SCHEMA normal_demo;
 
 USE normal_demo;
@@ -97,6 +99,17 @@ This is the exact structure from which we normally start the normalization journ
 
 ---
 
+1. First Normal Form (1NF)
+
+Rule:
+
+* Each column should contain atomic (indivisible) values
+* No repeating groups or multi-valued attributes
+
+Conceptually:
+
+> One cell → one value
+
 CREATE TABLE nf1_ecom (
     order_id INT,
     user_name VARCHAR(100),
@@ -146,19 +159,22 @@ No repeating groups	    ✔	Each product gets a separate row
 Tabular structure	    ✔	Rows & columns well-formed
 No arrays / CSV lists	✔	product_id, qty are atomic
 
+---
+
+Before we dive into further normal forms, lets delve into anomalies and some important terms.
 
 ---
 
 Anomalies
----------
+=========
 
-# 🔥 **1. INSERTION ANOMALY (Problem while inserting new data)**
+# 🔥 1. INSERTION ANOMALY (Problem while inserting new data)
 
 Insertion anomaly means:
 
-> We **cannot insert some data unless other unrelated data also exists**.
+> We cannot insert some data unless other unrelated data also exists.
 
-### **Example from our wrong table:**
+### Example from our wrong table:
 
 ### ❌ Case 1 — We want to add a *new product* to the system
 
@@ -171,7 +187,7 @@ price = 1999
 ```
 
 But…
-In the wrong table, **we CANNOT insert this product** unless:
+In the wrong table, we CANNOT insert this product unless:
 
 * A user places an order
 * We provide fake order_id
@@ -186,9 +202,9 @@ user_email?
 delivery_address?
 ```
 
-Which makes **no logical sense**.
+Which makes no logical sense.
 
-👉 **This happens because product data is *dependent* on order data.**
+👉 This happens because product data is *dependent* on order data.
 
 ---
 
@@ -209,46 +225,47 @@ We would have to create a fake order row.
 
 ---
 
-# ⚠️ **Why this is bad**
+# ⚠️ Why this is bad
 
 * We cannot add meaningful data unless unrelated data exists.
 * This blocks simple operations like onboarding new users or adding products.
 
 ---
 
-# 🔥 **2. DELETION ANOMALY (Losing important data unintentionally)**
+# 🔥 2. DELETION ANOMALY (Losing important data unintentionally)
 
 Deletion anomaly means:
 
-> Deleting one fact **accidentally deletes another important fact**.
+> Deleting one fact accidentally deletes another important fact.
 
 ### Using our data:
 
-Rahul Sharma placed order #101 with two products:
+Neha Gupta placed order #106 with a product:
 
 ```
-(101, Boat Airdopes)
-(101, Dell Mouse)
+(788, Milton Water Bottle)
 ```
 
-### ❌ If he returns BOTH items → we delete both rows:
+### ❌ If she returns it → we delete the row:
 
 ```sql
-DELETE FROM ecom_raw_orders WHERE order_id = 101;
+DELETE FROM nf1_ecom WHERE order_id = 106;
 ```
 
 ### What gets deleted?
 
-1. His order → expected
-2. His *products ordered* → expected
-3. His *user information* → **NOT EXPECTED**
+1. Her order → expected
+2. Her *ordered product* → expected
+3. Her *user information* → NOT EXPECTED
 
    * Name
    * Email
    * Phone
    * Delivery address
 
-Suddenly Rahul Sharma appears nowhere in the system.
+4. Product `Milton Water Bottle` deleted - Not Expected
+
+Suddenly Neha Gupta & Milton Bottle appears nowhere in the system.
 
 ---
 
@@ -257,13 +274,13 @@ Suddenly Rahul Sharma appears nowhere in the system.
 If we delete Rohan Patil’s order (103):
 
 ```
-(103, Boat Airdopes)
-(103, Prestige Kettle)
+(201, Boat Airdopes)
+(509, Prestige Kettle)
 ```
 
-Both rows go away → and Rohan’s identity also vanishes from the database.
+Both rows go away → and Rohan’s identity plus `Prestige Kettle` also vanishes from the database.
 
-👉 **We should not lose a user simply because their order is deleted.**
+👉 We should not lose a user or a product simply because their order is deleted.
 
 ---
 
@@ -275,7 +292,7 @@ Both rows go away → and Rohan’s identity also vanishes from the database.
 
 ---
 
-# 🔥 **3. UPDATE ANOMALY (Problem while updating repeated information)**
+# 🔥 3. UPDATE ANOMALY (Problem while updating repeated information)
 
 Update anomaly means:
 
@@ -287,7 +304,7 @@ Using our table:
 
 ## ❌ Case 1 — User changes their address
 
-Rahul Sharma’s address appears **multiple times**:
+Rahul Sharma’s address appears multiple times:
 
 ```
 101, MG Road, Indore, MP
@@ -299,7 +316,7 @@ If Rahul shifts to:
 201, Race Course Road, Indore
 ```
 
-Then we must update **all rows** where Rahul appears:
+Then we must update all rows where Rahul appears:
 
 ```sql
 UPDATE ecom_raw_orders
@@ -307,7 +324,7 @@ SET delivery_address = '201, Race Course Road, Indore'
 WHERE user_email = 'rahul.sharma@gmail.com';
 ```
 
-If even **one row is missed**, our data becomes contradictory.
+If even one row is missed, our data becomes contradictory.
 
 ---
 
@@ -348,28 +365,39 @@ If “Aditi Verma” changes her phone number, we must update every row for orde
 
 | Anomaly       | Meaning                     | Example in our dataset                                 |
 | ------------- | ----------------------------| ------------------------------------------------------ |
-| **Insertion** | Cannot add data unless      | Cannot add a new product without fake order            |
+| Insertion | Cannot add data unless      | Cannot add a new product without fake order            |
                 | unrelated fields exist 
-| **Deletion**  | Deleting one fact deletes   | Deleting order deletes user data                       |
+| Deletion  | Deleting one fact deletes   | Deleting order deletes user data                       |
                 | another             
-| **Update**    | Must update repeated fields | Changing address/price/phone must update multiple rows | 
+| Update    | Must update repeated fields | Changing address/price/phone must update multiple rows | 
                 | everywhere        
 
 ---
 
-# 🧠 Dependencies
+# 🚀 Next Step: NF2 (Second Normal Form)
 
 ---
 
-# 🔷 1. **Partial Dependency**
+# ⭐ What is 2NF (Second Normal Form)?
 
-### **Definition**
+A table is in 2NF when:
 
-A **partial dependency** occurs when:
+1. It is already in 1NF
+2. There are NO partial dependencies
 
-> A non-key attribute depends on **part of a composite primary key**, not the whole key.
+Before moving to acheiving 2nd NF, we should understand Partial Dependency.
 
-This only occurs when the primary key is **composite** (made of 2 or more columns).
+---
+
+# 🔷 Partial Dependency
+
+### Definition
+
+A partial dependency occurs when:
+
+> A non-key attribute depends on part of a composite primary key, not the whole key.
+
+This only occurs when the primary key is composite (made of 2 or more columns).
 
 ---
 
@@ -385,21 +413,29 @@ Because for each order, multiple products may appear.
 
 Now check this:
 
-### 🔸 **user_name** depends only on `order_id`
+### 🔸 user_name depends only on `order_id`
 
 It does *not* depend on `product_id`.
 
-### 🔸 **product_name** depends only on `product_id`
+### 🔸 product_name depends only on `product_id`
 
 It does *not* depend on `order_id`.
 
-These are classical **partial dependencies**.
+These are classical partial dependencies.
+
+## 🔸 Columns that depend on both (order_id + product_id)
+
+```
+qty  → depends on the order line (one product within one order)
+```
+
+This is a valid dependency.
 
 ---
 
 ## ✔ Why this is a problem?
 
-Because attributes that depend only on part of the key should be in **separate tables**.
+Because attributes that depend only on part of the key should be in separate tables.
 
 ### Visual:
 
@@ -409,15 +445,168 @@ Because attributes that depend only on part of the key should be in **separate t
 | order_id + product_id | user_email   | order_id only   | Partial dependency |
 | order_id + product_id | product_name | product_id only | Partial dependency |
 
-This violates **2NF**.
+---
+
+# 🚫 Conclusion: nf1_ecom violates 2NF
+
+Because several non-key attributes depend on only part of the composite primary key.
 
 ---
 
-# 🔷 2. **Transitive Dependency**
+# ⭐ Goal of 2NF
 
-### **Definition**
+→ Remove partial dependencies
+→ Each non-key column must depend on the *whole* primary key
+→ Break into new tables that each depend only on ONE key
 
-A **transitive dependency** exists when:
+---
+
+# ✔ How to Achieve 2NF (General Rule)
+
+## ➤ Step 1: Take attributes depending only on order_id
+
+Place them in orders table
+
+* nf2_orders
+
+```
+order_id (PK)
+user_name
+user_email
+user_phone
+order_date
+delivery_address
+```
+
+```sql
+CREATE TABLE nf2_orders (
+    order_id INT PRIMARY KEY,
+    user_name VARCHAR(100),
+    user_email VARCHAR(100),
+    user_phone VARCHAR(15),
+    order_date DATE,
+    delivery_address VARCHAR(255)
+);
+```
+
+```sql
+INSERT INTO nf2_orders VALUES
+(101, 'Rahul Sharma', 'rahul.sharma@gmail.com', '9876543210', '2025-01-10', '101, MG Road, Indore, MP'),
+(102, 'Aditi Verma', 'aditi.verma@yahoo.com', '9123456780', '2025-01-11', '22, Nehru Nagar, Bhopal, MP'),
+(103, 'Rohan Patil', 'rohan.patil@gmail.com', '9988776655', '2025-01-12', '14, FC Road, Pune, MH'),
+(104, 'Kavya Iyer', 'kavya.iyer@outlook.com', '9090909090', '2025-01-12', '55, Anna Nagar, Chennai, TN'),
+(105, 'Arjun Singh', 'arjun.singh@gmail.com', '9000011111', '2025-01-14', '18, Hazratganj, Lucknow, UP'),
+(106, 'Neha Gupta', 'neha.gupta@gmail.com', '9822334455', '2025-01-15', '88, Civil Lines, Kanpur, UP'),
+(107, 'Vikas Yadav', 'vikas.yadav@gmail.com', '9811122233', '2025-01-16', '40, Sector 18, Noida, UP');
+```
+
+## ➤ Step 2: Take attributes depending only on product_id
+
+Place them in products table
+
+* nf2_products
+
+```
+product_id (PK)
+product_name
+price
+```
+
+```sql
+CREATE TABLE nf2_products (
+    product_id INT PRIMARY KEY,
+    product_name VARCHAR(100),
+    price DECIMAL(10,2)
+);
+```
+
+```sql
+INSERT INTO nf2_products VALUES
+(201, 'Boat Airdopes 141', 999.00),
+(305, 'Dell Wireless Mouse', 699.00),
+(402, 'Campus Running Shoes', 1299.00),
+(509, 'Prestige Kettle', 799.00),
+(611, 'Samsung Galaxy M34 Cover', 299.00),
+(788, 'Milton Water Bottle 1L', 499.00);
+```
+
+## ➤ Step 3: Keep attributes depending on (order_id, product_id)
+
+Place them in order_items table
+
+* nf2_order_items
+
+```
+order_id (FK)
+product_id (FK)
+qty
+PRIMARY KEY (order_id, product_id)
+```
+
+```sql
+CREATE TABLE nf2_order_items (
+    order_id INT,
+    product_id INT,
+    qty INT,
+    PRIMARY KEY (order_id, product_id),
+    FOREIGN KEY (order_id) REFERENCES nf2_orders(order_id),
+    FOREIGN KEY (product_id) REFERENCES nf2_products(product_id)
+);
+
+(One row per order-product combination)
+
+```sql
+INSERT INTO nf2_order_items VALUES
+(101, 201, 1),
+(101, 305, 1),
+(102, 402, 2),
+(103, 201, 1),
+(103, 509, 1),
+(104, 611, 1),
+(105, 402, 1),
+(105, 305, 1),
+(106, 788, 1),
+(107, 402, 1);
+```
+---
+
+# 🎉 NF2 is complete!
+
+### ✔ All partial dependencies removed
+
+### ✔ Orders stored separately
+
+### ✔ Products stored separately
+
+### ✔ Order items linked with composite key
+
+### ✔ Redundancy reduced
+
+### ✔ Structural clarity improved
+
+---
+
+# 🚀 Next Step: NF3 (Third Normal Form)
+
+---
+
+# ⭐ What is NF3?
+
+A table is in 3NF if:
+
+1. It is already in 2NF
+2. No non-key attribute depends on another non-key attribute
+   (i.e., no *transitive dependency*)
+
+Before moving forward let us understand what is Transitive Dependency
+
+---
+
+# 🔷 Transitive Dependency
+
+### Definition
+
+A transitive dependency exists when:
 
 > A non-key column depends on another non-key column, not directly on the primary key.
 
@@ -438,7 +627,7 @@ Where:
 
 ## ⭐ Practical Example Using Our Data
 
-Take **delivery_address**:
+Take delivery_address:
 
 ```
 "101, MG Road, Indore, MP"
@@ -456,7 +645,7 @@ If the address was broken into parts:
 | city   | pin_code   |
 | state  | city       |
 
-But both city and state are **non-key attributes**.
+But both city and state are non-key attributes.
 
 So:
 
@@ -464,7 +653,7 @@ So:
 order_id → pin_code → city → state
 ```
 
-This creates a **transitive dependency**.
+This creates a transitive dependency.
 
 Another simple example:
 
@@ -486,351 +675,31 @@ This is also a transitive dependency.
 
 # ✔ Why is this a problem?
 
-Because non-key attributes should **not depend on each other**.
+Because non-key attributes should not depend on each other.
 
-They must depend **only on the primary key**.
+They must depend only on the primary key.
 
-Transitive dependencies violate **3NF**.
-
----
-
-# 🔥 SUPER SHORT MEMORY TRICK
-
-| Type                  | Pattern                         | Meaning                                          |
-| ----------------------| ------------------------------- | ------------------------------------------------ |
-| Partial Dependency    | part of key → column            | Column depends on only one part of composite key |
-| Transitive Dependency | key → non-key → another non-key | Non-key column depends indirectly on PK       |
+Transitive dependencies violate 3NF.
 
 ---
 
-# 🎯 ONE-LINE DEFINITIONS (For interviews)
+In NF3, we remove transitive dependencies, such as:
 
-### **Partial dependency:**
-
-A non-key attribute depending on part of a composite primary key.
-
-### **Transitive dependency:**
-
-A non-key attribute depending on another non-key attribute instead of directly on the primary key.
-
----
-
-# ⭐ **What is 2NF (Second Normal Form)?**
-
-A table is in **2NF** when:
-
-1. It is already in **1NF**
-2. There are **NO partial dependencies**
-
----
-
-# ⭐ **What is Partial Dependency?**
-
-A **partial dependency** happens when a **non-key attribute** depends on only **part** of a **composite primary key**, not the whole primary key.
-
-Composite Key = A primary key with 2 or more columns.
-
----
-
-# ⭐ **Composite Key in nf1_ecom**
-
-In the NF1 table:
-
-```
-(order_id, product_id)
-```
-
-together uniquely identifies a row (composite key).
-
-This is because one order can have multiple products.
-
----
-
-# ❗ Now check dependencies:
-
-## 🔸 **Columns that depend ONLY on order_id**
-
-| Column           | Why it depends only on order_id     |
-| ---------------- | ----------------------------------- |
-| user_name        | Same for every product in the order |
-| user_email       | Same for every product in the order |
-| user_phone       | Same for every product in the order |
-| order_date       | Same for all items of the order     |
-| delivery_address | Same for all items of the order     |
-
-These attributes do NOT depend on the combination `(order_id, product_id)`.
-
-👉 They depend **only on order_id** → **Partial dependency**
-
----
-
-## 🔸 **Columns that depend ONLY on product_id**
-
-| Column       | Why                              |
-| ------------ | -------------------------------- |
-| product_name | Completely defined by product_id |
-| price        | Completely defined by product_id |
-
-These also do NOT depend on the entire composite key.
-
-👉 They depend **only on product_id** → **Partial dependency**
-
----
-
-## 🔸 **Columns that depend on both (order_id + product_id)**
-
-```
-qty  → depends on the order line (one product within one order)
-```
-
-This is a **valid dependency**.
-
----
-
-# 🚫 **Conclusion: nf1_ecom violates 2NF**
-
-Because several non-key attributes depend on only part of the composite primary key.
-
----
-
-# ⭐ **Goal of 2NF**
-
-→ **Remove partial dependencies**
-→ Each non-key column must depend on the *whole* primary key
-→ Break into new tables that each depend only on ONE key
-
----
-
-# ✔ How to Achieve 2NF (General Rule)
-
-### ➤ Step 1: Take attributes depending only on order_id
-
-Place them in **orders table**
-
-### ➤ Step 2: Take attributes depending only on product_id
-
-Place them in **products table**
-
-### ➤ Step 3: Keep attributes depending on (order_id, product_id)**
-
-Place them in **order_items table**
-
----
-
-# 📌 Final NF2 Design (which we already derived earlier)
-
-### **1. nf2_orders**
-
-```
-order_id (PK)
-user_name
-user_email
-user_phone
-order_date
-delivery_address
-```
-
-### **2. nf2_products**
-
-```
-product_id (PK)
-product_name
-price
-```
-
-### **3. nf2_order_items**
-
-```
-order_id (FK)
-product_id (FK)
-qty
-PRIMARY KEY (order_id, product_id)
-```
-
----
-
-# 🎯 **Visual Summary**
-
-#### **Before (nf1_ecom):**
-
-One table holding EVERYTHING → heavy redundancy → partial dependencies → anomalies
-
-#### **After (2NF):**
-
-* Orders table → depends only on order_id
-* Products table → depends only on product_id
-* Order Items table → depends on both keys
-
-This completely removes partial dependencies.
-
----
-
-Full SQL for NF2
-
-* **nf2_orders**
-* **nf2_products**
-* **nf2_order_items**
-
-This is the exact 2NF structure derived from **nf1_ecom** table.
-
----
-
-# ✅ **1. CREATE TABLES (NF2)**
-
----
-
-## 🔷 **nf2_orders**
-
-(Attributes that depend ONLY on `order_id`)
-
-```sql
-CREATE TABLE nf2_orders (
-    order_id INT PRIMARY KEY,
-    user_name VARCHAR(100),
-    user_email VARCHAR(100),
-    user_phone VARCHAR(15),
-    order_date DATE,
-    delivery_address VARCHAR(255)
-);
-```
-
----
-
-## 🔷 **nf2_products**
-
-(Attributes that depend ONLY on `product_id`)
-
-```sql
-CREATE TABLE nf2_products (
-    product_id INT PRIMARY KEY,
-    product_name VARCHAR(100),
-    price DECIMAL(10,2)
-);
-```
-
----
-
-## 🔷 **nf2_order_items**
-
-(Attributes that depend on BOTH `order_id` + `product_id`)
-
-```sql
-CREATE TABLE nf2_order_items (
-    order_id INT,
-    product_id INT,
-    qty INT,
-    PRIMARY KEY (order_id, product_id),
-    FOREIGN KEY (order_id) REFERENCES nf2_orders(order_id),
-    FOREIGN KEY (product_id) REFERENCES nf2_products(product_id)
-);
-```
-
----
-
-# ✅ **2. INSERT DATA (NF2)**
-
-Extracted from **nf1_ecom**.
-
----
-
-## 🔷 **Insert into nf2_orders**
-
-(Unique rows per order_id)
-
-```sql
-INSERT INTO nf2_orders VALUES
-(101, 'Rahul Sharma', 'rahul.sharma@gmail.com', '9876543210', '2025-01-10', '101, MG Road, Indore, MP'),
-(102, 'Aditi Verma', 'aditi.verma@yahoo.com', '9123456780', '2025-01-11', '22, Nehru Nagar, Bhopal, MP'),
-(103, 'Rohan Patil', 'rohan.patil@gmail.com', '9988776655', '2025-01-12', '14, FC Road, Pune, MH'),
-(104, 'Kavya Iyer', 'kavya.iyer@outlook.com', '9090909090', '2025-01-12', '55, Anna Nagar, Chennai, TN'),
-(105, 'Arjun Singh', 'arjun.singh@gmail.com', '9000011111', '2025-01-14', '18, Hazratganj, Lucknow, UP'),
-(106, 'Neha Gupta', 'neha.gupta@gmail.com', '9822334455', '2025-01-15', '88, Civil Lines, Kanpur, UP'),
-(107, 'Vikas Yadav', 'vikas.yadav@gmail.com', '9811122233', '2025-01-16', '40, Sector 18, Noida, UP');
-```
-
----
-
-## 🔷 **Insert into nf2_products**
-
-(Unique product list)
-
-```sql
-INSERT INTO nf2_products VALUES
-(201, 'Boat Airdopes 141', 999.00),
-(305, 'Dell Wireless Mouse', 699.00),
-(402, 'Campus Running Shoes', 1299.00),
-(509, 'Prestige Kettle', 799.00),
-(611, 'Samsung Galaxy M34 Cover', 299.00),
-(788, 'Milton Water Bottle 1L', 499.00);
-```
-
----
-
-## 🔷 **Insert into nf2_order_items**
-
-(One row per order-product combination)
-
-```sql
-INSERT INTO nf2_order_items VALUES
-(101, 201, 1),
-(101, 305, 1),
-(102, 402, 2),
-(103, 201, 1),
-(103, 509, 1),
-(104, 611, 1),
-(105, 402, 1),
-(105, 305, 1),
-(106, 788, 1),
-(107, 402, 1);
-```
-
----
-
-# 🎉 **NF2 is complete!**
-
-### ✔ All partial dependencies removed
-
-### ✔ Orders stored separately
-
-### ✔ Products stored separately
-
-### ✔ Order items linked with composite key
-
-### ✔ Redundancy reduced
-
-### ✔ Structural clarity improved
-
----
-
-# 🚀 Next Step: **NF3 (Third Normal Form)**
-
-In NF3, we remove **transitive dependencies**, such as:
-
-* user_name, user_email, user_phone → actually depend on *user* entity
+* user_name, user_email, user_phone → should actually depend on *user* entity
 * address → may be further decomposed
 * orders should reference `user_id`, not contain user details inside
 
 ---
 
-# ⭐ What NF3 Fixes
-
-A table is in **3NF** if:
-
-1. It is already in **2NF**
-2. **No non-key attribute depends on another non-key attribute**
-   (i.e., no *transitive dependency*)
-
----
-
 # 🔍 Transitive Dependencies in NF2
 
-### In **nf2_orders**, these three fields logically belong to a "User":
+### In nf2_orders, these three fields logically belong to a "User":
 
 * user_name
 * user_email
 * user_phone
 
-They all depend on **user_email**, not directly on order_id.
+They all depend on user_email, not directly on order_id.
 
 So:
 
@@ -838,8 +707,8 @@ So:
 order_id → user_email → user_name, user_phone
 ```
 
-➡ **Transitive dependency**
-➡ Must separate **Users** from **Orders**
+➡ Transitive dependency
+➡ Must separate Users from Orders
 
 ---
 
@@ -847,20 +716,20 @@ order_id → user_email → user_name, user_phone
 
 We create:
 
-1. **nf3_users**
-2. **nf3_orders** (order refers to user_id, not user details)
-3. **nf3_products**
-4. **nf3_order_items**
+1. nf3_users
+2. nf3_orders (order refers to user_id, not user details)
+3. nf3_products
+4. nf3_order_items
 
 (Products and order_items are already in 3NF — no transitive dependencies there.)
 
 ---
 
-# ✅ **1.  CREATE NF3 TABLES**
+# ✅ 1.  CREATE NF3 TABLES
 
 ---
 
-## 🔷 **nf3_users**
+## 🔷 nf3_users
 
 ```sql
 CREATE TABLE nf3_users (
@@ -873,7 +742,7 @@ CREATE TABLE nf3_users (
 
 ---
 
-## 🔷 **nf3_orders**
+## 🔷 nf3_orders
 
 (Reference user instead of storing user info repeatedly)
 
@@ -889,7 +758,7 @@ CREATE TABLE nf3_orders (
 
 ---
 
-## 🔷 **nf3_products**
+## 🔷 nf3_products
 
 (Same as NF2, already normalized)
 
@@ -903,7 +772,7 @@ CREATE TABLE nf3_products (
 
 ---
 
-## 🔷 **nf3_order_items**
+## 🔷 nf3_order_items
 
 (Same as NF2, already normalized)
 
@@ -920,7 +789,7 @@ CREATE TABLE nf3_order_items (
 
 ---
 
-# ✅ **2.  INSERT DATA INTO NF3 TABLES**
+# ✅ 2.  INSERT DATA INTO NF3 TABLES
 
 ---
 
@@ -928,7 +797,7 @@ CREATE TABLE nf3_order_items (
 
 (Unique users extracted from NF2)
 
-We must insert them **first**, because orders reference user_id.
+We must insert them first, because orders reference user_id.
 
 ```sql
 INSERT INTO nf3_users (user_name, user_email, user_phone) VALUES
@@ -1008,7 +877,7 @@ INSERT INTO nf3_order_items VALUES
 
 ---
 
-# 🎉 **NF3 Achieved!**
+# 🎉 NF3 Achieved!
 
 ### ✔ All tables are now free from:
 
@@ -1021,25 +890,34 @@ INSERT INTO nf3_order_items VALUES
 
 ---
 
-# **BCNF Review on Given Schema**
+# 🚀 Next Step: BCNF (Boyce–Codd Normal Form)
 
-You have already achieved **3NF**.
-Now we analyze **what is still wrong according to BCNF**.
+Why BCNF exists:
+
+* 3NF can still allow subtle anomalies
+* BCNF is a stricter version of 3NF
 
 ---
 
-## **Reminder: What BCNF Requires**
+# BCNF Review on Given Schema
 
-> **A table is in BCNF if, for every functional dependency, the determinant is a candidate key.**
+* You have already achieved 3NF.
+* Now we analyze what is still wrong according to BCNF.
+
+---
+
+## Reminder: What BCNF Requires
+
+> For every functional dependency, the determinant must be a candidate key
 
 In simple words:
 
-👉 **Only keys should determine other attributes**
-👉 **No non-key column should decide anything**
+👉 Only keys should determine other attributes
+👉 No non-key column should decide anything
 
 ---
 
-## **Tables That Are ALREADY OK in BCNF**
+## Tables That Are ALREADY OK in BCNF
 
 ### ✅ `nf3_users`
 
@@ -1047,10 +925,10 @@ In simple words:
 user_id → user_name, user_email, user_phone
 ```
 
-* `user_id` is the **primary key**
+* `user_id` is the primary key
 * All dependencies originate from a key
 
-✔ **BCNF compliant**
+✔ BCNF compliant
 
 ---
 
@@ -1063,7 +941,7 @@ product_id → product_name, price
 * Determinant is a key
 * No hidden dependency
 
-✔ **BCNF compliant**
+✔ BCNF compliant
 
 ---
 
@@ -1075,11 +953,11 @@ product_id → product_name, price
 
 * Composite key fully determines `qty`
 
-✔ **BCNF compliant**
+✔ BCNF compliant
 
 ---
 
-## ❌ **Problem Table: `nf3_orders`**
+## ❌ Problem Table: `nf3_orders`
 
 ### Current structure
 
@@ -1092,7 +970,7 @@ delivery_address
 
 ---
 
-## **Hidden Functional Dependency (BCNF Violation)**
+## Hidden Functional Dependency (BCNF Violation)
 
 From real-world meaning:
 
@@ -1102,7 +980,7 @@ user_id → delivery_address
 
 Because:
 
-* A user usually has **one delivery address**
+* A user usually has one delivery address
 * Multiple orders by the same user repeat the same address
 
 But in the table:
@@ -1115,22 +993,22 @@ This creates a problem.
 
 ---
 
-## **Why This Violates BCNF**
+## Why This Violates BCNF
 
-* `user_id` is **NOT a candidate key** in `nf3_orders`
+* `user_id` is NOT a candidate key in `nf3_orders`
 * Yet it determines `delivery_address`
 
-👉 **Non-key determining a non-key attribute = BCNF violation**
+👉 Non-key determining a non-key attribute = BCNF violation
 
 ---
 
-## **Problems Caused (Even Though 3NF is satisfied)**
+## Problems Caused (Even Though 3NF is satisfied)
 
 ### 🔴 Update Anomaly
 
 If a user changes address:
 
-* You must update **multiple order rows**
+* You must update multiple order rows
 
 ### 🔴 Redundancy
 
@@ -1138,20 +1016,20 @@ If a user changes address:
 
 ### 🔴 Logical mismatch
 
-* Address belongs to **user**, not to **order**
+* Address belongs to user, not to order
 
 ---
 
-## **Why 3NF Allowed This but BCNF Does Not**
+## Why 3NF Allowed This but BCNF Does Not
 
-* 3NF allows this because `delivery_address` is not dependent on another **non-key**
-* BCNF is **stricter**: it disallows **any non-key determinant**
+* 3NF allows this because `delivery_address` is not dependent on another non-key
+* BCNF is stricter: it disallows any non-key determinant
 
 ---
 
-## ✅ **Correct BCNF Fix**
+## ✅ Correct BCNF Fix
 
-### **Option 1 (Best & Cleanest): Move Address to Users**
+### Option 1 (Best & Cleanest): Move Address to Users
 
 ```text
 users
@@ -1173,13 +1051,13 @@ order_date
 
 ✔ Now:
 
-* `user_id → delivery_address` happens **in users**
-* Determinant is a **key**
+* `user_id → delivery_address` happens in users
+* Determinant is a key
 * BCNF satisfied
 
 ---
 
-## **Final BCNF Verdict**
+## Final BCNF Verdict
 
 | Table             | BCNF Status       |
 | ----------------- | ----------------- |
@@ -1190,9 +1068,9 @@ order_date
 
 ---
 
-## **Trainer-Grade Closing Line**
+## Closing Line
 
-> **3NF removes transitive dependency, but BCNF removes incorrect ownership of data by enforcing that only keys determine attributes.**
+> 3NF removes transitive dependency, but BCNF removes incorrect ownership of data by enforcing that only keys determine attributes.
 
 ---
 
@@ -1228,7 +1106,7 @@ CREATE TABLE nf4_order_items (
     FOREIGN KEY (product_id) REFERENCES nf4_products(product_id)
 );
 
-INSERT INTO nf4_users (user_name, user_email, user_phone) VALUES
+INSERT INTO nf4_users (user_name, user_email, user_phone, delivery_address) VALUES
 ('Rahul Sharma', 'rahul.sharma@gmail.com', '9876543210', '101, MG Road, Indore, MP'),
 ('Aditi Verma', 'aditi.verma@yahoo.com', '9123456780', '22, Nehru Nagar, Bhopal, MP'),
 ('Rohan Patil', 'rohan.patil@gmail.com', '9988776655', '14, FC Road, Pune, MH'),
@@ -1268,24 +1146,24 @@ INSERT INTO nf4_order_items VALUES
 
 ---
 
-# **Fourth Normal Form (4NF)**
+# Fourth Normal Form (4NF)
 
-## **What is 4NF? (Conceptual)**
+## What is 4NF? (Conceptual)
 
-> **A table is in Fourth Normal Form (4NF) if it is in BCNF and contains no multi-valued dependencies.**
+> A table is in Fourth Normal Form (4NF) if it is in BCNF and contains no multi-valued dependencies.
 
 In simple words:
 
-👉 **One table should not store multiple independent facts about the same entity.**
+👉 One table should not store multiple independent facts about the same entity.
 
 ---
 
-## **What is a Multi-Valued Dependency (MVD)?**
+## What is a Multi-Valued Dependency (MVD)?
 
-A **multi-valued dependency** exists when:
+A multi-valued dependency exists when:
 
-* One key determines **multiple independent sets of attributes**
-* These attributes are **not dependent on each other**
+* One key determines multiple independent sets of attributes
+* These attributes are not dependent on each other
 * But are stored together, causing duplication
 
 Symbolically:
@@ -1299,9 +1177,9 @@ A →→ C
 
 ---
 
-## **Let’s Apply 4NF to Your Example**
+## Let’s Apply 4NF to Your Example
 
-### **Current Tables (After BCNF Fix)**
+### Current Tables (After BCNF Fix)
 
 We have:
 
@@ -1310,15 +1188,15 @@ We have:
 * `products`
 * `order_items`
 
-Now we ask the **4NF question**:
+Now we ask the 4NF question:
 
-> Is there any table where **one key controls multiple independent lists**?
+> Is there any table where one key controls multiple independent lists?
 
 ---
 
-## ✅ **Tables Already in 4NF**
+## ✅ Tables Already in 4NF
 
-### **`nf3_users`**
+### `nf3_users`
 
 ```text
 user_id → user_name, email, phone
@@ -1327,41 +1205,41 @@ user_id → user_name, email, phone
 * Single fact per user
 * No independent multi-valued attributes
 
-✔ **4NF compliant**
+✔ 4NF compliant
 
 ---
 
-### **`nf3_products`**
+### `nf3_products`
 
 ```text
 product_id → product_name, price
 ```
 
-✔ **4NF compliant**
+✔ 4NF compliant
 
 ---
 
-### **`nf3_orders`**
+### `nf3_orders`
 
 ```text
 order_id → user_id, order_date
 ```
 
-✔ **4NF compliant**
+✔ 4NF compliant
 
 ---
 
-### **`nf3_order_items`**
+### `nf3_order_items`
 
 ```text
 (order_id, product_id) → qty
 ```
 
-✔ **4NF compliant**
+✔ 4NF compliant
 
 ---
 
-## ❌ **What a 4NF Violation WOULD Look Like (Important)**
+## ❌ What a 4NF Violation WOULD Look Like (Important)
 
 Suppose we had a table like this:
 
@@ -1375,9 +1253,9 @@ payment_method
 
 Meaning:
 
-* A user can prefer **multiple languages**
-* A user can prefer **multiple payment methods**
-* These two are **independent**
+* A user can prefer multiple languages
+* A user can prefer multiple payment methods
+* These two are independent sets of data
 
 This creates:
 
@@ -1386,11 +1264,11 @@ user_id →→ language
 user_id →→ payment_method
 ```
 
-❌ **4NF violation**
+❌ 4NF violation
 
 ---
 
-## ✅ **Correct 4NF Fix**
+## ✅ Correct 4NF Fix
 
 Split into two tables:
 
@@ -1410,38 +1288,38 @@ payment_method
 
 Now:
 
-* Each table represents **one independent fact**
+* Each table represents one independent fact
 * No duplication
 * 4NF satisfied
 
 ---
 
-## **Key Insight (Very Important)**
+## Key Insight (Very Important)
 
-* **BCNF fixes “who determines what”**
-* **4NF fixes “how many independent facts live together”**
+* BCNF fixes “who determines what”
+* 4NF fixes “how many independent facts live together”
 
 ---
 
-## **Final Verdict on Your Design**
+## Final Verdict on Your Design
 
 | Normal Form | Status                |
 | ----------- | --------------------- |
-| 1NF         | ✅                     |
-| 2NF         | ✅                     |
-| 3NF         | ✅                     |
-| BCNF        | ✅ (after address fix) |
-| **4NF**     | ✅                     |
+| 1NF         | Done                  |
+| 2NF         | Done                  |
+| 3NF         | Done                  |
+| BCNF        | (after address fix)   |
+| 4NF         | Done                  |
 
-👉 **Your final design is fully normalized up to 4NF.**
+👉 Our final design is fully normalized up to 4NF.
 
 ---
 
-## **Trainer-Grade Closing Line**
+## Trainer-Grade Closing Line
 
-> **4NF ensures that a table represents exactly one kind of fact and nothing else.**
+> 4NF ensures that a table represents exactly one kind of fact and nothing else.
 
-This is a **perfect conceptual stopping point** for normalization.
-Anything beyond this (5NF) is usually **academic only**, not industry-practical.
+This is a perfect conceptual stopping point for normalization.
+Anything beyond this (5NF) is usually academic only, not industry-practical.
 
-----X----X----X----
+----X----X----X---

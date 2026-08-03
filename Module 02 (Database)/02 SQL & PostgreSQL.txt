@@ -1,25 +1,6 @@
-Day 09 Notes
-============
 SQL & PostgreSQL
 ================
 In these notes we will learn:
-
-=> Setting up the database
-=> Parts of an Application
-=> Database
-  - Types of databases
-  - Storage Approaches
-=> RDBMS
-  - Schema
-  - Database
-  - Table
-  - Row/tuple
-  - Columns
-=> PostgreSQL Overview
-=> PostgreSQL Client/Server Model
-  - PostgreSQL Server
-  - PostgreSQL Client
-  - PostgreSQL Connectors
 => SQL
   - What Can SQL do?
   - CRUD Operation
@@ -51,419 +32,99 @@ In these notes we will learn:
   - DROP Table
   - DROP SCHEMA
 XXXXXXXXXXXXXXXXXXXX
-Setting up the Database
-=======================
-Download and Install
+SQL
+===
+What is SQL?
 
-- PostgreSQL Server (e.g., 17.x 64-bit)
-- DBeaver (Community Edition or Enterprise)
-- pgAdmin (Official GUI for PostgreSQL)
-- psql Shell (comes with PostgreSQL installer)
+-> Client programs can talk with the PostgreSQL database server only with commands.
 
-Make sure PostgreSQL DB Server is up and running.
+-> These command are known as SQL
 
----
+-> SQL stands for Structured Query Language
 
-DBeaver Font Size
-=================
-To increase the UI font : Window > Preferences > User Interface > Appearance > Colors and Fonts > DBeaver Fonts > Main font.
+-> It is the official language to communicate with any RDBMS software
 
-To increase the Script font : Window > Preferences > User Interface > Appearance > Colors and Fonts > DBeaver Fonts > Monospace font.
+-> Simply put, to work with any database we need to write SQL Instructions
 
----
+-> SQL instructions are also known as SQL Queries
 
-Parts of an Application
-=======================
-Every software application contains 3 components:
-
-1. Frontend
-2. Backend – Server-Side Code
-3. Backend – Database
-
-📎 Refer image: `01_application_layers.png`
+-> SQL lets us access and manipulate databases
 
 ---
 
-Database
-========
+What Can SQL Do?
 
-- A database is a structured collection of data.
-- In a database, data is stored permanently (data is persisted)
+SQL can:
 
-📎 Refer fig: `02_data_persistence.png`
+- retrieve data from a database
+- insert, update, and delete records in/from a database
+- create new databases and tables
+- alter existing database objects (tables, constraints, columns)
+- delete database objects such as tables or databases
+- control access to data using permissions
+- enforce data integrity using constraints
 
----
-
-Types of Databases
-==================
-Below are the types of databases:
-
-1. Relational Databases (RDBMS)
-
-2. NoSQL Databases
-
-   - Key-Value Databases
-
-   - Document-Oriented Databases
-
-   - Graph Databases
-   
-   - Ex: MongoDB, Apache Cassandra, Redis, CouchDB, Neo4j
-
-3. Object-Oriented Databases
-
-4. Hierarchical Databases
-
-5. Network Databases
+👉 In short:
+SQL allows us to define the structure of data, manipulate the data, and control access to it.
 
 ---
 
-Storage Approaches
-==================
-These are some different types of storage:
+CRUD Operations
+---------------
+- CRUD represents the four basic operations that we can perform on data stored in a database.
+[C]reate
+[R]ead
+[U]pdate
+[D]elete
 
-1. On-Disk Storage (Traditional databases stored on HDDs/SSDs)
+- Create: Adds new data (records/rows) into an existing table using the `INSERT` statement.
 
-2. In-Memory Storage (Data stored primarily in RAM, e.g., H2, Redis)
+- Read: Fetches existing data from one or more tables using the `SELECT` statement without changing it.
 
-3. Cloud Storage (Hosted on cloud platforms, e.g., AWS RDS, Firebase)
+- Update: Changes existing data in a table using the `UPDATE` statement, usually with a `WHERE` condition.
 
-4. Hybrid Storage (Combination of in-memory and disk storage)
-
-5. Distributed Storage (Data spread across multiple nodes, e.g., Cassandra)
-
----
-
-RDBMS
-=====
-
-- RDBMS stands for Relational Data Base Management System
-
-- In an RDBMS, entities are organized according to relationships.
-
-- Some key terms in an RDBMS are:
-  database, schema, table, records, properties, constraints, keys, relations, alias, etc.
-
-- Ex: Oracle Database, MySQL, PostgreSQL, Microsoft SQL Server, IBM Db2, MariaDB, SQLite, SAP HANA, Teradata, Firebird
+- Delete: Removes existing records from a table using the `DELETE` statement, either selectively or completely.
 
 ---
 
-PostgreSQL Overview
-===================
-=> PostgreSQL is an open-source RDBMS server.
+SQL Commands
+============
+SQL uses certain commands like Create, Drop, Insert, etc. to carry out the required tasks.
+ 
+These SQL commands are mainly categorized into following 5 categories as: 
 
-=> It can manage multiple databases.
-
-=> When it's installed, it comes with a default database named `postgres`.
-
-=> It was originally named POSTGRES and later renamed to PostgreSQL to reflect its support for SQL.
-
-=> The latest version is 18.x (as of July 2025).
-
-=> PostgreSQL ranks as one of the top relational databases, competing closely with MySQL and Oracle.
-
-=> Many companies such as Instagram, Reddit, Spotify, Apple, IMDB and GoDigit use PostgreSQL.
+1. DDL - Data Definition Language
+2. DML - Data Manipulation Language
+3. DQL - Data Query Language
+4. DCL - Data Control Language
+5. TCL - Transaction Control Language
 
 ---
 
-Database
-========
-- A database is the physical structure of data.
-
-Connection with DBeaver
-=======================
-=> When we first connect to PostgreSQL using DBeaver (or psql or pgAdmin), it usually connects to the default `postgres` database.
-
-=> This is often used for admin tasks.
-
-Creating a New Database
------------------------
-=> If we create a new database (e.g., ecommerce), it becomes independent.
-
-=> PostgreSQL does not support cross-database queries, so each database is isolated.
-
-=> New Database = New Connection in DBeaver
-
-=> We need to create a separate DBeaver connection to work with the new database.
-
-=> We can copy the existing connection and just change the database name in the settings.
-
----
-
-Schema
-======
-- In PostgreSQL, a schema is like a folder inside a database that helps organize and group database objects like tables, views, indexes, functions, etc.
-
-So we can say that:
-
-1. Schema is a namespace inside a database
-
-   * It helps prevent name conflicts.
-   * For example, we can have two tables named `users`, each in different schemas.
-
-2. Every database starts with a default schema called `public`
-
-   * If we don’t specify a schema, PostgreSQL assumes `public`.
-
-3. Schemas help organize large databases
-
-   * We can group related tables logically (e.g., `sales`, `hr`, `inventory`).
-
----
-
-🔗 Relationship: Database → Schema → Tables (and other objects)
-
-```
-PostgreSQL Server
-└── Database: ecommerce
-    ├── Schema: customer_data
-    │   ├── Table: customers
-    │   └── Table: addresses
-    └── Schema: order_data
-        ├── Table: orders
-        └── Table: payments
-
-	└── Database: university
-		├── Schema: academics
-		│   ├── Table: students
-		│   ├── Table: courses
-		│   └── Table: enrollments
-		└── Schema: administration
-			├── Table: departments
-			└── Table: faculty
-
-```
-
----
-
-⚠️ Important:
-
-* Schemas are *inside* databases — not across them.
-* We can join tables across schemas within the same database.
-* But we cannot join tables across different *databases*.
-
----
-
-Table
-=====
-- Tables contain all the data in a database.
-- In tables, data is logically organized in a row-and-column format, similar to a spreadsheet.
-
----
-
-Row / Tuple
-===========
-- Each row represents a unique record
-- 1 row → 1 record
-
----
-
-Columns
-=======
-- Each column represents a field/property/attribute in the record.
-- 1 column → 1 property
-
----
-
-Simply Put
-==========
-Database → Schemas → Tables → Collection of rows and columns → Collection of records
-
----
-
-Example:
-
-Schema → `school`
-
-Table1 → `students`
-
-```
-Columns → id (PK), name
-
-   id   name  
-  ----  ------
-   1    Mohit  
-   2    Raj
-```
-
-Table2 → `mobile_numbers`
-
-```
-// Links mobile_no to students  
-// Depends on the PK of students  
-
-Columns → id (PK), mobile_no, student_id (FK)
-
-   id   mobile_no   student_id  
-  ----  ----------  -----------
-   1    9988776655     1  
-   2    8877669911     1  
-   3    7711990912     2  
-   4    8877887788     3  ← not allowed (foreign key violation)
-```
-
-- The above tables represent 2 entities — `student` and `mobile number`
-
-- Fields: `id`, `name` in `students`; `id`, `mobile_no`, `student_id` in `mobile_numbers`
-
-- Each row = 1 record
-
-- `id` in both tables = Primary Key
-
-- `student_id` = Foreign Key
-
----
-
-PostgreSQL Client/Server Model
-==============================
-PostgreSQL Server
-=================
-
-1. PostgreSQL Server manages the physical memory space and system where the data is stored (persisted).
-
-2. Simply put, it is the software that handles actual data operations.
-
-3. For usage, it must be running as a service (PostgreSQL Service).
-
-4. We can configure it to start automatically with the system boot.
-
-5. Every software runs on an IP and port, so does PostgreSQL Server
-
-   => IP: The digital address of the host machine
-   => Port: The endpoint where PostgreSQL runs
-
-6. If PostgreSQL Server is on our own PC, it can be accessed with IP: `127.0.0.1` (localhost)
-
-7. PostgreSQL by default runs on Port: 5432
-
-Refer Image: `03_client_server.png`
-
----
-
-PostgreSQL Client
-=================
-=> The data stored by PostgreSQL Server cannot be accessed directly.
-
-=> To interact with it, we need client software or applications.
-
-Refer Image: `03_client_server.png`
-
-Following are some PostgreSQL clients:
-
-1. pgAdmin
-2. psql (PostgreSQL Shell)
-3. DBeaver - Universal client
-4. DataGrip
-5. Postico (Mac)
-6. Any software application
-   => If we connect a Java application with PostgreSQL Server, it will be known as a Java Client.
-   => If with Python, it will be Python Client
-
----
-
-Most used PostgreSQL clients: 
-
-🧩 pgAdmin (GUI for PostgreSQL)
-
-1. Official browser-based GUI tool for managing PostgreSQL databases.
-2. Supports visual database design, query execution, role/permission management, and backups.
-3. Best suited for beginners and visual learners who prefer point-and-click over writing SQL manually.
-
----
-
-💻 psql (PostgreSQL Shell)
-
-1. Command-line tool for interacting with PostgreSQL using SQL and meta-commands.
-2. Ideal for script automation, quick queries, and power users.
-3. Offers features like auto-completion, query history, and administrative tasks (e.g., creating users, databases).
-
----
-
-🧰 DBeaver (Universal DB Tool)
-
-1. Cross-platform and supports many databases (PostgreSQL, MySQL, Oracle, etc.) in one interface.
-2. Offers powerful features like ER diagrams, data export/import, and SQL editing with auto-complete.
-3. Great for developers or DB admins working with multiple database systems.
-
----
-
-PostgreSQL Connectors
-=====================
-=> To connect one software with another, we need drivers.
-
-=> To connect our applications written in different programming languages, we need to install appropriate drivers on the client side.
-
-=> These drivers are called Connectors.
-
-=> PostgreSQL provides connectors for languages like Java, Python, PHP, etc.
-
-=> Official clients come embedded with drivers
-Ex: MySQL Workbench comes embedded with MySQL Drivers
-Ex: PgAdmin comes embedded with PostgreSQL Drivers
-
-=> As DBeaver is not specific to any RDBMS, to connect with PostgreSQL we need to download respective drivers.
-
-=> For our Java Applications, with have to download PostgreSQL JDBC Driver (`postgresql-<version>.jar`).
-
----
 SQL DDL
 =======
-Setup new Database
-==================
 
-✅ Step-by-Step Guide to Set Up PostgreSQL in DBeaver
+SQL DDL (Data Definition Language)
 
----
+* DDL is used to define and manage the structure of database objects.
+* It works on schema-level objects, not on individual records.
+* DDL commands are used to create, modify, and delete database structures.
+* Changes made using DDL are auto-committed in most databases.
+* DDL affects objects such as databases, tables, views, and constraints.
 
-🔹 Step 1: Ensure PostgreSQL is Running
+Common DDL Commands
 
-On Windows:
+* `CREATE`
+* `ALTER`
+* `DROP`
+* `TRUNCATE`
 
-=> Open Start Menu → Services
-=> Find service like: `postgresql-x64-15` (or `14`, `16`, depending on your version)
-=> Make sure Status = Running
-=> If not, right-click → Start
-
----
-
-🔹 Step 2: Open DBeaver and Add New PostgreSQL Connection
-
-1. Open DBeaver
-2. Go to menu: `Database > New Database Connection`
-3. Select PostgreSQL (use search if needed)
-4. Click Next
+👉 In short:
+DDL defines what the database looks like and how it is structured.
 
 ---
 
-🔹 Step 3: Enter Connection Details
-
-| Field        | Value            |
-| ------------ | ---------------- |
-| Host         | `localhost`      |
-| Port         | `5432` (default) |
-| Database     | `postgres`       |
-| Username     | `postgres`       |
-| Password     | (your password)  |
-
-=> ✅ Click Test Connection
-=> If driver is missing, it will prompt you to Download Driver Files
-=> Click Download, wait for a few seconds
-
-> If all good → Click Finish
-
----
-
-🔹 Step 4: Expand PostgreSQL in DBeaver Left Panel
-
-Once connected:
-
-=> You'll see postgres under Databases
-=> Expand it → `Schemas > public > Tables`
-=> That’s the default setup.
-
----
-
-✅ 1. Create Your Own Database (e.g., `school`)
+✅ Create Your Own Database (e.g., `school`)
 
 1. Right-click on postgres (the database)
 2. Choose SQL Editor > New SQL Script
@@ -475,7 +136,7 @@ CREATE DATABASE company;
 
 ---
 
-🔹 Step 6: Connect to the `company` Database
+🔹 Connect to the `company` Database
 
 You need to connect separately to `company`:
 
@@ -573,6 +234,8 @@ This gives you full CREATE TABLE statement.
 ```
 
 ---
+DML
+===
 
 ✅ 7. Insert Statements
 
@@ -635,7 +298,7 @@ WHERE student_email = 'yash@hotmail.com';
 
 ---
 
-✅ 10. Bonus: Basic SELECT Filters
+✅ 10. DQL: SELECT Filters
 
 ```sql
 -- Simple select
@@ -684,8 +347,6 @@ This may include the structure, the data, or both.
 * Used when you want a working copy of the table with existing data.
 
 --
-* Was the structure truly copied in course_1?
---
 
 #🔸 Syntax:
 
@@ -698,6 +359,14 @@ CREATE TABLE new_table AS SELECT * FROM existing_table;
 ```sql
 CREATE TABLE training.course_1 AS SELECT * FROM training.students;
 ```
+
+Result:
+=> Creates a new table `course_1`
+=> Copies both columns and data from `students`
+=> Does not copy primary key, foreign keys, indexes, or unique constraints
+=> Does copy `NOT NULL` constraint
+
+* Compare setting of both tables
 
 #🔸 With Conditions (Filter rows while cloning):
 
@@ -861,8 +530,8 @@ Drop Database
 
 🔹 Step 1: Ensure You Are Not Connected to `company`
 
-* In the **Database Navigator**, locate the `company` database.
-* If it shows a **green dot** (active connection), **right-click on `company` ➝ `Disconnect`.
+* In the Database Navigator, locate the `company` database.
+* If it shows a green dot (active connection), right-click on `company` ➝ `Disconnect`.
 
 ---
 
@@ -877,7 +546,7 @@ Drop Database
 
 > If multiple users/connections are using `company`, you need to terminate them manually.
 
-1. Open a **SQL Editor** tab connected to `postgres`.
+1. Open a SQL Editor tab connected to `postgres`.
 2. Run:
 
    ```sql
@@ -890,12 +559,12 @@ Drop Database
 
 🔹 Step 4: Drop the Database
 
-* Right-click on the `company` database ➝ choose **Delete**.
+* Right-click on the `company` database ➝ choose Delete.
 * A dialog will appear. Confirm that:
 
-  * You're deleting the **database**, not just disconnecting.
+  * You're deleting the database, not just disconnecting.
   * The SQL shown is `DROP DATABASE company;`
-* Click **Yes / OK** to execute.
+* Click Yes / OK to execute.
 
 ---
 

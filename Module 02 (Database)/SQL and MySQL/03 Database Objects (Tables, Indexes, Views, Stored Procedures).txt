@@ -95,18 +95,18 @@ Database objects are structural components of MySQL used to store data, improve 
 
 ---
 
-## **Table**
+## Table
 
-* A **table** is the basic database object used to **store data**.
-* Data is stored in the form of **rows (records)** and **columns (attributes)**.
-* Each table represents a **single entity** (e.g., employees, orders).
-* Columns define **data type and rules**, rows store actual data.
-* All other database objects (indexes, views, triggers, etc.) are built **on top of tables**.
+* A table is the basic database object used to store data.
+* Data is stored in the form of rows (records) and columns (attributes).
+* Each table represents a single entity (e.g., employees, orders).
+* Columns define data type and rules, rows store actual data.
+* All other database objects (indexes, views, triggers, etc.) are built on top of tables.
 
-👉 **In short:**
-A table is the **foundation of a database** where all data resides.
+👉 In short:
+A table is the foundation of a database where all data resides.
 
-**Query
+**Query:
 
 CREATE SCHEMA db_objects;
 
@@ -165,7 +165,7 @@ Exercise:
 
 -- Display indexes in a table
 
-**Query
+**Query:
 
 SHOW INDEX FROM Employees;
 
@@ -178,32 +178,32 @@ Important points:
 
 1. Create index on a single column
 
-**Query
+**Query:
 
 CREATE INDEX idx_name ON employees(name);
 
 2. Create composite index
 
-**Query
+**Query:
 
 CREATE INDEX idx_dept_designation
 ON employees(department, designation);
 
 -- Display index
 
-**Query
+**Query:
 
 SHOW INDEX FROM Employees;
 
 -- Search based on name idex
 
-**Query
+**Query:
 
 SELECT * FROM employees WHERE name = 'Amit Sharma';
 
 -- Search based on department and designation
 
-**Query
+**Query:
 
 SELECT * FROM employees WHERE department = 'IT' 
 AND designation = 'Software Engineer';
@@ -214,7 +214,7 @@ MySQL doesn't suppport modifying index. Instead we can recreate an index with a 
 
 4. Delete an index
 
-**Query
+**Query:
 
 DROP INDEX idx_name ON employees;
 DROP INDEX idx_dept_designation ON employees;
@@ -222,7 +222,7 @@ DROP INDEX idx_dept_designation ON employees;
 5. Display indexes in a table
 SHOW INDEX FROM Employees;
 
-** Important Notes
+ Important Notes
 - Dropping an index does not delete table data.
 - PRIMARY KEY index cannot be dropped using DROP INDEX.
 - To remove a primary key, we use:
@@ -251,29 +251,40 @@ Imagine you are working on a big puzzle, and you need a separate space to keep s
 
 1. Fresh temporary table
 
-**Query:
+Query
 
 CREATE TEMPORARY TABLE temp_employees (
-    id INT,
+    id INT PRIMARY KEY,
     name VARCHAR(50)
 );
 
 -- Insert data
 
-**Query (DML):
+**Query: (DML):
 
 INSERT INTO temp_employees 
 VALUES (1, 'Jay'), (2, 'Raj'), (3, 'Yash');
+SELECT * FROM temp_employees;
 
 -- View data
 
-**Query (DQL):
+**Query: (DQL):
 
+SELECT * FROM temp_employees;
+
+**Query: (DML):
+
+UPDATE temp_employees SET name = 'Mina' WHERE id = 3;
+SELECT * FROM temp_employees;
+
+**Query: (DML):
+
+DELETE FROM temp_employees WHERE id = 1;
 SELECT * FROM temp_employees;
 
 -- Drop table
 
-**Query (DDL)
+**Query: (DDL)
 
 DROP TEMPORARY TABLE temp_employees; 
 
@@ -281,12 +292,13 @@ DROP TEMPORARY TABLE temp_employees;
 
 2. Clone a table from another table
 
-**Query (DDL):
+**Query: (DDL):
 
 CREATE TEMPORARY TABLE temp_it_employees AS
 SELECT *
 FROM employees
 WHERE department = 'IT';
+SELECT * FROM temp_it_employees;
 
 As a result
 - Table will be created
@@ -294,26 +306,26 @@ As a result
 
 -- Display data
 
-**Query (DQL): 
+**Query: (DQL): 
 
 SHOW tables;
 
-** Temporary tables won't be displayed
+ Temporary tables won't be displayed
 
-**Query (DQL):
+**Query: (DQL):
 
-SELECT * FROM temp_students;
+SELECT * FROM temp_it_employees;
 
-** Data will be displayed`
+ Data will be displayed`
 
 -- Insert more data
 
-**Query (DML):
+**Query: (DML):
 
 INSERT INTO temp_it_employees 
-(name, email, department, designation, joining_date, basic_salary)
-VALUES ('Akanksha', 'akanksha@yahoo.com', 'CS', 'Lead','2020-12-12', 40000);
-SELECT * FROM temp_students;
+(id, name, email, department, designation, joining_date, basic_salary)
+VALUES (9, 'Akanksha', 'akanksha@yahoo.com', 'CS', 'Lead','2020-12-12', 40000);
+SELECT * FROM temp_it_employees;
 
 ---
 
@@ -325,9 +337,9 @@ Way 1 : Go to Menu -> Query -> Reconnect to server
 
 OR
 
-Way 2: **Query (DDL): 
+Way 2: Query (DDL): 
 	
-	DROP TEMPORARY TABLE temp_students; 
+	DROP TEMPORARY TABLE temp_it_employees; 
 
 -----X-----X-----X-----
 Views
@@ -350,7 +362,7 @@ There are 2 types of views:
 
 Create Views
 ------------
-**Query (DDL):
+Query (DDL):
 
 CREATE VIEW it_senior_employees_view AS
 SELECT 
@@ -367,13 +379,13 @@ WHERE department = 'IT'
 
 See view
 --------
-**Query (DQL):
+Query (DQL):
 
 SHOW FULL TABLES WHERE Table_Type = 'VIEW';
 
 See data in view
 ----------------
-**Query (DQL):
+Query (DQL):
 
 SELECT * FROM it_senior_employees_view;
 
@@ -385,18 +397,18 @@ We can hide long SELECT, JOIN, or WHERE logic behind a short name.
 -----X-----X----
 Updating data in a View
 -----------------------
-**Query (DML):
+Query (DML):
 
 UPDATE it_senior_employees_view
 SET basic_salary = basic_salary + 5000
 WHERE id = 4;
 SELECT * FROM it_senior_employees_view;
 
-** This will not only change the view, but also the original students table
+ This will not only change the view, but also the original students table
 
 Updating the structure of a View
 --------------------------------
-**Query:
+**Query::
 
 CREATE OR REPLACE VIEW it_senior_employees_view AS
 SELECT id, name, email, department, designation, basic_salary
@@ -417,6 +429,7 @@ Drop view
 **Query:
 
 DROP VIEW it_senior_employees_view;
+SHOW FULL TABLES WHERE Table_Type = 'VIEW';
 
 -----X-----X-----X-----
 Views vs. Temporary Tables
@@ -471,7 +484,7 @@ Practice
 
 -- Using Schema db_objects
 
-**Query 1: Stored procedure with IN paremeter
+Query 1: Stored procedure with IN paremeter
 --------
 DELIMITER //
 
@@ -491,7 +504,7 @@ How to call?
 CALL get_employees_by_department('IT');
 
 -----X-----X-----X-----
-**Query 2: Stored procedure with OUT paremeter
+Query 2: Stored procedure with OUT paremeter
 ----------
 
 DELIMITER $$
@@ -584,13 +597,13 @@ Drop Stored procedures
 
 -- Drop a Single Stored Procedure
 
-**Query
+**Query:
 
 DROP PROCEDURE get_employees_by_department;
 
 -- Safer version
 
-**Query
+**Query:
 
 DROP PROCEDURE IF EXISTS get_employees_by_department;
 

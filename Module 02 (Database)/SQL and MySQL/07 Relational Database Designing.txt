@@ -42,7 +42,7 @@ Some of the many types of keys in RDBMS are:
 
 🧱 Example Setup
 
-We’ll use a Student–Course–Enrollment system to demonstrate all types of keys.
+We'll use a Student–Course–Enrollment system to demonstrate all types of keys.
 
 ```sql
 CREATE TABLE students (
@@ -81,11 +81,11 @@ Table 2: `courses`
 
 ---
 
- 🔹 2. Foreign Key
+🔹 2. Foreign Key
 
 > A column that establishes a relationship between two tables by referencing the Primary Key of another table.
 
-Example:
+Table 3: `enrollments`
 
 ```sql
 CREATE TABLE enrollments (
@@ -98,11 +98,23 @@ CREATE TABLE enrollments (
 );
 ```
 
+`enrollments`
+
+| student_id | course_id | semester |
+| ---------- | --------- | -------- |
+| 1          | 101       | 1        |
+| 1          | 102       | 2        |
+| 2          | 101       | 1        |
+| 2          | 103       | 2        |
+| 3          | 102       | 1        |
+| 3          | 103       | 2        |
+
+
 👉 `student_id` and `course_id` are foreign keys referencing the parent tables.
 
 ---
 
- 🔹 3. Composite Key
+🔹 3. Composite Key
 
 > A key made by combining two or more columns to uniquely identify a record.
 > In the above table 
@@ -184,7 +196,7 @@ All super keys:
 
 ---
 
- 🔹 7. Surrogate Key
+🔹 7. Surrogate Key
 
 > A system-generated unique identifier (not derived from existing data).
 > Usually an auto-increment value.
@@ -193,20 +205,11 @@ Example:
 
 In our table:
 
-```
-CREATE TABLE students (
-    student_id INT AUTO_INCREMENT PRIMARY KEY,
-    name VARCHAR(50) NOT NULL,
-    email VARCHAR(100) UNIQUE,
-    mobile VARCHAR(15) UNIQUE
-);
-```
-
 👉 `student_id` is a surrogate key, generated automatically by the database.
 
 ---
 
- 🔹 8. Index Key
+🔹 8. Index Key
 
 > An index is created on a column to speed up searching and sorting operations.
 > It does not ensure uniqueness but improves performance.
@@ -262,7 +265,7 @@ Example: Employee and Address
 
 | Employee | Address          |
 | -------- | ---------------- |
-| id       | emp_id *(PK, FK) |
+| id (PK)  | emp_id *(PK, FK) |
 | fname    | house_no         |
 | mname    | street_address   |
 | lname    | reference_point  |
@@ -330,7 +333,7 @@ QA department ⟶ Harsh and Harish
 3. Many-to-Many Relationship
 
 In a many-to-many relationship, multiple records in one table can relate to multiple records in another.
-To implement this, we use a junction (linking) table that contains foreign keys from both tables.
+To implement this, we use a junction (join/linking) table that contains foreign keys from both tables.
 
 Example: Project and Employee
 
@@ -364,7 +367,7 @@ Employees
 
 Project_Employee
 
-| pa_id | p_id | e_id |
+| pr_id | p_id | e_id |
 | ----- | ---- | ---- |
 | 1     | 1    | 1    |
 | 2     | 1    | 3    |
@@ -557,7 +560,7 @@ Conceptual idea:
 
 ---
 
-## Trainer-Grade One-Liner
+## One-Liner
 
 > Normalization is the art of designing tables so that each fact is stored once, and anomalies are eliminated.
 

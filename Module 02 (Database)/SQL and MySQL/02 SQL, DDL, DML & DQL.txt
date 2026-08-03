@@ -7,8 +7,8 @@ Topics
 	- What Can SQL do?
 	- CRUD Operation
 	- SQL Commands
-=> DDL - Create/Alter
-	- Creating a Database
+=> DDL 
+	- Creating a Database/Schema
 	- Make schema - active schema 
 	- Creating a Table
 	- Rename the Schema
@@ -47,7 +47,7 @@ What is SQL?
 
 -> SQL stands for Structured Query Language
 
--> It is the official language to communicate with the any RDBMS software
+-> It is the official language to communicate with any RDBMS software
 
 -> Simply put, to work with any database we need to write SQL Instructions
 
@@ -299,7 +299,7 @@ SHOW CREATE TABLE students;
 
 Result: The create table query for current table will show.
 
-** It is a DQL, not a DDL
+** `SHOW CREATE TABLE` is a DQL, and not a DDL.
 -----X-----X-----X-----X-----
 DML
 ===
@@ -324,12 +324,13 @@ Quotes
 - CHAR, VARCHAR, TEXT, BLOB values MUST be written with single/double quotes
 - The column names can be written in Back ticks (` `)
 
-Ex:
+---
 
 **Query: Insert query without column names
 
 INSERT INTO students VALUES 
 (102, 'Madhavi', 'madhavi@yahoo.com', 'Core Python', 18000, '2023-06-01');
+SELECT * FROM students;
 
 Ex:
 
@@ -343,7 +344,8 @@ VALUES
 (104, 'Mithun', 'mithun@hotmail.com', 'Core Java', 5000, '2023-06-30'),
 (105, 'Raj', 'raj@gmail.com', 'Advance Java', 8000, '2022-12-31'),
 (106, 'Shekhar', 'shekhar@yahoo.com', 'Core Python', 5000, '2023-01-01'), 
-(107, 'Sapna', 'sapna@gmail.com', 'Advanced PHP', 10000, '2023-06-07');
+(107, 'Sapna', 'sapna@gmail.co.in', 'Advanced PHP', 10000, '2023-06-07');
+SELECT * FROM students;
 -----X-----X-----
 2. UPDATE : It is used to update existing data within a table.
 
@@ -360,6 +362,7 @@ Ex:
 UPDATE students 
 SET student_course = 'Advance Java', course_fees = 8000 
 WHERE student_id = 101;
+SELECT * FROM students;
 
 Update multiple columns
 -----------------------
@@ -372,6 +375,7 @@ Ex:
 UPDATE students 
 SET course_fees = 10000 
 WHERE student_course = 'Advance Java';
+SELECT * FROM students;
 
 Note: You may get "safe update mode" Error.
 What it means is: Safe Update Mode is ON in MySQL that is saving us from accidently updating/deleting multiple records at once
@@ -415,6 +419,7 @@ Ex:
 **Query:
 
 DELETE FROM students WHERE `student_email` = 'yash@hotmail.com';
+SELECT * FROM students;
 -----X-----X-----X-----X-----
 DQL
 ===
@@ -551,6 +556,7 @@ CREATE TABLE new_tbl SELECT * FROM orig_tbl;
 **Query:
 
 CREATE TABLE course_1 SELECT * FROM students;
+SELECT * FROM course_1;
 
 Result:
 => Creates a new table `course_1`
@@ -567,6 +573,7 @@ Example 2 – Clone with filtered data:
 CREATE TABLE course_2 AS
 SELECT * FROM students
 WHERE course_fees >= 8000;
+SELECT * FROM course_2;
 
 Same as above, but creates a new table with only those records having `course_fees` ≥ 8000.
 
@@ -582,6 +589,7 @@ AS
 SELECT student_name, student_course
 FROM students
 WHERE course_fees <= 8000;
+SELECT * FROM course_3;
 
 => Adds a new column `id`
 => Copies selected columns (`student_name`, `student_course`)
@@ -599,6 +607,7 @@ Syntax : CREATE TABLE new_table LIKE old_table;
 **Query: 
 
 CREATE TABLE course_4 LIKE students;
+SELECT * FROM course_4;
 
 Full Cloning
 ============
@@ -613,6 +622,7 @@ Query
 CREATE TABLE course_5 LIKE students;
 
 INSERT INTO course_5 SELECT * FROM students;
+SELECT * FROM course_5;
 -----X-----X-----X-----
 Deleting database & tables
 ==========================
@@ -620,7 +630,9 @@ Deleting database & tables
 
 Syntax: TRUNCATE table_name; 
 
-**Query: TRUNCATE course_1;
+**Query: 
+TRUNCATE course_1;
+SELECT * FROM course_1;
 
 2. Drop the table
 

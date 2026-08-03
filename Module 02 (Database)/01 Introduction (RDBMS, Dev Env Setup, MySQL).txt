@@ -1,0 +1,676 @@
+SQL & PostgreSQL
+================
+In these notes we will learn:
+
+=> Setting up the database
+=> Parts of an Application
+=> Database
+  - Types of databases
+  - Storage Approaches
+=> RDBMS
+  - Schema
+  - Database
+  - Table
+  - Row/tuple
+  - Columns
+=> PostgreSQL Overview
+=> PostgreSQL Client/Server Model
+  - PostgreSQL Server
+  - PostgreSQL Client
+  - PostgreSQL Connectors
+=> SQL
+  - What Can SQL do?
+  - CRUD Operation
+  - SQL Commands
+=> SQL DDL
+  - Creating a Database
+  - Make schema
+  - Creating a Table
+  - Rename the Schema
+  - Rename the Table
+  - Alter the table
+  - Showing How a Table Was Created
+=> DML
+  - INSERT
+  - UPDATE
+  - DELETE
+=> DQL
+  - SELECT
+  - WHERE
+  - AND, OR
+  - <, >, ==
+  - LIKE, BETWEEN
+=> DDL Again
+  - Cloning
+   - Full Cloning
+   - Shallow Cloning
+=> Delete tables/schema
+  - Truncate
+  - DROP Table
+  - DROP SCHEMA
+XXXXXXXXXXXXXXXXXXXX
+Setting up the Database
+=======================
+Download and Install
+
+- PostgreSQL Server (e.g., 17.x 64-bit)
+- DBeaver (Community Edition or Enterprise)
+- pgAdmin (Official GUI for PostgreSQL)
+- psql Shell (comes with PostgreSQL installer)
+
+Make sure PostgreSQL DB Server is up and running.
+
+- Open Task Manager
+- Open Services tab, search for: potgresql-x64-18 service
+- If it is stopped, right click & select: Start
+
+---
+
+Parts of an Application
+=======================
+Every software application contains 3 components:
+
+1. Frontend
+2. Backend – Server-Side Code
+3. Backend – Database
+
+📎 Refer image: `01_application_layers.png`
+
+---
+
+Database
+========
+
+- A database is a structured collection of data.
+- In a database, data is stored permanently (data is persisted)
+
+📎 Refer fig: `02_data_persistence.png`
+
+---
+
+Types of Databases
+==================
+Below are the types of databases:
+
+1. Relational Databases (RDBMS)
+
+2. NoSQL Databases
+
+   - Key-Value Databases
+
+   - Document-Oriented Databases
+
+   - Graph Databases
+   
+   - Ex: MongoDB, Apache Cassandra, Redis, CouchDB, Neo4j
+
+3. Object-Oriented Databases
+
+4. Hierarchical Databases
+
+5. Network Databases
+
+---
+
+Storage Approaches
+==================
+These are some different types of storage:
+
+1. On-Disk Storage (Traditional databases stored on HDDs/SSDs)
+
+2. In-Memory Storage (Data stored primarily in RAM, e.g., H2, Redis)
+
+3. Cloud Storage (Hosted on cloud platforms, e.g., AWS RDS, Firebase)
+
+4. Hybrid Storage (Combination of in-memory and disk storage)
+
+5. Distributed Storage (Data spread across multiple nodes, e.g., Cassandra)
+
+---
+
+RDBMS
+=====
+
+- RDBMS stands for Relational Data Base Management System
+
+- In an RDBMS, data is organized into entities (tables) and the relationships between those entities are clearly defined.
+
+- Data is stored in a structured, tabular format consisting of rows and columns.
+
+- Relationships between tables are established using keys (primary keys and foreign keys).
+
+- Some key terms in an RDBMS are:
+  database, schema, table, records, properties, constraints, keys, relations, alias, etc.
+
+- Ex: Oracle Database, MySQL, PostgreSQL, Microsoft SQL Server, IBM Db2, MariaDB, SQLite, SAP HANA, Teradata, Firebird
+
+---
+
+Schema
+------
+- A database schema is the skeleton structure that represents the logical view of the entire database.
+- A schema tells us what exists in the database and how everything is connected, not the actual data.
+
+Database
+--------
+- Database is the physical structure of data
+
+Table
+-----
+- Tables contain all the data in a database.
+- In tables, data is logically organized in a row-and-column format, similar to a spreadsheet.
+
+Row / Tuple
+===========
+- Each row represents a unique record
+- Tuple → 1 row → 1 record
+
+Columns
+=======
+- Each column represents a field/property/attribute in the record.
+- 1 column → 1 property
+
+---
+
+Simply Put
+==========
+Database/Schema → Tables → Collection of rows and columns → Collection of records
+
+---
+
+Example:
+
+Database/Schema → `school`
+
+Table1 → `students`
+
+```
+Columns → id (PK), name
+
+   id   name  
+  ----  ------
+   1    Mohit  
+   2    Raj
+```
+
+Table2 → `mobile_numbers`
+
+```
+// Linking mobile_no to students  
+// Depends on the PK of students  
+
+Columns → id (PK), mobile_no, student_id (FK)
+
+   id   mobile_no   student_id  
+  ----  ----------  -----------
+   1    9988776655     1  
+   2    8877669911     1  
+   3    7711990912     2  
+   4    8877887788     3  ← not allowed (foreign key violation)
+```
+
+- The above tables represent 2 entities - `student` and `mobile number`
+
+- Fields: `id`, `name` in `students`; `id`, `mobile_no`, `student_id` in `mobile_numbers`
+
+- Each row = 1 record
+
+- `id` in both tables = Primary Key
+
+- `student_id` in mobile table = Foreign Key
+
+---
+
+PostgreSQL Overview
+===================
+=> PostgreSQL is an open-source RDBMS server.
+
+=> It can manage multiple databases.
+
+=> When it's installed, it comes with a default database named `postgres`.
+
+=> It was originally named POSTGRES and later renamed to PostgreSQL to reflect its support for SQL.
+
+=> The latest version is 18.x (as of July 2025).
+
+=> PostgreSQL ranks as one of the top relational databases, competing closely with MySQL and Oracle.
+
+=> Many companies such as Instagram, Reddit, Spotify, Apple, IMDB and GoDigit use PostgreSQL.
+
+---
+
+PostgreSQL Client/Server Model
+==============================
+PostgreSQL Server
+-----------------
+
+1. PostgreSQL Server is used to connect and manage the physical memory space where the data is actually stored (persisted)
+
+2. Simply put, PostgreSQL server does not store data itself, it simply acts as a bridge between client programs and underlying data.
+
+3. If we want to use it, it must be running as a service (PostgreSQL). 
+We cannot directly access the data without PostgreSQL Server up and running.
+
+4. We can configure PostgreSQL Service to start when the System is switched on (at boot time)
+
+5. Every software runs on an IP and port, so does PostgreSQL Server
+    IP: is the unique digital address of any computer
+	Port: is the place where a software runs
+
+6. If PostgreSQL Server is on our own PC, it can be accessed via IP: 127.0.0.1, i.e. localhost
+
+7. PostgreSQL by default runs on Port: 5432
+
+Refer Image: `03_client_server.png`
+
+---
+
+PostgreSQL Client
+=================
+- The data is physically stored on disk and can be accessed only via PostgreSQL Server.
+
+- Even PostgreSQL Server cannot be accessed directly.
+
+- To do this we need client softwares and programs.
+
+- These clients send SQL queries to the server and receive results in return.
+
+Refer Image: `03_client_server.png`
+
+Following are some PostgreSQL clients:
+
+1. pgAdmin
+2. psql (PostgreSQL Shell)
+3. DBeaver - Universal client
+4. DataGrip
+5. Postico (Mac)
+6. Any software application
+   => If we connect a Java application with PostgreSQL Server, it will be known as a Java Client.
+   => If with Python, it will be Python Client
+
+---
+
+Most used PostgreSQL clients: 
+
+🧩 pgAdmin (GUI for PostgreSQL)
+
+1. Official browser-based GUI tool for managing PostgreSQL databases.
+2. Supports visual database design, query execution, role/permission management, and backups.
+3. Best suited for beginners and visual learners who prefer point-and-click over writing SQL manually.
+
+---
+
+💻 psql (PostgreSQL Shell)
+
+1. Command-line tool for interacting with PostgreSQL using SQL and meta-commands.
+2. Ideal for script automation, quick queries, and power users.
+3. Offers features like auto-completion, query history, and administrative tasks (e.g., creating users, databases).
+
+---
+
+🧰 DBeaver (Universal DB Tool)
+
+1. Cross-platform and supports many databases (PostgreSQL, MySQL, Oracle, etc.) in one interface.
+2. Offers powerful features like ER diagrams, data export/import, and SQL editing with auto-complete.
+3. Great for developers or DB admins working with multiple database systems.
+
+---
+
+PostgreSQL Connectors
+=====================
+=> To connect one software with another, we need drivers.
+
+=> To connect our applications written in different programming languages, we need to install appropriate drivers on the client side.
+
+=> These drivers are called Connectors.
+
+=> PostgreSQL provides connectors for languages like Java, Python, PHP, etc.
+
+=> Official clients come embedded with drivers
+Ex: MySQL Workbench comes embedded with MySQL Drivers
+Ex: PgAdmin comes embedded with PostgreSQL Drivers
+
+=> As DBeaver is not specific to any RDBMS, to connect with PostgreSQL we need to download respective drivers.
+
+=> For our Java Applications, with have to download PostgreSQL JDBC Driver (`postgresql-<version>.jar`).
+
+---
+
+# Connect PostgreSQL with DBeaver
+
+## Step 1: Open DBeaver
+
+Launch DBeaver.
+
+DBeaver Font Size
+=================
+To increase the UI font : Window > Preferences > User Interface > Appearance > Colors and Fonts > DBeaver Fonts > Main font.
+
+To increase the Script font : Window > Preferences > User Interface > Appearance > Colors and Fonts > DBeaver Fonts > Monospace font.
+
+---
+
+## Step 2: Create a New Connection
+
+You can use any of these methods:
+
+* Click the New Database Connection icon (plug with a + sign) on the toolbar.
+* Or go to Database → New Database Connection.
+* Or press Ctrl + Shift + N.
+
+---
+
+## Step 3: Select PostgreSQL
+
+* Search for PostgreSQL.
+* Select PostgreSQL.
+* Click Next.
+
+---
+
+## Step 4: Enter Connection Details
+
+Fill in the following:
+
+| Field    | Value                                                   |
+| -------- | ------------------------------------------------------- |
+| Host     | `localhost`                                             |
+| Port     | `5432`                                                  |
+| Database | `postgres`                                              |
+| Username | `postgres`                                              |
+| Password | *(Password you entered during PostgreSQL installation)* |
+
+* Host → The computer where PostgreSQL is running.
+* Port → The communication channel (default is 5432).
+* Database → The database to connect to PostgreSQL creates a default database named `postgres`.
+* Username → Usually `postgres`.
+* Password → The password set during installation.
+
+---
+
+## Step 5: Download JDBC Driver
+
+The first time you connect, DBeaver will ask to download the PostgreSQL JDBC driver.
+
+Click Download.
+
+This requires an internet connection.
+
+---
+
+## Step 6: Test Connection
+
+Click Test Connection.
+
+If everything is correct, you'll see:
+
+> Connected
+
+Then click Finish.
+
+---
+
+# Common Errors
+
+### 1. Connection Refused
+
+```
+Connection refused
+```
+
+Reason: PostgreSQL service is not running.
+
+Fix: Start the PostgreSQL service from Services (`services.msc`).
+
+---
+
+### 2. Password Authentication Failed
+
+```
+password authentication failed
+```
+
+Reason: Incorrect password.
+
+Fix: Use the password you set during PostgreSQL installation.
+
+---
+
+### 3. Database Does Not Exist
+
+```
+database "xyz" does not exist
+```
+
+Fix: Use `postgres` as the database name initially.
+
+---
+
+### 4. Driver Not Found
+
+Simply click Download when prompted.
+
+---
+
+# After Connecting
+
+Students should see something like:
+
+```
+postgres (localhost:5432)
+   └─ Databases
+         └─ postgres
+			   └─ Schemas
+				    └─ public
+					└─ sales
+```
+
+---
+
+## PostgreSQL Hierarchy
+
+The hierarchy of objects in PostgreSQL is:
+
+```text
+PostgreSQL Server
+    │
+    ├── Database
+    │      │
+    │      ├── Schema
+    │      │      │
+    │      │      ├── Tables
+    │      │      ├── Views
+    │      │      ├── Functions
+    │      │      ├── Sequences
+    │      │      └── Other Database Objects
+    │      │
+    │      ├── Extensions
+    │      ├── Roles
+    │      └── ...
+    │
+    └── Other Databases
+```
+
+### Why are there two `postgres` in DBeaver?
+
+When you connect to PostgreSQL in DBeaver, you may see:
+
+```text
+postgres (localhost:5432)
+    │
+    └── Databases
+            │
+            └── postgres
+```
+
+These represent different things.
+
+* `postgres (localhost:5432)`
+
+  * This is the connection created in DBeaver.
+  * It represents the PostgreSQL server running on `localhost` at port `5432`.
+  * The connection name can be changed without affecting the database.
+
+* `postgres` under Databases
+
+  * This is the actual database.
+  * It is the default database created automatically during PostgreSQL installation.
+
+---
+
+### PostgreSQL
+
+In PostgreSQL, Database and Schema are different.
+
+* A PostgreSQL Server can contain multiple Databases.
+* Each Database can contain multiple Schemas.
+* Each Schema contains tables, views, functions, sequences, and other database objects.
+
+Example:
+
+```text
+Server
+│
+├── companydb
+│      ├── public
+│      ├── hr
+│      └── sales
+│
+└── trainingdb
+       └── public
+```
+
+---
+
+## What is a Schema?
+
+A Schema is a logical container inside a database used to organize database objects.
+
+A schema can contain:
+
+* Tables
+* Views
+* Functions
+* Sequences
+* Procedures
+* Triggers
+* Other database objects
+
+Different schemas within the same database can contain objects with the same name.
+
+Example:
+
+```text
+public.employee
+
+hr.employee
+
+sales.employee
+```
+
+These are three different tables because they belong to different schemas.
+
+---
+
+## What is the `public` Schema?
+
+* Every PostgreSQL database automatically contains a schema named `public`.
+* It is the default schema.
+* If a schema is not specified while creating a table, PostgreSQL creates it in the `public` schema.
+
+Example:
+
+```sql
+CREATE TABLE student (
+    id INT,
+    name VARCHAR(50)
+);
+```
+
+is equivalent to:
+
+```sql
+CREATE TABLE public.student (
+    id INT,
+    name VARCHAR(50)
+);
+```
+
+---
+
+## Summary
+
+* A PostgreSQL Server contains multiple Databases.
+* A Database contains multiple Schemas.
+* A Schema contains tables and other database objects.
+* `public` is the default schema created automatically in every PostgreSQL database.
+* In MySQL, Database and Schema are the same.
+* In PostgreSQL, Database and Schema are separate concepts.
+
+---
+
+Creating a New Database
+-----------------------
+=> If we create a new database (e.g., ecommerce), it becomes independent.
+
+=> PostgreSQL does not support cross-database queries, so each database is isolated.
+
+=> New Database = New Connection in DBeaver
+
+=> We need to create a separate DBeaver connection to work with the new database.
+
+---
+
+Schema
+======
+- In PostgreSQL, a schema is like a folder inside a database that helps organize and group database objects like tables, views, indexes, functions, etc.
+
+So we can say that:
+
+1. Schema is a namespace inside a database
+
+   * It helps prevent name conflicts.
+   * For example, we can have two tables named `users`, each in different schemas.
+
+2. Every database starts with a default schema called `public`
+
+   * If we don’t specify a schema, PostgreSQL assumes `public`.
+
+3. Schemas help organize large databases
+
+   * We can group related tables logically (e.g., `sales`, `hr`, `inventory`).
+
+---
+
+🔗 Relationship: Database → Schema → Tables (and other objects)
+
+```
+PostgreSQL Server
+└── Database: ecommerce
+    ├── Schema: customer_data
+    │   ├── Table: customers
+    │   └── Table: addresses
+    └── Schema: order_data
+        ├── Table: orders
+        └── Table: payments
+
+	└── Database: university
+		├── Schema: academics
+		│   ├── Table: students
+		│   ├── Table: courses
+		│   └── Table: enrollments
+		└── Schema: administration
+			├── Table: departments
+			└── Table: faculty
+
+```
+
+---
+
+⚠️ Important:
+
+* Schemas are *inside* databases — not across them.
+* We can join tables across schemas within the same database.
+* But we cannot join tables across different *databases*.
+
+---

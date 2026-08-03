@@ -1,0 +1,333 @@
+Database Objects
+================
+Topics
+======
+=> Triggers
+=> Alias
+=> Functions
+	String Functions
+	Numeric Functions
+	Date Functions
+
+---
+
+# Triggers
+
+* A trigger is a stored program that automatically executes or **fires** in response to certain events on a specific table or view in a database.
+
+It is used to:
+
+* Enforce business rules.
+* Automatically update other tables or logs.
+* Validate data before insertion or update.
+
+---
+
+## Types of Triggers
+
+There are 2 types of triggers:
+
+* **BEFORE Trigger**: Executes before the specified event.
+* **AFTER Trigger**: Executes after the specified event.
+
+---
+
+## Trigger Events
+
+Triggers can be associated with these events:
+
+* BEFORE INSERT
+* AFTER INSERT
+* BEFORE UPDATE
+* AFTER UPDATE
+* BEFORE DELETE
+* AFTER DELETE
+
+Most important are:
+
+* **BEFORE INSERT**
+* **BEFORE UPDATE**
+
+---
+
+## PostgreSQL Trigger Syntax
+
+Unlike MySQL, PostgreSQL requires a **Trigger Function**.
+
+### Step 1: Create a Trigger Function
+
+```sql
+CREATE OR REPLACE FUNCTION function_name()
+RETURNS TRIGGER
+LANGUAGE plpgsql
+AS $$
+BEGIN
+
+    -- SQL statements
+
+    RETURN NEW;
+END;
+$$;
+```
+
+### Step 2: Create the Trigger
+
+```sql
+CREATE TRIGGER trigger_name
+BEFORE | AFTER INSERT OR UPDATE OR DELETE
+ON table_name
+FOR EACH ROW
+EXECUTE FUNCTION function_name();
+```
+
+---
+
+# Practice
+
+## Alter the employees table
+
+```sql
+ALTER TABLE db_objects.employees
+ADD COLUMN bonus NUMERIC(10,2),
+ADD COLUMN deduction NUMERIC(10,2),
+ADD COLUMN final_salary NUMERIC(10,2),
+ADD COLUMN total_experience INT;
+```
+
+---
+
+# Trigger No. 1 - BEFORE UPDATE Trigger
+
+### Step 1: Create Trigger Function
+
+```sql
+CREATE OR REPLACE FUNCTION db_objects.calculate_employee_details()
+RETURNS TRIGGER
+LANGUAGE plpgsql
+AS $$
+BEGIN
+
+    -- Calculate bonus
+    NEW.bonus := NEW.basic_salary * 0.10;
+
+    -- Calculate deduction
+    NEW.deduction := NEW.basic_salary * 0.05;
+
+    -- Calculate final salary
+    NEW.final_salary :=
+        NEW.basic_salary + NEW.bonus - NEW.deduction;
+
+    -- Calculate total experience
+    NEW.total_experience :=
+        EXTRACT(YEAR FROM AGE(CURRENT_DATE, NEW.joining_date));
+
+    RETURN NEW;
+
+END;
+$$;
+```
+
+### Step 2: Create Trigger
+
+```sql
+CREATE TRIGGER before_update_employees
+BEFORE UPDATE
+ON db_objects.employees
+FOR EACH ROW
+EXECUTE FUNCTION db_objects.calculate_employee_details();
+```
+
+---
+
+## Test
+
+```sql
+UPDATE db_objects.employees
+SET basic_salary = basic_salary;
+```
+
+All rows will be updated.
+
+---
+
+# Trigger No. 2 - BEFORE INSERT Trigger
+
+Since the trigger function already performs the calculations, create another trigger that uses the same function.
+
+```sql
+CREATE TRIGGER before_insert_employees
+BEFORE INSERT
+ON db_objects.employees
+FOR EACH ROW
+EXECUTE FUNCTION db_objects.calculate_employee_details();
+```
+
+### Test
+
+```sql
+INSERT INTO db_objects.employees
+(name, email, department, designation, joining_date, basic_salary)
+VALUES
+('Rohit Malhotra',
+ 'rohit.malhotra@gmail.com',
+ 'IT',
+ 'Backend Developer',
+ '2020-05-12',
+ 65000);
+```
+
+---
+
+# Display Triggers
+
+```sql
+SELECT
+    trigger_name,
+    event_manipulation,
+    action_timing
+FROM information_schema.triggers
+WHERE trigger_schema = 'db_objects';
+```
+
+---
+
+# Modifying a Trigger
+
+PostgreSQL does **not** support modifying a trigger directly.
+
+If changes are required:
+
+* Modify the **trigger function** using `CREATE OR REPLACE FUNCTION`.
+* Or drop and recreate the trigger.
+
+---
+
+# Remove Trigger
+
+```sql
+DROP TRIGGER IF EXISTS before_update_employees
+ON db_objects.employees;
+```
+
+```sql
+DROP TRIGGER IF EXISTS before_insert_employees
+ON db_objects.employees;
+```
+
+---X---X---X---
+
+# Alias
+
+* An alias is a temporary name given to a table or column for the purpose of a particular SQL query to make table or column names more readable.
+
+* The renaming is temporary and does not change the original table or column name in the database.
+
+* Aliases are useful when table or column names are long or not very readable.
+
+* They are especially useful when multiple tables are involved in a query.
+
+**Example:** `total_employees` is the alias.
+
+### 1. Using `AS` (Recommended)
+
+```sql
+SELECT COUNT(*) AS total_employees
+FROM db_objects.employees;
+```
+
+### 2. Without `AS`
+
+```sql
+SELECT COUNT(*) total_employees
+FROM db_objects.employees;
+```
+
+Both queries produce the same result.
+
+---
+
+**Table aliases** are used extensively in joins:
+
+```sql
+SELECT e.name, e.department
+FROM db_objects.employees AS e;
+```
+
+or simply:
+
+```sql
+SELECT e.name, e.department
+FROM db_objects.employees e;
+```
+
+---
+
+PostgreSQL Inbuilt Functions
+============================
+
+PostgreSQL provides many built-in functions to perform common operations on strings, numbers, dates, and groups of rows.
+
+There are four major categories of functions:
+
+1. String Functions
+2. Numeric Functions
+3. Date & Time Functions
+4. Aggregate Functions
+
+These functions can be used with:
+- SELECT
+- WHERE
+- ORDER BY
+- GROUP BY
+- HAVING
+- INSERT
+- UPDATE
+
+---
+
+Practice Table
+==============
+
+The examples in this chapter use the `employees` table.
+
+---
+
+General Syntax
+==============
+
+**Query:
+
+```sql
+SELECT function_name(column_name)
+FROM table_name;
+```
+
+Functions can also be used with constants.
+
+**Query:
+
+```sql
+SELECT UPPER('postgresql');
+```
+
+Functions can be nested (one function inside another).
+
+**Query:
+
+```sql
+SELECT UPPER(TRIM('   postgresql   '));
+```
+
+Functions can be used on multiple columns.
+
+**Query:
+
+```sql
+SELECT CONCAT(name, ' - ', department)
+FROM employees;
+```
+
+---
+````
+
+This gives students just enough background before immediately moving into the actual functions, which seems to match the style of the rest of your notes.

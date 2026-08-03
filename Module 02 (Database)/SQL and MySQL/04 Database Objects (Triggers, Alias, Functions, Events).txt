@@ -109,21 +109,73 @@ DELIMITER ;
 SET SQL_SAFE_UPDATES = 0;
 
 **Query
+Test: SELECT name, basic_salary, bonus, deduction, final_salary, total_experience FROM employees;
 
 UPDATE employees
 SET basic_salary = basic_salary;
 
+Test: SELECT name, basic_salary, bonus, deduction, final_salary, total_experience FROM employees;
+
 ** All rows will be updated
 
+Note: 
+* BEFORE UPDATE → Runs before the row is actually updated in the table.
+* ON employees → Only for the employees table.
+* FOR EACH ROW → If an UPDATE affects multiple rows, the trigger runs once for each row.
+
+* Any UPDATE on the employees table fires the trigger, even if basic_salary wasn't changed.
+
+---
 
 Trigger No 2 - Before Insert Trigger 
--------------
-**Query
+
+Even though we have created the Update Trigger, if we insert new data the salary fields will remain empty as the trigger is set on Update action, and not insert.
+
+Check:
 
 INSERT INTO employees
 (name, email, department, designation, joining_date, basic_salary)
 VALUES
 ('Rohit Malhotra', 'rohit.malhotra@gmail.com', 'IT', 'Backend Developer', '2020-05-12', 65000);
+
+Test: SELECT name, basic_salary, bonus, deduction, final_salary, total_experience FROM employees ORDER BY id DESC LIMIT 1;
+
+We can see that in the new record, salary fields are not set. For the fields in a new record to populate themselves we need to create an INSERT BEFORE trigger for the same:
+
+```sql
+DELIMITER //
+
+CREATE TRIGGER before_insert_employees
+BEFORE INSERT ON employees
+FOR EACH ROW
+BEGIN
+    -- Calculate bonus (10% of basic salary)
+    SET NEW.bonus = NEW.basic_salary * 0.10;
+
+    -- Calculate deduction (5% of basic salary)
+    SET NEW.deduction = NEW.basic_salary * 0.05;
+
+    -- Calculate final salary
+    SET NEW.final_salary = NEW.basic_salary + NEW.bonus - NEW.deduction;
+
+    -- Calculate total experience (in years)
+    SET NEW.total_experience =
+        TIMESTAMPDIFF(YEAR, NEW.joining_date, CURDATE());
+END//
+
+DELIMITER ;
+```
+
+Test with a new record again
+
+```sql
+INSERT INTO employees
+(name, email, department, designation, joining_date, basic_salary)
+VALUES
+('Vino Thakur', 'vinod.thakur@yahoo.com', 'QA', 'Testing Manager', '2025-03-15', 60000);
+
+Test: SELECT name, basic_salary, bonus, deduction, final_salary, total_experience FROM employees ORDER BY id DESC LIMIT 1;
+```
 
 -- Display Triggers
 
@@ -137,7 +189,8 @@ MySQL doesn't suppport modifying triggers. Instead we can recreate an trigger wi
 
 -- Remove Triggers
 
-DROP TRIGGER IF EXISTS trg_set_actual_fees_before_update;
+DROP TRIGGER IF EXISTS before_update_employees;
+DROP TRIGGER IF EXISTS before_insert_employees;
 
 ---X---X---X---
 Alias
@@ -153,10 +206,10 @@ Alias
 Ex: total_employees is the alias
 
 1. Use AS for more clarity
-- SELECT COUNT(*) AS total_employees FROM employees
+- SELECT COUNT(*) AS total_employees FROM employees;
 
 2. However we can avoid it totally
-- SELECT COUNT(*) total_employees FROM employees
+- SELECT COUNT(*) total_employees FROM employees;
 
 ---
 
@@ -228,6 +281,7 @@ ADD COLUMN monthly_tax DECIMAL(10,4);
 **Query
 UPDATE employees
 SET monthly_tax = basic_salary * 0.0785 + id * 0.137;
+SELECT basic_salary, monthly_tax FROM employees;
 
 ---
 
@@ -300,6 +354,8 @@ INSERT INTO employees
 VALUES
 ('Arjun Khanna', 'arjun.khanna@gmail.com', 'IT', 'Full Stack Developer', CURDATE(), 72000);
 
+SELECT * FROM employees ORDER BY id DESC LIMIT 1;
+
 -- Format the joining_date to display only the year
 
 **Query:
@@ -357,7 +413,7 @@ Solution 1:
 **Query:
 
 SELECT 
-    first_name,
+    name,
     joining_date,
     CONCAT(
         TIMESTAMPDIFF(YEAR, joining_date, CURDATE()), ' years ',
@@ -490,7 +546,7 @@ SHOW EVENTS;
 ### **6. Disable an Event**
 
 ```sql
-ALTER EVENT update_experience_daily DISABLE;
+ALTER EVENT update_salary_every_minute DISABLE;
 ```
 
 ---
@@ -498,7 +554,7 @@ ALTER EVENT update_experience_daily DISABLE;
 ### **7. Drop an Event**
 
 ```sql
-DROP EVENT IF EXISTS update_experience_daily;
+DROP EVENT IF EXISTS update_salary_every_minute;
 ```
 
 ---
