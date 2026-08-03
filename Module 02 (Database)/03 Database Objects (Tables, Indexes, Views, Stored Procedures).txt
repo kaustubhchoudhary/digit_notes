@@ -739,6 +739,10 @@ BEGIN
     p_bonus := p_total_salary * 0.10;
 
     p_total_salary := p_total_salary + p_bonus;
+	
+	UPDATE db_objects.employees
+    SET basic_salary = p_total_salary
+    WHERE id = p_employee_id;
 
 END;
 $$;
@@ -750,12 +754,13 @@ How to call?
 ```sql
 DO $$
 DECLARE
+	id INT := 1;
     bonus NUMERIC;
     total_salary NUMERIC := 50000;
 BEGIN
 
     CALL db_objects.calculate_bonus(
-        101,
+        id,
         bonus,
         total_salary
     );
@@ -803,10 +808,10 @@ Stored Procedure vs Function
 | Stored Procedure                       | Function                                             |
 | -------------------------------------- | ---------------------------------------------------- |
 | Performs an action (business logic).   | Computes and returns a value.                        |
-| Called using CALL.                     | Called inside SQL statements or using SELECT.      |
+| Called using CALL.                     | Called inside SQL statements or using SELECT.        |
 | May or may not return values           | Must return a value (or a table).                    |
   (using OUT/INOUT).                
-| Cannot be used directly inside a       | Can be used inside SELECT, WHERE, ORDER BY, etc. |
+| Cannot be used directly inside a       | Can be used inside SELECT, WHERE, ORDER BY, etc.     |
   SELECT statement.
 | Can perform database operations like   | Can also perform database operations in PostgreSQL, but 
   INSERT, UPDATE, DELETE.                  they're primarily intended for returning results and  

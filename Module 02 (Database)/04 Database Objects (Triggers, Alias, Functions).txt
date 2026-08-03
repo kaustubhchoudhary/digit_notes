@@ -292,42 +292,86 @@ The examples in this chapter use the `employees` table.
 
 ---
 
-General Syntax
-==============
+-- ==========================
+-- String Functions
+-- ==========================
 
-**Query:
+-- Generate employee login ID
+SELECT
+    name,
+    LOWER(REPLACE(name, ' ', '.')) || '@company.com' AS login_id
+FROM db_objects.employees;
 
-```sql
-SELECT function_name(column_name)
-FROM table_name;
-```
+-- Display employee initials
+SELECT
+    name,
+    LEFT(name, 1) ||
+    LEFT(SPLIT_PART(name, ' ', 2), 1) AS initials
+FROM db_objects.employees;
 
-Functions can also be used with constants.
+-- Mask email addresses
+SELECT
+    email,
+    LEFT(email, 3) ||
+    '*****' ||
+    SUBSTRING(email FROM POSITION('@' IN email)) AS masked_email
+FROM db_objects.employees;
 
-**Query:
+-- ==========================
+-- Date & Time Functions
+-- ==========================
 
-```sql
-SELECT UPPER('postgresql');
-```
+-- Calculate employee experience in years
+SELECT
+    name,
+    joining_date,
+    AGE(CURRENT_DATE, joining_date) AS experience
+FROM db_objects.employees;
 
-Functions can be nested (one function inside another).
+-- Display employees who joined in the current month
+SELECT
+    name,
+    joining_date
+FROM db_objects.employees
+WHERE EXTRACT(MONTH FROM joining_date) =
+      EXTRACT(MONTH FROM CURRENT_DATE);
 
-**Query:
+-- Find the next work anniversary
+SELECT
+    name,
+    joining_date,
+    joining_date +
+    (EXTRACT(YEAR FROM AGE(CURRENT_DATE, joining_date)) + 1)
+    * INTERVAL '1 year' AS next_anniversary
+FROM db_objects.employees;
 
-```sql
-SELECT UPPER(TRIM('   postgresql   '));
-```
+-- ==========================
+-- Mathematical Functions
+-- ==========================
 
-Functions can be used on multiple columns.
+-- Calculate annual salary with 12% bonus
+SELECT
+    name,
+    basic_salary,
+    ROUND((basic_salary * 12) * 1.12, 2) AS annual_package
+FROM db_objects.employees;
 
-**Query:
+-- Display salary rounded to nearest thousand
+SELECT
+    name,
+    basic_salary,
+    ROUND(basic_salary, -3) AS rounded_salary
+FROM db_objects.employees;
 
-```sql
-SELECT CONCAT(name, ' - ', department)
-FROM employees;
-```
+-- Calculate salary percentage of the highest salary
+SELECT
+    name,
+    basic_salary,
+    ROUND(
+        basic_salary * 100.0 /
+        (SELECT MAX(basic_salary) FROM employees),
+        2
+    ) AS salary_percentage
+FROM db_objects.employees;
 
----
-````
-
-This gives students just enough background before immediately moving into the actual functions, which seems to match the style of the rest of your notes.
+----X---X---X---
