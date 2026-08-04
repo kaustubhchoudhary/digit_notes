@@ -1,0 +1,270 @@
+
+JDBC
+====
+
+-> JDBC stands for Java Data Base Connectivity. 
+
+-> JDBC is a Java API used to connect our Java Application to run SQL queries on the database. 
+
+Refer fig: 
+	- 01_Jdbc.png
+	- 02_Jdbc.png
+
+-> It consists of a set of classes, interfaces and methods to work with databases
+
+-> The full JDBC API is inside the java.sql package
+
+-> It can be used to interact with any type of database, be it an RDBMS such as MySQL, Oracle, PostgreSQL, or a Non-RDBMS such as MongoDB, Redis or Apache Cassandra.
+
+-> It is a part of Java SE (Java Platform, Standard Edition), there is no need to install it separately
+
+-> The current version of JDBC is 4.3
+
+---
+
+JDBC Data Types
+===============
+
+* Java has its own data type system, such as `int`, `long`, `float`, `double`, `boolean`, and `String`.
+* PostgreSQL also has its own data types, such as `INTEGER`, `VARCHAR`, `TEXT`, `DATE`, and `BOOLEAN`.
+* The JDBC driver automatically converts Java data types to the corresponding PostgreSQL data types and vice versa.
+* The following are some commonly used PostgreSQL data types and their corresponding Java types.
+
+| PostgreSQL Data Type  | Java Data Type                         |
+| --------------------- | -------------------------------------- |
+| `VARCHAR`             | `String`                               |
+| `CHAR`                | `String`                               |
+| `TEXT`                | `String`                               |
+| `INTEGER`             | `int` / `Integer`                      |
+| `BIGINT`              | `long` / `Long`                        |
+| `SMALLINT`            | `short` / `Short`                      |
+| `REAL`                | `float` / `Float`                      |
+| `DOUBLE PRECISION`    | `double` / `Double`                    |
+| `NUMERIC` / `DECIMAL` | `java.math.BigDecimal` *(Recommended)* |
+| `BOOLEAN`             | `boolean` / `Boolean`                  |
+| `DATE`                | `java.sql.Date`                        |
+| `TIME`                | `java.sql.Time`                        |
+| `TIMESTAMP`           | `java.sql.Timestamp`                   |
+| `BYTEA`               | `byte[]`                               |
+| `UUID`                | `java.util.UUID`                       |
+
+### Note
+
+* PostgreSQL does **not** have `BLOB` and `CLOB` data types like MySQL or Oracle.
+* Binary data is stored using the **`BYTEA`** data type.
+* For monetary or high-precision values, prefer **`NUMERIC`** (mapped to `BigDecimal`) instead of `double` to avoid precision loss.
+* `INTEGER`, `BIGINT`, and `BOOLEAN` are among the most commonly used PostgreSQL data types in JDBC applications.
+
+---
+
+First JDBC Program
+==================
+-> A succesfull operation with the database is known as a transaction. 
+
+-> A transaction involves the exceution of several small steps. 
+
+-> Each step has a significance of its own. 
+
+-> To write efficient database code, all these steps must be implemented correctly. 
+
+-> These steps are as follows:
+	-> Step 0. Prerequisites
+		-> Install JDK
+		-> Install any IDE
+		-> Install PostgreSQL Server
+		-> It should be up and running
+		-> Download & add PostgreSQL JDBC Connector to the build path
+		
+	-> Step 1: Load the Driver
+	-> Step 2. Connect to database
+	-> Step 3. Create an SQL Query
+	-> Step 4. Create Statement
+	-> Step 4. Prepare the Query
+	-> Step 5. Execute the Query
+	-> Step 6. Collect Response Data
+	-> Step 7. Close Resources
+	
+3rd Party Library
+=================
+Follow the three steps to use a library
+
+1. The library has to be downloaded
+
+2. The library should be in a consistent, non-changeable location
+
+3. We have to tell Java RTE which libraries we want to use
+	- The library should be in the build path
+
+Load the driver
+
+- Download PostgreSQL JDBC Connector JAR from PostgreSQL website
+
+- Create a folder - "lib" in the project's root folder
+
+- Add it to the build path
+
+- In older versions of JDBC (JDBC 3 and earlier), the driver had to be loaded manually. 
+	`Class.forName("org.postgresql.Driver")`
+	
+- Modern JDBC drivers use the Service Provider Interface (SPI).
+
+- When your application starts, DriverManager automatically discovers JDBC drivers present in the classpath.
+
+---
+
+Queries for JDBC Example
+========================
+Here are all the SQL queries extracted from your `DbUtils` class.
+
+---
+
+## 1. Create Schema
+
+```sql
+CREATE SCHEMA IF NOT EXISTS training;
+```
+
+---
+
+## 2. Create Table
+
+```sql
+CREATE TABLE IF NOT EXISTS training.students (
+    id SERIAL PRIMARY KEY,
+    name VARCHAR(50) NOT NULL,
+    course_fee NUMERIC(10,2),
+    is_enrolled BOOLEAN,
+    date_of_joining DATE,
+    skills TEXT[]
+);
+```
+
+---
+
+## 3. Insert Student
+
+```sql
+INSERT INTO training.students
+(name, course_fee, is_enrolled, date_of_joining, skills)
+VALUES
+(?, ?, ?, ?, ?);
+```
+
+---
+
+## 4. Update Student
+
+```sql
+UPDATE training.students
+SET
+    name = ?,
+    course_fee = ?,
+    is_enrolled = ?,
+    date_of_joining = ?,
+    skills = ?
+WHERE id = ?;
+```
+
+---
+
+## 5. Delete Student
+
+```sql
+DELETE FROM training.students
+WHERE id = ?;
+```
+
+---
+
+## 6. Get Student by ID
+
+```sql
+SELECT *
+FROM training.students
+WHERE id = ?;
+```
+
+---
+
+## 7. Get All Students
+
+```sql
+SELECT *
+FROM training.students;
+```
+
+---
+
+## 8. Get Students by Joining Date
+
+```sql
+SELECT *
+FROM training.students
+WHERE date_of_joining = ?;
+```
+
+-----X-----X-----X-----
+
+JDBC Classes & Interfaces
+=========================
+The following are the important interfaces and classes of the JDBC API:
+
+1. Driver (I)
+- Every database provides a Driver class to connect with it.
+- This Driver class must implement java.sql.Driver interface.
+
+2. DriverManager (C)
+- It contains a static method getConnection() to connect with the database and return the connection.
+- The getConnection() requires the URL, username and password of the database
+- The getConnection() returns a Connection object
+
+3. Connection (I)
+- Represents a connection object to connect to the database.
+
+4. Statement (I)
+- Used to execute a static SQL statement & return the results it produces
+
+5. PreparedStatement (I)
+- The PreparedStatement interface is a sub-interface of Statement. 
+- It is used to execute parameterized/dynamic query.
+
+6. CallableStatement (I)
+- It is a sub-interface of PreparedStatement.
+- Used to execute SQL stored procedures or user-defined functions
+
+7. ResultSet (I)
+- It is used to contain & retrieve the results of an SQL query.
+- It is a pointer to the records
+- It uses next() to iterate over the records, and
+- getXXX() to fetch data from columns
+
+8. RowSet (I)
+- It is an extension of the ResultSet interface. 
+- RowSet is a Java object that represents a set of database rows. 
+- It allows working with data in a disconnected manner.
+
+9. ResultSetMetaData (I)
+- It is used to get the metadata of a table.
+- Metadata means data about data, i.e like total number of column, column name, column type etc. from the ResultSet object. 
+
+10. DatabaseMetaData (I) 
+- It is used to get meta data of a database such as database product name & version, driver name, name of total number of tables etc.
+-----X-----X-----X-----
+RowSet
+======
+RowSet is a Java object that represents a set of database rows. It allows working with data in a disconnected manner.
+
+Types of RowSet
+---------------
+There are following 5 types of RowSets:
+
+1. CachedRowSet: Disconnected RowSet with data stored in memory.
+
+2. WebRowSet: CachedRowSet with XML serialization support for web transport.
+
+3. FilteredRowSet: RowSet with the ability to filter rows before retrieval.
+
+4. JdbcRowSet: Connected RowSet with serialization and scrollability features.
+
+5. JoinRowSet: Connected RowSet with SQL JOIN support.
+-----X-----X-----X-----

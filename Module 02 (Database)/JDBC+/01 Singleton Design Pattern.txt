@@ -1,0 +1,340 @@
+
+# Singleton Design Pattern
+
+## What is Singleton?
+
+The **Singleton Design Pattern** ensures that **only one object of a class is created throughout the application** and provides a global point of access to that object.
+
+---
+
+## Why do we need Singleton?
+
+Some objects are expensive to create or should exist only once in an application.
+
+Examples:
+
+* Database Connection
+* Logger
+* Configuration Manager
+* Cache Manager
+* Printer Spooler
+
+Instead of creating multiple objects, we create **one object** and reuse it.
+
+---
+
+## Real-Life Example
+
+Think of the **Principal of a School**.
+
+* There is only **one Principal**.
+* Every teacher or student who needs the Principal refers to the same person.
+* No one creates a new Principal whenever needed.
+
+Similarly, in Java, everyone accesses the **same Singleton object**.
+
+---
+
+# Singleton with Database Connection
+
+Suppose we have multiple DAO classes:
+
+```text
+EmployeeDAO
+StudentDAO
+DepartmentDAO
+ProductDAO
+```
+
+If every DAO creates its own database connection:
+
+```java
+Connection con = DriverManager.getConnection(...);
+```
+
+then multiple connections are created unnecessarily.
+
+Instead, we create one `DbConnection` object and allow all DAOs to use it.
+
+```text
+                 DbConnection (Singleton)
+                          │
+         ┌────────────────┼────────────────┐
+         │                │                │
+   EmployeeDAO      StudentDAO      DepartmentDAO
+```
+
+---
+
+# Types of Singleton
+
+There are two common ways to create a Singleton:
+
+1. Eager Initialization
+2. Lazy Initialization
+
+---
+
+# 1. Eager Initialization
+
+The object is created **when the class is loaded**, even if it is never used.
+
+## Steps
+
+### Step 1: Make the constructor private
+
+```java
+private DbConnection() {
+}
+```
+
+This prevents object creation using `new`.
+
+```java
+DbConnection db = new DbConnection(); // Not Allowed
+```
+
+---
+
+### Step 2: Create a static object
+
+```java
+private static DbConnection instance = new DbConnection();
+```
+
+Since it is `static`, it is created only once when the class is loaded.
+
+---
+
+### Step 3: Provide a public method
+
+```java
+public static DbConnection getInstance() {
+    return instance;
+}
+```
+
+Everyone accesses the same object using this method.
+
+---
+
+## Complete Example
+
+```java
+public class DbConnection {
+
+    private static DbConnection instance = new DbConnection();
+
+    private DbConnection() {
+    }
+
+    public static DbConnection getInstance() {
+        return instance;
+    }
+}
+```
+
+Usage
+
+```java
+DbConnection db = DbConnection.getInstance();
+```
+
+---
+
+## Advantages
+
+* Very simple.
+* Thread-safe by default.
+* Object is always available.
+
+## Disadvantages
+
+* Object is created even if never used.
+* May waste memory for expensive objects.
+
+---
+
+# 2. Lazy Initialization
+
+The object is created **only when it is needed for the first time**.
+
+---
+
+### Step 1: Private constructor
+
+```java
+private DbConnection() {
+}
+```
+
+---
+
+### Step 2: Static object (initially null)
+
+```java
+private static DbConnection instance;
+```
+
+Initially, no object exists.
+
+---
+
+### Step 3: Create object only if needed
+
+```java
+public static DbConnection getInstance() {
+
+    if(instance == null) {
+        instance = new DbConnection();
+    }
+
+    return instance;
+}
+```
+
+---
+
+## Complete Example
+
+```java
+public class DbConnection {
+
+    private static DbConnection instance;
+
+    private DbConnection() {
+    }
+
+    public static DbConnection getInstance() {
+
+        if(instance == null) {
+            instance = new DbConnection();
+        }
+
+        return instance;
+    }
+}
+```
+
+Usage
+
+```java
+DbConnection db = DbConnection.getInstance();
+```
+
+---
+
+## Advantages
+
+* Object is created only when required.
+* Saves memory.
+
+## Disadvantages
+
+* Basic implementation is not thread-safe.
+* Needs synchronization or other techniques in multithreaded applications.
+
+---
+
+# Applying Singleton to Database Connection
+
+Our goal is not just to create one `DbConnection` object, but also to use it to manage a single `Connection` for this demo application.
+
+```java
+public class DbConnection {
+
+    private static DbConnection instance;
+    private Connection connection;
+
+    private DbConnection() throws SQLException {
+        connection = DriverManager.getConnection(
+                DbUtils.URL,
+                DbUtils.USERNAME,
+                DbUtils.PASSWORD);
+    }
+
+    public static DbConnection getInstance() throws SQLException {
+
+        if(instance == null) {
+            instance = new DbConnection();
+        }
+
+        return instance;
+    }
+
+    public Connection getConnection() {
+        return connection;
+    }
+}
+```
+
+Usage
+
+```java
+Connection con = DbConnection.getInstance().getConnection();
+```
+
+---
+
+# Steps to Create a Singleton Class
+
+1. Declare the class.
+2. Make the constructor `private` to prevent object creation using `new`.
+3. Create a `private static` variable of the same class.
+4. Create a `public static getInstance()` method.
+5. Create the object only once (eager or lazy initialization).
+6. Return the same object whenever `getInstance()` is called.
+
+---
+
+# Eager vs Lazy Initialization
+
+| Feature         | Eager Initialization        | Lazy Initialization           |
+| --------------- | --------------------------- | ----------------------------- |
+| Object Creation | At class loading            | On first use                  |
+| Memory Usage    | Higher                      | Lower                         |
+| Performance     | Faster access after loading | Slight overhead on first call |
+| Thread Safety   | Yes                         | No (basic implementation)     |
+| Suitable For    | Object always needed        | Object may not be needed      |
+
+---
+
+# Interview Questions
+
+Q1. What is the Singleton Design Pattern?**
+A design pattern that ensures only one object of a class exists and provides a global access point to it.
+
+Q2. Why Make the constructor `private`
+
+To prevent other classes from creating objects using the `new` keyword. This ensures that object creation is controlled entirely by the Singleton class.
+
+Q3. Why Create a `private static` variable of the same class
+
+To store the single instance of the class. The `static` keyword ensures that only one copy of this variable exists for the entire application, while `private` prevents direct access from outside the class.
+
+```java
+private static DbConnection instance;
+```
+
+Q4. Why Create a `public static getInstance()` method
+
+Since the constructor is private, objects cannot be created using `new`. The `getInstance()` method provides a global access point to obtain the Singleton object. It is `static` so it can be called without creating an object.
+
+```java
+DbConnection db = DbConnection.getInstance();
+```
+Q5. Why Create the object only once (eager or lazy initialization)
+
+The main objective of the Singleton pattern is to ensure that only one instance of the class exists throughout the application's lifetime. Whether the object is created when the class is loaded (eager) or when it is first requested (lazy), it must be created only once.
+
+Q6. Why Return the same object whenever `getInstance()` is called
+e that every part of the application uses the same object instead of creating new ones. This guarantees consistency and fulfills the core principle of the Singleton pattern: **one class, one object**.
+
+Q7. What is the difference between Eager and Lazy Initialization?**
+Eager creates the object when the class is loaded, while Lazy creates it only when it is first requested.
+
+---
+
+> **Note for this JDBC project:** "We're using DbConnection to demonstrate the Singleton pattern. In this small console application, it doesn't provide a significant advantage over a simple utility class. In real applications, database connections are usually managed by a connection pool rather than by a Singleton."
+
+---

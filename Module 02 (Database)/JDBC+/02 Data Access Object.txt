@@ -1,0 +1,256 @@
+
+
+# DAO (Data Access Object) Design Pattern
+
+## What is DAO?
+
+The DAO (Data Access Object) Pattern is a design pattern that separates the database access logic from the business logic of an application.
+
+Instead of writing SQL queries throughout the application, all database operations are placed inside dedicated DAO classes.
+
+This is known as the principle of Separation of Concerns
+
+---
+
+## DAO Layer
+
+- The classes and files carrying out database transactions form the DAO Layer
+- A layer is nothing but a group of classes/interfaces for a specific task
+
+---
+
+How to create a DAO Layer?
+==========================
+1. Create a separate package for DAO classes/interfaces (jdbc.demo.dao)
+2. Create a separate package for entity class (jdbc.demo.entities)
+3. Create an interface dao that contains the functionality
+4. Create an implementation class of the interface
+
+---
+
+## Why do we need DAO?
+
+Without DAO:
+
+* SQL queries are scattered across multiple classes.
+* Business logic and database code become tightly coupled.
+* Code becomes difficult to maintain and reuse.
+
+With DAO:
+
+* All database operations are centralized.
+* Business logic remains independent of the database.
+* Code is cleaner, modular, and easier to maintain.
+
+---
+
+## Real-Life Example
+
+Consider a library management system.
+
+Instead of every class directly querying the database:
+
+```java
+SELECT * FROM books;
+```
+
+we create a `BookDAO` class.
+
+```text
+   Library
+     │
+     ▼
+  BookDAO
+     │
+     ▼
+  Database
+```
+
+Whenever the application needs book data, it simply calls:
+
+```java
+bookDAO.getAllBooks();
+```
+
+The application does not know or care how the SQL query is written.
+
+---
+
+# DAO Architecture
+
+```text
+Main / Service
+      │
+      ▼
+StudentDAO
+      │
+      ▼
+StudentDAOImpl
+      │
+      ▼
+DbConnection
+      │
+      ▼
+PostgreSQL Database
+```
+
+---
+
+# Components of the DAO Pattern
+
+### 1. Entity (Model)
+
+Represents a database table.
+
+Example:
+
+```java
+Student
+```
+
+---
+
+### 2. DAO Interface
+
+Defines what operations can be performed.
+
+Example:
+
+```java
+public interface StudentDAO {
+
+    void addStudent(Student student);
+
+    Student getStudentById(int id);
+
+    List<Student> getAllStudents();
+
+    void updateStudent(Student student);
+
+    void deleteStudent(int id);
+}
+```
+
+---
+
+### 3. DAO Implementation
+
+Implements the interface and contains the JDBC code and SQL queries.
+
+```java
+public class StudentDAOImpl implements StudentDAO {
+    // JDBC Code
+}
+```
+
+---
+
+### 4. Database Utility
+
+Provides the database connection.
+
+```java
+DbConnection
+```
+
+---
+
+### 5. Client
+
+Uses the DAO to perform database operations.
+
+```java
+StudentDAO dao = new StudentDAOImpl();
+dao.addStudent(student);
+```
+
+---
+
+# Advantages of DAO
+
+* Separates business logic from database logic.
+* Centralizes SQL queries.
+* Improves code readability.
+* Makes maintenance easier.
+* Promotes code reusability.
+
+---
+
+# Project Structure
+
+```text
+entity
+    Student.java
+
+dao
+    StudentDAO.java
+    StudentDAOImpl.java
+
+util
+    DbConnection.java
+
+Main.java
+```
+
+---
+
+# Flow of Execution
+
+```text
+Main
+ │
+ ▼
+StudentDAO
+ │
+ ▼
+StudentDAOImpl
+ │
+ ▼
+DbConnection
+ │
+ ▼
+PostgreSQL
+```
+
+---
+
+# Why do we create an Interface?
+
+The interface defines what operations are available, while the implementation defines how they are performed.
+
+This allows us to change the implementation later without affecting the rest of the application.
+
+Example:
+
+```text
+StudentDAO
+      │
+      ├── StudentDAOImpl (JDBC)
+      ├── StudentHibernateDAO (Hibernate)
+      └── StudentJpaDAO (JPA)
+```
+
+The application continues to use:
+
+```java
+StudentDAO dao = ...;
+```
+
+regardless of the underlying technology.
+
+---
+
+# Interview Questions
+
+Q1. What is the DAO Pattern?
+A design pattern that separates database access logic from business logic by placing all database operations in dedicated DAO classes.
+
+Q2. Why do we use DAO?
+To centralize database operations, improve maintainability, and separate concerns.
+
+Q3. What is the difference between a DAO Interface and a DAO Implementation?
+The interface defines what operations are available, while the implementation defines how those operations are performed using JDBC.
+
+This version is concise enough for a 20–30 minute classroom discussion while still covering everything students need before you start coding.
+
+---
