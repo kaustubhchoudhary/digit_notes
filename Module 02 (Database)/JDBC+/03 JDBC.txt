@@ -30,23 +30,23 @@ JDBC Data Types
 * The JDBC driver automatically converts Java data types to the corresponding PostgreSQL data types and vice versa.
 * The following are some commonly used PostgreSQL data types and their corresponding Java types.
 
-| PostgreSQL Data Type  | Java Data Type                         |
-| --------------------- | -------------------------------------- |
-| `VARCHAR`             | `String`                               |
-| `CHAR`                | `String`                               |
-| `TEXT`                | `String`                               |
-| `INTEGER`             | `int` / `Integer`                      |
-| `BIGINT`              | `long` / `Long`                        |
-| `SMALLINT`            | `short` / `Short`                      |
-| `REAL`                | `float` / `Float`                      |
-| `DOUBLE PRECISION`    | `double` / `Double`                    |
-| `NUMERIC` / `DECIMAL` | `java.math.BigDecimal` *(Recommended)* |
-| `BOOLEAN`             | `boolean` / `Boolean`                  |
-| `DATE`                | `java.sql.Date`                        |
-| `TIME`                | `java.sql.Time`                        |
-| `TIMESTAMP`           | `java.sql.Timestamp`                   |
-| `BYTEA`               | `byte[]`                               |
-| `UUID`                | `java.util.UUID`                       |
+| Java Data Type        | PostgreSQL Data Type            | Example                         |
+| --------------------- | ------------------------------- | ------------------------------- |
+| `String`              | `VARCHAR(n)`                    | `"John"`                        |
+| `String`              | `CHAR(n)`                       | `"M"`                           |
+| `String`              | `TEXT`                          | `"This is a long description."` |
+| `int` / `Integer`     | `INTEGER`                       | `101`                           |
+| `long` / `Long`       | `BIGINT`                        | `1234567890L`                   |
+| `float` / `Float`     | `REAL`                          | `45.5f`                         |
+| `double` / `Double`   | `DOUBLE PRECISION`              | `99.95`                         |
+| `BigDecimal`          | `NUMERIC(p,s)` / `DECIMAL(p,s)` | `12500.75`                      |
+| `boolean` / `Boolean` | `BOOLEAN`                       | `true`                          |
+| `java.sql.Date`       | `DATE`                          | `2026-08-04`                    |
+| `java.sql.Time`       | `TIME`                          | `10:30:00`                      |
+| `java.sql.Timestamp`  | `TIMESTAMP`                     | `2026-08-04 10:30:00`           |
+| `byte[]`              | `BYTEA`                         | Binary data                     |
+| `String[]`            | `TEXT[]`                        | `{"Java","SQL","Spring"}`       |
+
 
 ### Note
 
@@ -130,7 +130,7 @@ CREATE SCHEMA IF NOT EXISTS training;
 
 ```sql
 CREATE TABLE IF NOT EXISTS training.students (
-    id SERIAL PRIMARY KEY,
+    id GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     name VARCHAR(50) NOT NULL,
     course_fee NUMERIC(10,2),
     is_enrolled BOOLEAN,
@@ -156,12 +156,7 @@ VALUES
 
 ```sql
 UPDATE training.students
-SET
-    name = ?,
-    course_fee = ?,
-    is_enrolled = ?,
-    date_of_joining = ?,
-    skills = ?
+SET name = ?, course_fee = ?, is_enrolled = ?, date_of_joining = ?, skills = ?
 WHERE id = ?;
 ```
 
