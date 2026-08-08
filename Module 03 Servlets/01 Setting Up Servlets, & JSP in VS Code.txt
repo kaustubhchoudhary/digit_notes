@@ -1,0 +1,308 @@
+
+# Setting Up Servlets, JSP & JDBC in VS Code
+
+## Prerequisites
+
+* JDK 21 installed
+* Apache Maven installed
+* Apache Tomcat installed
+* VS Code installed
+
+---
+
+# Required VS Code Extensions
+
+Install the following extensions:
+
+* Extension Pack for Java
+* Language Support for Java
+* Debugger for Java
+* Maven for Java
+* Project Manager for Java
+* Community Server Connectors
+
+---
+
+# Step 1: Create a Maven Web Project
+
+1. Press **Ctrl + Shift + P**
+2. Select:
+
+```text
+Java: Create Java Project
+```
+
+3. Choose:
+
+```text
+Maven
+```
+
+4. Select the archetype:
+
+```text
+org.apache.maven.archetypes:maven-archetype-webapp
+```
+
+5. Enter:
+
+```text
+Group Id     : servlets_jsp.demo
+Artifact Id  : ServletJSPDemo
+```
+
+The project is created with **WAR** packaging.
+
+---
+
+# Step 2: Project Structure
+
+The generated project contains:
+
+```text
+ServletJSPDemo
+│
+├── pom.xml
+│
+├── src
+│   └── main
+│       └── webapp
+│           └── WEB-INF
+│               └── web.xml
+│
+└── target
+```
+
+Create the following manually:
+
+```text
+src
+└── main
+    ├── java
+    │   └── web
+    │       └── app
+    │           └── servlet
+    │
+    └── webapp
+        └── index.jsp
+```
+
+Final structure:
+
+```text
+ServletJSPDemo
+│
+├── pom.xml
+│
+├── src
+│   └── main
+│       ├── java
+│       │   └── com
+│       │       └── servlet
+│       │           └── jsp
+│       │                └── demo
+│       │                  └── HelloServlet.java
+│       │
+│       └── webapp
+│           ├── index.jsp
+│           └── WEB-INF
+│               └── web.xml
+│
+└── target
+```
+
+---
+
+# Step 3: Add Required Dependencies
+
+### Servlet API
+
+```xml
+<dependency>
+    <groupId>jakarta.servlet</groupId>
+    <artifactId>jakarta.servlet-api</artifactId>
+    <version>6.0.0</version>
+    <scope>provided</scope>
+</dependency>
+```
+
+### PostgreSQL JDBC Driver
+
+```xml
+<dependency>
+    <groupId>org.postgresql</groupId>
+    <artifactId>postgresql</artifactId>
+    <version>42.7.7</version>
+</dependency>
+```
+
+---
+
+# Why is `jakarta.servlet-api` Required?
+
+Tomcat provides the Servlet API **at runtime**.
+
+The dependency is required so that:
+
+* Maven can compile the project.
+* VS Code recognizes classes like `HttpServlet`.
+* IntelliSense works correctly.
+
+The dependency is marked as:
+
+```xml
+<scope>provided</scope>
+```
+
+because Tomcat already provides the implementation at runtime.
+
+---
+
+# Step 4: Change Maven Compiler
+
+<properties>
+	<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+	<maven.compiler.source>21</maven.compiler.source>
+	<maven.compiler.target>21</maven.compiler.target>
+</properties>
+
+---
+
+# Step 5: Configure Tomcat in VS Code
+
+1. Install:
+
+```text
+Community Server Connectors
+```
+
+2. Press:
+
+```text
+Ctrl + Shift + P
+```
+
+3. Execute:
+
+```text
+Explorers: Focus on Servers View
+```
+
+4. The **Servers** view appears.
+
+5. Click:
+
+```text
+Create New Server icon
+```
+
+6. Choose:
+
+```text
+No, use Server in disk
+```
+
+7. Select the Tomcat installation folder.
+
+Example:
+
+```text
+C:\apache-tomcat-10.1.43
+```
+
+Do **not** select the `bin` folder.
+
+8. Leave these fields blank (optional):
+
+```text
+server.base.dir
+vm.install.path
+```
+
+9. Click **Finish**.
+
+Tomcat should now appear under the **Servers** view.
+
+---
+
+# Creating a Servlet
+
+Create a package:
+
+```text
+web.app.servlet
+```
+
+Create:
+
+```text
+HelloServlet.java
+```
+
+---
+
+# Creating a JSP
+
+Inside:
+
+```text
+src/main/webapp
+```
+
+Create:
+
+```text
+index.jsp
+```
+
+A JSP is simply a file having the `.jsp` extension.
+
+---
+
+# Why Use Maven?
+
+Maven automatically:
+
+* Manages dependencies
+* Downloads required libraries
+* Builds the project
+* Creates the WAR file
+
+Build the project using:
+
+```bash
+mvn clean package
+```
+
+The generated WAR is placed inside:
+
+```text
+target/
+```
+
+---
+
+# Technologies Used
+
+* VS Code
+* Maven
+* Apache Tomcat
+* Servlets
+* JSP
+* PostgreSQL
+* JDBC
+* JDK 21
+
+---
+
+## Next Topics
+
+* Writing the first Servlet
+* Using `@WebServlet`
+* Understanding `HttpServletRequest` and `HttpServletResponse`
+* Deploying the application on Tomcat
+* Forms and request parameters
+* Servlet → JSP communication using `RequestDispatcher`
+* Connecting Servlets with PostgreSQL using JDBC
+
+---

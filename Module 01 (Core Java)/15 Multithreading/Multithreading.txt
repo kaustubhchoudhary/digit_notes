@@ -99,6 +99,7 @@ Example:
 | Scalability    | Handle multiple users/tasks |
 
 -----X-----X-----
+
 Features:
 - Threads are independent, i.e. if there occurs exception in one thread, it doesn't affect other threads. 
 - All the threads within a process share a common memory area.

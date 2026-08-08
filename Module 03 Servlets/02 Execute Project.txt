@@ -1,0 +1,290 @@
+
+Execute Project
+===============
+
+# Step 1: Create Your First Servlet
+
+Inside:
+
+```text
+src
+└── main
+    └── java
+        └── com
+            └── servlet
+                └── jsp
+                    └── demo
+```
+
+Create:
+
+```text
+HelloServlet.java
+```
+
+```java
+package com.servlet.jsp.demo;
+
+import java.io.IOException;
+import java.io.PrintWriter;
+
+import jakarta.servlet.ServletException;
+import jakarta.servlet.annotation.WebServlet;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+
+@WebServlet("/hello")
+public class HelloServlet extends HttpServlet {
+
+    @Override
+    protected void doGet(HttpServletRequest request,
+                         HttpServletResponse response)
+            throws ServletException, IOException {
+
+        response.setContentType("text/html");
+
+        PrintWriter out = response.getWriter();
+
+        out.println("<h1>Hello from Servlet!</h1>");
+    }
+
+}
+```
+
+Notice that there is **no need to edit `web.xml`** because we're using the `@WebServlet` annotation.
+
+---
+
+# Step 2: Create the Home JSP
+
+Inside
+
+```text
+src/main/webapp
+```
+
+Create
+
+```text
+index.jsp
+```
+
+```jsp
+<!DOCTYPE html>
+
+<html>
+
+<head>
+    <title>Servlet Demo</title>
+</head>
+
+<body>
+
+    <h1>Servlet & JSP Demo</h1>
+
+    <a href="hello">Open Hello Servlet</a>
+
+</body>
+
+</html>
+```
+
+---
+
+# Step 3: Build the WAR
+
+Open the VS Code terminal.
+
+Run
+
+```bash
+mvn clean package
+```
+
+If everything is correct, Maven prints
+
+```text
+BUILD SUCCESS
+```
+
+A new folder is created:
+
+```text
+target
+│
+├── ServletJSPDemo
+├── ServletJSPDemo.war
+```
+
+The WAR file is what Tomcat deploys.
+
+---
+
+# Step 4: Deploy the WAR to Tomcat
+
+There are **two ways**.
+
+## Method 1 (Recommended for Beginners)
+
+Simply copy
+
+```text
+target/ServletJSPDemo.war
+```
+
+to
+
+```text
+D:\apache-tomcat-10.1.52\webapps
+```
+
+Tomcat automatically extracts it as
+
+```text
+webapps
+│
+├── ServletJSPDemo
+├── ServletJSPDemo.war
+```
+
+This is how Tomcat is commonly demonstrated in tutorials and makes it easy to understand what deployment means.
+
+---
+
+## Method 2 (Using VS Code)
+
+If your Tomcat appears in the **Servers** view:
+
+1. Right-click **Apache Tomcat**.
+2. Choose **Add Deployment** (or **Deploy**, depending on the extension version).
+3. Select your Maven project.
+4. The extension copies the WAR into Tomcat's `webapps` folder automatically.
+
+---
+
+# Step 5: Start Tomcat
+
+### Option 1 (VS Code)
+
+In the **Servers** view:
+
+```text
+Apache Tomcat
+    Right Click
+        Start
+```
+
+---
+
+### Option 2 (Recommended for Learning)
+
+Open
+
+```text
+D:\apache-tomcat-10.1.52\bin
+```
+
+Run
+
+```text
+startup.bat
+```
+
+or, even better,
+
+```text
+catalina.bat run
+```
+
+`catalina.bat run` keeps the console open so you can immediately see deployment errors or exceptions.
+
+You should see
+
+```text
+INFO: Server startup in xxxx ms
+```
+
+---
+
+# Step 6: Open the Application
+
+If your artifactId is
+
+```xml
+<artifactId>ServletJSPDemo</artifactId>
+```
+
+then open:
+
+Home page
+
+```text
+http://localhost:8080/ServletJSPDemo/
+```
+
+or
+
+```text
+http://localhost:8080/ServletJSPDemo/index.jsp
+```
+
+Servlet
+
+```text
+http://localhost:8080/ServletJSPDemo/hello
+```
+
+Expected output:
+
+```text
+Hello from Servlet!
+```
+
+---
+
+# Step 7: Make a Change
+
+Suppose you change
+
+```java
+out.println("<h1>Welcome Students!</h1>");
+```
+
+Then rebuild:
+
+```bash
+mvn clean package
+```
+
+Replace the old WAR in `webapps` with the new one (or redeploy via VS Code), then restart Tomcat or use the Tomcat Manager/redeployment mechanism. Refresh the browser to see the updated output.
+
+---
+
+# Complete Development Cycle
+
+```text
+Write Servlet/JSP
+        │
+        ▼
+mvn clean package
+        │
+        ▼
+ServletJSPDemo.war
+        │
+        ▼
+Copy WAR to Tomcat\webapps
+        │
+        ▼
+Start Tomcat
+        │
+        ▼
+Open Browser
+        │
+        ▼
+http://localhost:8080/ServletJSPDemo/
+```
+
+This is the fundamental deployment workflow you'll use before moving on to more advanced topics like request handling, JSP forwarding, JDBC integration, and eventually Spring Boot.
+
+---

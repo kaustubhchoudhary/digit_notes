@@ -1,0 +1,223 @@
+
+# Section 1 - Project Guidelines (Applicable to Every Team)
+
+## 1. Technology Stack
+
+The project must be developed using the following technologies:
+
+* Java 21+
+* Spring Boot
+* Spring Data JPA (Hibernate)
+* Spring Security
+* Spring AOP
+* Spring Actuator
+* PostgreSQL
+* Maven
+* Git & BitBucket
+* Postman
+* Swagger/OpenAPI
+
+---
+
+## 2. Architecture Guidelines
+
+Projects must follow a clean layered architecture.
+
+```
+    Security
+	    ↓
+    Controller
+        ↓
+      Service
+        ↓
+    Repository
+        ↓
+    PostgreSQL
+```
+
+The following standards must be followed:
+
+* Layered Architecture
+* DTO-based communication
+* Entities must never be exposed directly through APIs
+* Global Exception Handling
+* Constructor Injection should be used in most cases
+* Proper package structure
+* Externalized configuration (`application.properties` / `application.yml`)
+* Follow REST API naming conventions
+
+---
+
+## 3. Database Design Guidelines
+
+The database should be properly designed before implementation.
+
+Requirements:
+
+* Database normalized up to **Third Normal Form (3NF)**
+* Proper Primary Keys
+* Proper Foreign Keys
+* Appropriate Constraints
+* Meaningful table and column names
+* Indexes wherever required
+* Seed data (Master Data) wherever applicable
+
+---
+
+## 4. Security Guidelines
+
+Projects should implement secure access to the application.
+
+Minimum expectations:
+
+* Authentication
+* Role-Based Authorization
+* Password Encryption
+* Protected APIs
+* Public APIs wherever applicable
+* Proper handling of Unauthorized and Forbidden requests
+
+---
+
+## 5. Functional Expectations
+
+Every project should provide:
+
+* Complete business workflow implementation
+* Search functionality
+* Pagination
+* Sorting
+* Filtering
+* Soft Delete (where applicable)
+* File Upload (where applicable)
+* Audit fields (`createdBy`, `createdDate`, `modifiedBy`, `modifiedDate`)
+* Meaningful reports/dashboard APIs
+
+---
+
+## 6. Concurrency & Transaction Management
+
+Each project must identify **at least two critical business scenarios** where concurrent requests can lead to inconsistent data.
+
+trainees should:
+
+* Identify the Race Condition
+* Explain the business impact
+* Implement an appropriate solution
+* Demonstrate the solution
+
+Possible approaches include:
+
+* `synchronized`
+* Optimistic Locking
+* Pessimistic Locking
+* Appropriate Transaction Management
+
+---
+
+## 7. Logging & Monitoring
+
+Projects should include:
+
+* Logging using SLF4J
+* AOP-based logging
+* Exception logging
+* Spring Actuator
+* Custom Health Indicator
+
+---
+
+## 8. Version Control
+
+The project must be maintained using Git and BitBucket.
+
+Each team should:
+
+* Use meaningful commit messages
+* Work using feature branches
+* Merge into `develop`
+* Final merge into `main`
+* Ensure every member contributes commits
+
+---
+
+## 9. Documentation
+
+Each team must submit:
+
+* ER Diagram
+* Database Schema
+* Role-Permission Matrix
+* API Documentation (Swagger/OpenAPI)
+* Postman Collection
+* README
+* Project Architecture Diagram
+
+---
+
+## 10. Business Rules Document
+
+Before coding begins, each team should prepare a document listing the business rules implemented in the project.
+
+Examples:
+
+* A customer cannot have more than one active insurance policy of the same type.
+* A passenger cannot book more seats than available.
+* A tenant cannot rent an already occupied property.
+
+Aim for **20–30 business rules**.
+
+---
+
+## 11. Project Planning
+
+Before implementation, each team should submit:
+
+* List of Modules
+* List of Roles
+* Database Tables
+* Major Workflows
+* Team Member Responsibilities
+
+This will prevent you from jumping directly into coding.
+
+---
+
+## 12. Coding Standards
+
+Projects should follow clean coding practices.
+
+* Meaningful class names
+* Meaningful method names
+* Proper variable names
+* Avoid duplicate code
+* Proper exception handling
+* Consistent code formatting
+
+---
+
+## Sequence of operation
+
+1. Finalize Modules
+2. Finalize Roles
+3. Finalize Business Rules
+4. Design Database (ER Diagram)
+5. Define REST APIs
+6. Create BitBucket Repository
+7. Start Development
+
+---
+
+##In a Nutshell
+
+At least 4+ user roles (more if the business domain naturally requires them).
+Around 15+ database tables.
+Multiple business modules with well-defined interactions.
+At least 2 critical business workflows involving approvals or state transitions.
+At least 2 concurrency (Race Condition) scenarios with appropriate handling.
+Around 50–70 REST APIs.
+At least 20–30 documented business rules.
+Search, filtering, sorting, and pagination wherever applicable.
+Reports and dashboard APIs relevant to the business domain.
+
+---
